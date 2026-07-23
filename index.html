@@ -4,626 +4,1032 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Parallel Hearts</title>
-<meta name="description" content="A digital home for Rashmi and Sharath">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --midnight:#0a0a14;--deep:#0f0f1e;--surface:rgba(255,255,255,0.03);
-  --surface-hover:rgba(255,255,255,0.06);--golden:#c8a855;--golden-dim:rgba(200,168,85,0.3);
-  --golden-glow:rgba(200,168,85,0.12);--warm:#f0e6d2;--text:#e8e0d4;
-  --text-secondary:rgba(240,230,210,0.45);--green:#4a7c59;--green-dim:rgba(74,124,89,0.25);
-  --brown:#3d2b1f;--glass:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.08);
-  --font:'Cormorant Garamond','Georgia',serif;--font-ui:'Inter',-apple-system,sans-serif
-}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--midnight);color:var(--text);font-family:var(--font-ui)}
-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none}
-#stars{z-index:0}
-#fireflies{z-index:3}
-::selection{background:var(--golden);color:var(--midnight)}
-
-/* ── Entrance ── */
-#entrance{position:fixed;inset:0;z-index:100;background:var(--midnight);display:flex;align-items:center;justify-content:center;transition:opacity 1.8s ease,visibility 1.8s}
-#entrance.hidden{opacity:0;visibility:hidden;pointer-events:none}
-.entrance-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,85,0.08) 0%,transparent 70%);animation:glowPulse 4s ease-in-out infinite}
-@keyframes glowPulse{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.15);opacity:1}}
-.entrance-content{text-align:center;position:relative;z-index:1}
-.entrance-content .names{display:flex;align-items:baseline;justify-content:center;gap:16px;margin-bottom:16px}
-.entrance-content .name{font-family:var(--font);font-size:clamp(36px,7vw,72px);font-weight:300;letter-spacing:0.02em;opacity:0;transform:translateY(20px);transition:opacity 1.2s ease,transform 1.2s ease}
-.entrance-content .name.show{opacity:1;transform:translateY(0)}
-.entrance-content .ampersand{font-family:var(--font);font-size:clamp(24px,4vw,40px);font-weight:300;color:var(--golden);opacity:0;transition:opacity 1s ease}
-.entrance-content .ampersand.show{opacity:0.7}
-.entrance-content .date{font-family:var(--font-ui);font-size:clamp(11px,1.5vw,14px);font-weight:300;color:var(--text-secondary);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:32px;opacity:0;transition:opacity 1.2s ease}
-.entrance-content .date.show{opacity:1}
-.entrance-content .quote{font-family:var(--font);font-size:clamp(16px,2.5vw,24px);font-style:italic;font-weight:300;color:var(--golden-dim);opacity:0;transition:opacity 1.5s ease;max-width:400px;margin:0 auto;line-height:1.6}
-.entrance-content .quote.show{opacity:1}
-.enter-btn{margin-top:48px;padding:12px 32px;border:1px solid var(--glass-border);border-radius:40px;background:var(--glass);color:var(--text-secondary);font-family:var(--font-ui);font-size:13px;font-weight:400;cursor:pointer;letter-spacing:0.08em;opacity:0;transition:all 0.6s ease;backdrop-filter:blur(20px)}
-.enter-btn.show{opacity:1}
-.enter-btn:hover{border-color:var(--golden-dim);color:var(--golden);background:rgba(200,168,85,0.06)}
-
-/* ── World ── */
-#world{position:fixed;inset:0;z-index:1;opacity:0;transition:opacity 2s ease 0.5s;overflow:hidden}
-#world.show{opacity:1}
-
-/* ── Moon ── */
-#moon{position:absolute;top:8%;right:12%;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#f5ecd7,#e8dcc0,#c8b896);box-shadow:0 0 40px rgba(200,168,85,0.2),0 0 80px rgba(200,168,85,0.1),0 0 120px rgba(200,168,85,0.05);animation:moonFloat 8s ease-in-out infinite}
-@keyframes moonFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.moon-crater{position:absolute;border-radius:50%;background:rgba(0,0,0,0.06)}
-
-/* ── Tree ── */
-#tree{position:absolute;bottom:12%;left:50%;transform:translateX(-50%);width:clamp(280px,40vw,420px);height:auto;z-index:2}
-#tree svg{width:100%;height:auto;filter:drop-shadow(0 0 30px rgba(74,124,89,0.15))}
-.tree-sway{animation:treeSway 6s ease-in-out infinite;transform-origin:bottom center}
-@keyframes treeSway{0%,100%{transform:rotate(0deg)}25%{transform:rotate(0.5deg)}75%{transform:rotate(-0.5deg)}}
-.leaf{animation:leafSway 3s ease-in-out infinite}
-@keyframes leafSway{0%,100%{transform:translate(0,0)}50%{transform:translate(2px,-1px)}}
-
-/* ── Ground ── */
-#ground{position:absolute;bottom:0;left:0;right:0;height:18%;background:linear-gradient(to top,#0a120d 0%,#0d1a12 40%,transparent 100%);z-index:1}
-.ground-detail{position:absolute;bottom:0;left:0;right:0;height:100%}
-
-/* ── Bench ── */
-#bench{position:absolute;bottom:14%;right:18%;z-index:2;width:clamp(100px,14vw,160px)}
-#bench svg{width:100%;height:auto;opacity:0.85}
-.presence{position:absolute;opacity:0;transition:opacity 1.5s ease}
-.presence.visible{opacity:1}
-.presence-mug{bottom:65%;left:10%}
-.presence-book{bottom:65%;right:10%}
-
-/* ── Flowers ── */
-.flower{position:absolute;z-index:2;opacity:0;transition:opacity 1s ease,transform 1s ease;transform:scale(0.5)}
-.flower.visible{opacity:0.8;transform:scale(1)}
-.flower svg{width:100%;height:auto}
-.flower-sway{animation:flowerSway 4s ease-in-out infinite}
-@keyframes flowerSway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
-
-/* ── Navigation ── */
-#mainNav{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:4px;padding:6px;border-radius:40px;background:rgba(15,15,30,0.7);backdrop-filter:blur(24px);border:1px solid var(--glass-border);opacity:0;transition:opacity 1s ease}
-#mainNav.show{opacity:1}
-.nav-btn{padding:10px 20px;border:none;border-radius:30px;background:transparent;color:var(--text-secondary);font-family:var(--font-ui);font-size:12px;font-weight:400;cursor:pointer;transition:all 0.4s ease;letter-spacing:0.04em;white-space:nowrap}
-.nav-btn:hover{color:var(--text);background:var(--glass)}
-.nav-btn.active{color:var(--golden);background:rgba(200,168,85,0.1)}
-.nav-btn svg{width:14px;height:14px;vertical-align:-2px;margin-right:4px;stroke:currentColor;fill:none;stroke-width:1.5}
-
-/* ── Letter Modal ── */
-#letterModal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(5,5,10,0.85);backdrop-filter:blur(12px);opacity:0;visibility:hidden;transition:opacity 0.5s ease,visibility 0.5s}
-#letterModal.open{opacity:1;visibility:visible}
-.letter-paper{width:min(480px,90vw);background:linear-gradient(135deg,rgba(30,28,24,0.95),rgba(25,23,20,0.98));border:1px solid var(--glass-border);border-radius:16px;padding:40px;position:relative;transform:translateY(20px);transition:transform 0.5s ease}
-#letterModal.open .letter-paper{transform:translateY(0)}
-.letter-paper::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--golden-dim),transparent);border-radius:16px 16px 0 0}
-.letter-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
-.letter-header h3{font-family:var(--font);font-size:22px;font-weight:400;color:var(--golden)}
-.letter-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.3s}
-.letter-close:hover{border-color:var(--golden-dim);color:var(--golden)}
-.letter-to{font-family:var(--font-ui);font-size:11px;color:var(--text-secondary);margin-bottom:16px;letter-spacing:0.06em}
-.letter-textarea{width:100%;min-height:200px;border:none;background:transparent;color:var(--text);font-family:var(--font);font-size:18px;line-height:1.8;resize:none;outline:none}
-.letter-textarea::placeholder{color:rgba(240,230,210,0.2);font-style:italic}
-.letter-footer{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--glass-border)}
-.letter-count{font-size:11px;color:var(--text-secondary);letter-spacing:0.04em}
-.letter-send{padding:10px 24px;border:1px solid var(--golden-dim);border-radius:30px;background:rgba(200,168,85,0.08);color:var(--golden);font-family:var(--font-ui);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.3s;letter-spacing:0.04em}
-.letter-send:hover{background:rgba(200,168,85,0.15);border-color:var(--golden)}
-.letter-sent{text-align:center;padding:40px 0}
-.letter-sent .check{font-size:48px;margin-bottom:16px;animation:checkPop 0.5s ease}
-@keyframes checkPop{0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
-.letter-sent p{font-family:var(--font);font-size:18px;color:var(--golden);font-style:italic}
-
-/* ── Constellation Modal ── */
-#constellationModal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(5,5,10,0.9);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity 0.5s ease,visibility 0.5s}
-#constellationModal.open{opacity:1;visibility:visible}
-.memory-card{width:min(420px,90vw);background:linear-gradient(135deg,rgba(30,28,24,0.95),rgba(25,23,20,0.98));border:1px solid var(--glass-border);border-radius:16px;padding:32px;position:relative;transform:scale(0.95);transition:transform 0.4s ease}
-#constellationModal.open .memory-card{transform:scale(1)}
-.memory-card .mem-date{font-size:11px;color:var(--golden);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px}
-.memory-card .mem-title{font-family:var(--font);font-size:24px;font-weight:400;margin-bottom:12px;line-height:1.3}
-.memory-card .mem-text{font-size:14px;color:var(--text-secondary);line-height:1.7}
-.memory-card .mem-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
-
-/* ── Info Overlay ── */
-#infoPanel{position:fixed;top:24px;left:24px;z-index:15;opacity:0;transition:opacity 1s ease}
-#infoPanel.show{opacity:1}
-.info-names{font-family:var(--font);font-size:clamp(20px,3vw,32px);font-weight:300;color:var(--warm);letter-spacing:0.02em}
-.info-sub{font-size:11px;color:var(--text-secondary);letter-spacing:0.06em;margin-top:4px}
-.info-time{position:fixed;top:24px;right:24px;z-index:15;font-size:11px;color:var(--text-secondary);letter-spacing:0.06em;opacity:0;transition:opacity 1s ease}
-.info-time.show{opacity:1}
-.info-time .city{display:block;text-align:right;margin-bottom:2px}
-.info-time .clock{font-family:var(--font);font-size:18px;color:var(--text);font-weight:300}
-
-/* ── Garden Info ── */
-#gardenInfo{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:15;text-align:center;opacity:0;transition:opacity 1s ease}
-#gardenInfo.show{opacity:1}
-.garden-label{font-family:var(--font);font-size:clamp(14px,2vw,18px);font-weight:300;color:var(--text-secondary);letter-spacing:0.04em}
-.garden-sublabel{font-size:11px;color:var(--text-secondary);opacity:0.5;margin-top:4px;letter-spacing:0.06em}
-
-/* ── Thinking of You ── */
-#thinkBtn{position:fixed;bottom:90px;right:32px;z-index:15;width:48px;height:48px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass);backdrop-filter:blur(20px);color:var(--golden);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all 0.4s ease;font-size:18px}
-#thinkBtn.show{opacity:0.7}
-#thinkBtn:hover{opacity:1;border-color:var(--golden-dim);transform:scale(1.1)}
-#thinkBtn.pulse{animation:thinkPulse 1s ease}
-@keyframes thinkPulse{0%{transform:scale(1)}30%{transform:scale(1.3);box-shadow:0 0 30px rgba(200,168,85,0.3)}100%{transform:scale(1)}}
-
-/* ── Responsive ── */
-@media(max-width:768px){
-  #tree{bottom:10%;width:260px}
-  #bench{bottom:12%;right:10%;width:100px}
-  #mainNav{bottom:20px;gap:2px;padding:4px}
-  .nav-btn{padding:8px 14px;font-size:11px}
-  .nav-btn span{display:none}
-  .nav-btn svg{margin-right:0}
-  #moon{width:40px;height:40px;top:10%;right:8%}
-  #infoPanel{top:16px;left:16px}
-  .info-time{top:16px;right:16px}
-  #thinkBtn{bottom:80px;right:20px;width:40px;height:40px}
-}
-@media(max-width:480px){
-  #tree{width:220px;bottom:8%}
-  #bench{width:80px;right:8%}
-  .entrance-content .names{flex-direction:column;gap:4px}
-}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;cursor:none}
+canvas{display:block;position:fixed;top:0;left:0;width:100%;height:100%}
+#cursor{position:fixed;width:12px;height:12px;border-radius:50%;border:1px solid rgba(200,168,85,0.4);pointer-events:none;z-index:100;transform:translate(-50%,-50%);transition:width 0.3s,height 0.3s,border-color 0.3s}
+#cursor.look{width:40px;height:40px;border-color:rgba(200,168,85,0.8)}
+#vignette{position:fixed;inset:0;pointer-events:none;z-index:2;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.7) 100%)}
+#load{position:fixed;inset:0;z-index:200;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 2s ease}
+#load.done{opacity:0;pointer-events:none}
+#load .bar{width:120px;height:1px;background:rgba(200,168,85,0.15);margin-top:24px;position:relative;overflow:hidden}
+#load .bar-fill{height:100%;background:rgba(200,168,85,0.6);width:0;transition:width 0.3s}
+#load .pct{font-size:11px;color:rgba(200,168,85,0.4);margin-top:8px;letter-spacing:0.15em;font-weight:300}
+#intro{position:fixed;inset:0;z-index:150;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 1.5s}
+#intro.show{opacity:1;pointer-events:auto}
+#intro.hide{opacity:0;pointer-events:none}
+.line{font-size:clamp(28px,5vw,56px);font-weight:200;color:rgba(240,230,210,0.9);letter-spacing:0.04em;opacity:0;transform:translateY(12px);transition:opacity 1.5s ease,transform 1.5s ease;text-align:center;line-height:1.3}
+.line.on{opacity:1;transform:translateY(0)}
+.line small{font-size:0.35em;letter-spacing:0.2em;text-transform:uppercase;color:rgba(200,168,85,0.5);display:block;margin-top:8px;font-weight:300}
+#enterPrompt{position:fixed;bottom:10vh;left:50%;transform:translateX(-50%);z-index:151;opacity:0;transition:opacity 2s;cursor:pointer}
+#enterPrompt.show{opacity:1}
+#enterPrompt span{font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(200,168,85,0.4);animation:breathe 3s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:0.3}50%{opacity:0.7}}
+#label{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:10;opacity:0;transition:opacity 1s;pointer-events:none;text-align:center}
+#label.show{opacity:1}
+#label .name{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(200,168,85,0.35);font-weight:300}
+#label .hint{font-size:10px;color:rgba(240,230,210,0.15);margin-top:6px;letter-spacing:0.15em;font-weight:300}
+#prompt{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;opacity:0;transition:opacity 1.5s;pointer-events:none;text-align:center}
+#prompt.show{opacity:1}
+#prompt p{font-size:clamp(14px,2vw,18px);font-weight:200;color:rgba(240,230,210,0.5);line-height:1.8;letter-spacing:0.02em;max-width:400px}
+#prompt .attr{font-size:11px;color:rgba(200,168,85,0.3);margin-top:12px;letter-spacing:0.15em;font-weight:300}
+#crosshair{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:4px;height:4px;border-radius:50%;background:rgba(200,168,85,0.25);z-index:10;pointer-events:none;opacity:0;transition:opacity 1s}
+#crosshair.show{opacity:1}
+#interactHint{position:fixed;bottom:25%;left:50%;transform:translateX(-50%);z-index:10;opacity:0;transition:opacity 0.8s;pointer-events:none}
+#interactHint.show{opacity:1}
+#interactHint span{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(200,168,85,0.4)}
 </style>
 </head>
 <body>
-
-<canvas id="stars"></canvas>
-<canvas id="fireflies"></canvas>
-
-<!-- Entrance -->
-<div id="entrance">
-  <div class="entrance-glow"></div>
-  <div class="entrance-content">
-    <div class="names">
-      <span class="name" id="nameR">Rashmi</span>
-      <span class="ampersand" id="amp">&amp;</span>
-      <span class="name" id="nameS">Sharath</span>
-    </div>
-    <div class="date" id="eDate">23 May 2025 · Coorg, Karnataka</div>
-    <div class="quote" id="eQuote">"God put us in each other's hands."</div>
-    <button class="enter-btn" id="enterBtn" onclick="enterWorld()">Enter our home</button>
-  </div>
+<div id="load"><div class="bar"><div class="bar-fill" id="loadBar"></div></div><div class="pct" id="loadPct">0</div></div>
+<div id="intro">
+  <div class="line" id="l1">Rashmi<small>&</small></div>
+  <div class="line" id="l2">Sharath</div>
+  <div class="line" id="l3" style="font-size:clamp(14px,2vw,20px);margin-top:32px;font-style:italic;color:rgba(200,168,85,0.5)">&ldquo;God put us in each each other&rsquo;s hands.&rdquo;</div>
 </div>
+<div id="enterPrompt"><span>click to enter</span></div>
+<div id="cursor"></div>
+<div id="vignette"></div>
+<div id="label"><div class="name">The Glasshouse</div><div class="hint">WASD to move &middot; mouse to look</div></div>
+<div id="prompt"><p id="promptText"></p><div class="attr" id="promptAttr"></div></div>
+<div id="crosshair"></div>
+<div id="interactHint"><span>look to discover</span></div>
 
-<!-- World -->
-<div id="world">
-  <div id="moon">
-    <div class="moon-crater" style="width:8px;height:8px;top:18px;left:20px"></div>
-    <div class="moon-crater" style="width:5px;height:5px;top:32px;left:35px"></div>
-    <div class="moon-crater" style="width:6px;height:6px;top:14px;left:38px"></div>
-  </div>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 
-  <div id="tree">
-    <svg viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="leafGlow" cx="50%" cy="40%"><stop offset="0%" stop-color="rgba(200,168,85,0.15)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
-        <filter id="softGlow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      </defs>
-      <g class="tree-sway">
-        <!-- Roots -->
-        <path d="M200,460 Q180,455 160,460 Q140,465 130,460" stroke="#2d1b0f" stroke-width="3" fill="none" opacity="0.4"/>
-        <path d="M200,460 Q220,455 240,460 Q260,465 270,460" stroke="#2d1b0f" stroke-width="3" fill="none" opacity="0.4"/>
-        <!-- Trunk -->
-        <path d="M192,460 C190,430 188,400 190,370 C192,340 195,310 198,280 C200,260 200,240 200,220" stroke="none" fill="#3d2b1f"/>
-        <path d="M208,460 C210,430 212,400 210,370 C208,340 205,310 202,280 C200,260 200,240 200,220" stroke="none" fill="#3d2b1f"/>
-        <path d="M192,460 C190,430 188,400 190,370 C192,340 195,310 198,280 C200,260 200,240 200,220 L200,220 C200,240 200,260 202,280 C205,310 208,340 210,370 C212,400 210,430 208,460 Z" fill="#3d2b1f"/>
-        <!-- Branches -->
-        <path d="M200,250 C180,235 155,225 130,220" stroke="#3d2b1f" stroke-width="7" fill="none" stroke-linecap="round"/>
-        <path d="M200,250 C220,232 250,222 275,218" stroke="#3d2b1f" stroke-width="7" fill="none" stroke-linecap="round"/>
-        <path d="M200,225 C175,210 145,200 115,195" stroke="#3d2b1f" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <path d="M200,225 C225,208 260,195 290,190" stroke="#3d2b1f" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <path d="M200,210 C185,195 165,180 145,165" stroke="#3d2b1f" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <path d="M200,210 C215,192 240,175 260,160" stroke="#3d2b1f" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <path d="M200,200 C195,180 185,160 175,140" stroke="#3d2b1f" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <path d="M200,200 C205,178 218,155 230,135" stroke="#3d2b1f" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <!-- Leaf clusters -->
-        <g filter="url(#softGlow)">
-          <ellipse cx="130" cy="215" rx="38" ry="28" fill="#4a7c59" opacity="0.75" class="leaf" style="animation-delay:0s"/>
-          <ellipse cx="105" cy="200" rx="32" ry="24" fill="#3a6c49" opacity="0.7" class="leaf" style="animation-delay:0.3s"/>
-          <ellipse cx="155" cy="195" rx="30" ry="22" fill="#5a8c69" opacity="0.65" class="leaf" style="animation-delay:0.6s"/>
-          <ellipse cx="275" cy="212" rx="40" ry="28" fill="#4a7c59" opacity="0.75" class="leaf" style="animation-delay:0.2s"/>
-          <ellipse cx="295" cy="198" rx="30" ry="22" fill="#3a6c49" opacity="0.7" class="leaf" style="animation-delay:0.5s"/>
-          <ellipse cx="255" cy="192" rx="28" ry="20" fill="#5a8c69" opacity="0.65" class="leaf" style="animation-delay:0.8s"/>
-          <ellipse cx="115" cy="190" rx="35" ry="25" fill="#4a7c59" opacity="0.7" class="leaf" style="animation-delay:0.4s"/>
-          <ellipse cx="90" cy="175" rx="28" ry="20" fill="#3a6c49" opacity="0.65" class="leaf" style="animation-delay:0.7s"/>
-          <ellipse cx="140" cy="172" rx="26" ry="18" fill="#5a8c69" opacity="0.6" class="leaf" style="animation-delay:1s"/>
-          <ellipse cx="290" cy="185" rx="34" ry="24" fill="#4a7c59" opacity="0.7" class="leaf" style="animation-delay:0.3s"/>
-          <ellipse cx="310" cy="172" rx="26" ry="18" fill="#3a6c49" opacity="0.65" class="leaf" style="animation-delay:0.6s"/>
-          <ellipse cx="265" cy="170" rx="24" ry="16" fill="#5a8c69" opacity="0.6" class="leaf" style="animation-delay:0.9s"/>
-          <ellipse cx="145" cy="160" rx="30" ry="22" fill="#4a7c59" opacity="0.7" class="leaf" style="animation-delay:0.2s"/>
-          <ellipse cx="260" cy="155" rx="32" ry="22" fill="#4a7c59" opacity="0.7" class="leaf" style="animation-delay:0.5s"/>
-          <ellipse cx="175" cy="135" rx="25" ry="18" fill="#5a8c69" opacity="0.65" class="leaf" style="animation-delay:0.8s"/>
-          <ellipse cx="230" cy="130" rx="28" ry="20" fill="#4a7c59" opacity="0.7" class="leaf" style="animation-delay:0.1s"/>
-          <ellipse cx="200" cy="155" rx="35" ry="26" fill="#3a6c49" opacity="0.6" class="leaf" style="animation-delay:0.4s"/>
-          <ellipse cx="200" cy="120" rx="30" ry="22" fill="#4a7c59" opacity="0.55" class="leaf" style="animation-delay:0.7s"/>
-        </g>
-        <!-- Golden highlights on leaves -->
-        <g opacity="0.4">
-          <circle cx="125" cy="210" r="4" fill="var(--golden)" class="leaf" style="animation-delay:1.2s"/>
-          <circle cx="280" cy="208" r="3" fill="var(--golden)" class="leaf" style="animation-delay:0.8s"/>
-          <circle cx="170" cy="145" r="3" fill="var(--golden)" class="leaf" style="animation-delay:1.5s"/>
-          <circle cx="235" cy="140" r="4" fill="var(--golden)" class="leaf" style="animation-delay:1.1s"/>
-          <circle cx="200" cy="125" r="3" fill="var(--golden)" class="leaf" style="animation-delay:0.5s"/>
-        </g>
-      </g>
-    </svg>
-  </div>
-
-  <div id="ground"></div>
-
-  <div id="bench">
-    <svg viewBox="0 0 160 80" xmlns="http://www.w3.org/2000/svg">
-      <!-- Bench legs -->
-      <rect x="20" y="50" width="6" height="30" rx="2" fill="#5a4030"/>
-      <rect x="134" y="50" width="6" height="30" rx="2" fill="#5a4030"/>
-      <!-- Bench seat -->
-      <rect x="10" y="44" width="140" height="10" rx="3" fill="#6b5040"/>
-      <rect x="10" y="44" width="140" height="3" rx="2" fill="#7a6050" opacity="0.5"/>
-      <!-- Bench back -->
-      <rect x="14" y="20" width="132" height="8" rx="2" fill="#5a4030"/>
-      <rect x="14" y="12" width="132" height="8" rx="2" fill="#5a4030"/>
-      <!-- Back supports -->
-      <rect x="18" y="20" width="4" height="24" rx="1" fill="#4a3525"/>
-      <rect x="138" y="20" width="4" height="24" rx="1" fill="#4a3525"/>
-    </svg>
-    <!-- Sharath's coffee mug -->
-    <div class="presence presence-mug" id="presenceMug">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="8" width="14" height="12" rx="2" fill="#6b5040" stroke="#8a7060" stroke-width="0.5"/>
-        <path d="M17,10 Q21,10 21,14 Q21,18 17,18" stroke="#8a7060" stroke-width="1" fill="none"/>
-        <path d="M7,7 Q8,4 9,7" stroke="rgba(200,168,85,0.3)" stroke-width="0.8" fill="none"/>
-        <path d="M10,6 Q11,3 12,6" stroke="rgba(200,168,85,0.2)" stroke-width="0.8" fill="none"/>
-      </svg>
-    </div>
-    <!-- Rashmi's book -->
-    <div class="presence presence-book" id="presenceBook">
-      <svg width="24" height="20" viewBox="0 0 24 20" fill="none">
-        <rect x="2" y="2" width="20" height="16" rx="1" fill="#8a7060" opacity="0.8"/>
-        <rect x="3" y="3" width="8" height="14" rx="0.5" fill="#a08a70"/>
-        <rect x="13" y="3" width="8" height="14" rx="0.5" fill="#a08a70"/>
-        <line x1="12" y1="3" x2="12" y2="17" stroke="#6b5040" stroke-width="0.5"/>
-      </svg>
-    </div>
-  </div>
-
-  <!-- Flowers placed around the garden -->
-  <div class="flower" id="f1" style="bottom:13%;left:28%;width:18px"><svg viewBox="0 0 20 30"><circle cx="10" cy="8" r="4" fill="#c8a855" opacity="0.7"/><circle cx="6" cy="10" r="3.5" fill="#d4a847" opacity="0.6"/><circle cx="14" cy="10" r="3.5" fill="#d4a847" opacity="0.6"/><circle cx="8" cy="14" r="3" fill="#c8a855" opacity="0.5"/><circle cx="12" cy="14" r="3" fill="#c8a855" opacity="0.5"/><line x1="10" y1="15" x2="10" y2="28" stroke="#4a7c59" stroke-width="1.5" class="flower-sway"/></svg></div>
-  <div class="flower" id="f2" style="bottom:12%;left:35%;width:14px"><svg viewBox="0 0 20 30"><circle cx="10" cy="8" r="3.5" fill="#e8d4a0" opacity="0.6"/><circle cx="6" cy="10" r="3" fill="#dfc07a" opacity="0.5"/><circle cx="14" cy="10" r="3" fill="#dfc07a" opacity="0.5"/><line x1="10" y1="13" x2="10" y2="28" stroke="#4a7c59" stroke-width="1.2" class="flower-sway" style="animation-delay:0.5s"/></svg></div>
-  <div class="flower" id="f3" style="bottom:14%;right:30%;width:16px"><svg viewBox="0 0 20 30"><circle cx="10" cy="8" r="4" fill="#c8a855" opacity="0.65"/><circle cx="6" cy="10" r="3" fill="#d4a847" opacity="0.55"/><circle cx="14" cy="10" r="3" fill="#d4a847" opacity="0.55"/><circle cx="10" cy="13" r="3" fill="#c8a855" opacity="0.45"/><line x1="10" y1="14" x2="10" y2="28" stroke="#4a7c59" stroke-width="1.5" class="flower-sway" style="animation-delay:1s"/></svg></div>
-  <div class="flower" id="f4" style="bottom:11%;left:42%;width:12px"><svg viewBox="0 0 20 30"><circle cx="10" cy="9" r="3" fill="#f0e6d2" opacity="0.5"/><circle cx="7" cy="11" r="2.5" fill="#e8d4a0" opacity="0.4"/><circle cx="13" cy="11" r="2.5" fill="#e8d4a0" opacity="0.4"/><line x1="10" y1="13" x2="10" y2="28" stroke="#4a7c59" stroke-width="1" class="flower-sway" style="animation-delay:1.5s"/></svg></div>
-  <div class="flower" id="f5" style="bottom:13%;right:22%;width:15px"><svg viewBox="0 0 20 30"><circle cx="10" cy="8" r="3.5" fill="#c8a855" opacity="0.6"/><circle cx="6" cy="10" r="3" fill="#dfc07a" opacity="0.5"/><circle cx="14" cy="10" r="3" fill="#dfc07a" opacity="0.5"/><line x1="10" y1="12" x2="10" y2="28" stroke="#4a7c59" stroke-width="1.2" class="flower-sway" style="animation-delay:0.8s"/></svg></div>
-</div>
-
-<!-- Info -->
-<div id="infoPanel">
-  <div class="info-names">Rashmi & Sharath</div>
-  <div class="info-sub">Our Garden</div>
-</div>
-<div class="info-time" id="infoTime">
-  <div class="city" id="cityLabel">Dublin</div>
-  <div class="clock" id="clockDisplay">--:--</div>
-</div>
-
-<!-- Garden Info -->
-<div id="gardenInfo">
-  <div class="garden-label">Our Garden</div>
-  <div class="garden-sublabel">A place that grows with love</div>
-</div>
-
-<!-- Thinking of You -->
-<button id="thinkBtn" onclick="thinkOfYou()" title="Thinking of you">&#9825;</button>
-
-<!-- Navigation -->
-<nav id="mainNav">
-  <button class="nav-btn active" onclick="switchSection('garden')"><svg viewBox="0 0 24 24"><path d="M12 22c4-4 8-7 8-12a8 8 0 0 0-16 0c0 5 4 8 8 12z"/></svg><span>Garden</span></button>
-  <button class="nav-btn" onclick="switchSection('letter')"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg><span>Letter</span></button>
-  <button class="nav-btn" onclick="switchSection('memories')"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>Stars</span></button>
-  <button class="nav-btn" onclick="switchSection('story')"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Story</span></button>
-</nav>
-
-<!-- Letter Modal -->
-<div id="letterModal">
-  <div class="letter-paper">
-    <div class="letter-header">
-      <h3>Write a Letter</h3>
-      <button class="letter-close" onclick="closeLetter()">&#10005;</button>
-    </div>
-    <div class="letter-to">To: <span id="letterRecipient">Sharath</span></div>
-    <div id="letterForm">
-      <textarea class="letter-textarea" id="letterText" placeholder="Write something from the heart..." maxlength="1500"></textarea>
-      <div class="letter-footer">
-        <span class="letter-count" id="letterCount">0 / 250 words</span>
-        <button class="letter-send" onclick="sendLetter()">Send with love</button>
-      </div>
-    </div>
-    <div id="letterSent" class="letter-sent" style="display:none">
-      <div class="check">&#10003;</div>
-      <p>Your letter has been sent with love.</p>
-    </div>
-  </div>
-</div>
-
-<!-- Constellation Modal -->
-<div id="constellationModal">
-  <div class="memory-card">
-    <button class="mem-close" onclick="closeConstellation()">&#10005;</button>
-    <div class="mem-date" id="memDate"></div>
-    <div class="mem-title" id="memTitle"></div>
-    <div class="mem-text" id="memText"></div>
-  </div>
-</div>
-
-<script>
-/* ═══════════════════════════════════════════════════════════
-   PARALLEL HEARTS — A Digital Home
-   ═══════════════════════════════════════════════════════════ */
-
-const STATE = {
-  entered: false,
-  section: 'garden',
-  letterRecipient: 'Sharath',
-  memories: [
-    { date:'23 May 2025', title:'The Day We Promised', text:'In the misty hills of Coorg, surrounded by family and the scent of coffee blossoms, we promised forever. The rain held back just long enough for us to say our vows.' },
-    { date:'2 January 2026', title:'The Goodbye That Wasn\'t', text:'Dublin airport. Two cups of chai and a thousand unspoken words. You held my hand and said "See you soon." Not goodbye. Never goodbye.' },
-    { date:'14 February 2026', title:'Apart But Never Alone', text:'Valentine\'s Day, 5,000 miles apart. You sent a voice note at midnight Dublin time. I listened to it six times before sleeping.' },
-    { date:'23 May 2026', title:'One Year', text:'One year of marriage. One year of choosing each other every day, across time zones and ocean waves. The tree in our garden grew another ring.' },
-    { date:'15 March 2026', title:'The Video Call Sunset', text:'We watched the sunset together over video — you from your window in Dublin, me from the balcony in Bangalore. Same sun. Two cities. One heart.' },
-  ]
+/* ═══════════════════════════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════════════════════════ */
+const S = {
+  loaded: false, introDone: false, started: false, locked: false,
+  move: {f:false,b:false,l:false,r:false},
+  vel: new THREE.Vector3(),
+  yaw: 0, pitch: 0,
+  mouseX: 0, mouseY: 0,
+  playerHeight: 1.7,
+  playerPos: new THREE.Vector3(0, 1.7, 8),
+  ray: new THREE.Raycaster(),
+  currentPrompt: null, promptTimer: 0,
+  time: 0, delta: 0,
+  fireflies: [], rain: [], leaves: [],
+  discovered: new Set()
 };
 
-/* ── Stars Canvas ── */
-const starsCanvas = document.getElementById('stars');
-const starsCtx = starsCanvas.getContext('2d');
-let stars = [];
+/* ═══════════════════════════════════════════════════════════════
+   THREE.JS CORE
+   ═══════════════════════════════════════════════════════════════ */
+const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.8;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.prepend(renderer.domElement);
 
-function initStars() {
-  starsCanvas.width = window.innerWidth;
-  starsCanvas.height = window.innerHeight;
-  stars = [];
-  const count = Math.floor((starsCanvas.width * starsCanvas.height) / 3000);
-  for (let i = 0; i < count; i++) {
-    stars.push({
-      x: Math.random() * starsCanvas.width,
-      y: Math.random() * starsCanvas.height * 0.7,
-      r: Math.random() * 1.5 + 0.3,
-      alpha: Math.random() * 0.8 + 0.2,
-      twinkleSpeed: Math.random() * 0.02 + 0.005,
-      twinkleOffset: Math.random() * Math.PI * 2
-    });
-  }
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x020208);
+scene.fog = new THREE.FogExp2(0x020208, 0.018);
+
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 200);
+camera.position.copy(S.playerPos);
+
+/* ── Post-processing ── */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.6, 0.4, 0.85);
+composer.addPass(bloom);
+const vignetteShader = {
+  uniforms:{tDiffuse:{value:null},darkness:{value:1.3},offset:{value:1.1}},
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+  fragmentShader:`uniform sampler2D tDiffuse;uniform float darkness;uniform float offset;varying vec2 vUv;void main(){vec4 t=texture2D(tDiffuse,vUv);vec2 u=(vUv-vec2(0.5))*vec2(offset);float v=1.0-dot(u,u);t.rgb*=smoothstep(0.0,1.0,v/darkness);gl_FragColor=t;}`
+};
+composer.addPass(new ShaderPass(vignetteShader));
+
+/* ═══════════════════════════════════════════════════════════════
+   MATERIALS
+   ═══════════════════════════════════════════════════════════════ */
+const M = {
+  concrete: new THREE.MeshStandardMaterial({color:0x3a3a3a, roughness:0.92, metalness:0.02}),
+  concreteDark: new THREE.MeshStandardMaterial({color:0x2a2a2a, roughness:0.95, metalness:0.01}),
+  glass: new THREE.MeshPhysicalMaterial({color:0xaaccdd, transmission:0.85, roughness:0.05, metalness:0.0, thickness:0.02, ior:1.5, envMapIntensity:0.3, transparent:true, opacity:0.35}),
+  glassFrost: new THREE.MeshPhysicalMaterial({color:0xbbccdd, transmission:0.6, roughness:0.3, metalness:0.0, thickness:0.05, transparent:true, opacity:0.5}),
+  wood: new THREE.MeshStandardMaterial({color:0x5a3a20, roughness:0.8, metalness:0.0}),
+  woodLight: new THREE.MeshStandardMaterial({color:0x7a5a3a, roughness:0.75, metalness:0.0}),
+  metal: new THREE.MeshStandardMaterial({color:0x222222, roughness:0.3, metalness:0.85}),
+  metalWarm: new THREE.MeshStandardMaterial({color:0x8a7050, roughness:0.4, metalness:0.6}),
+  leaf: new THREE.MeshStandardMaterial({color:0x3a6030, roughness:0.7, metalness:0.0, side:THREE.DoubleSide}),
+  leafBright: new THREE.MeshStandardMaterial({color:0x5a8a40, roughness:0.65, metalness:0.0, side:THREE.DoubleSide}),
+  bark: new THREE.MeshStandardMaterial({color:0x2d1b0f, roughness:0.95, metalness:0.0}),
+  water: new THREE.MeshPhysicalMaterial({color:0x1a2a3a, roughness:0.05, metalness:0.1, transmission:0.7, transparent:true, opacity:0.6}),
+  paper: new THREE.MeshStandardMaterial({color:0xf0e6d0, roughness:0.9, metalness:0.0}),
+  fabric: new THREE.MeshStandardMaterial({color:0x3a3028, roughness:0.95, metalness:0.0}),
+  glow: new THREE.MeshStandardMaterial({color:0xffcc66, emissive:0xffcc66, emissiveIntensity:2.0}),
+  glowSoft: new THREE.MeshStandardMaterial({color:0xffddaa, emissive:0xffddaa, emissiveIntensity:0.8}),
+  bookA: new THREE.MeshStandardMaterial({color:0x8b2500, roughness:0.8}),
+  bookB: new THREE.MeshStandardMaterial({color:0x1a3a5a, roughness:0.8}),
+  bookC: new THREE.MeshStandardMaterial({color:0x2a4a2a, roughness:0.8}),
+  bookD: new THREE.MeshStandardMaterial({color:0x5a3a1a, roughness:0.8}),
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHTING
+   ═══════════════════════════════════════════════════════════════ */
+const ambLight = new THREE.AmbientLight(0x0a0a1a, 0.15);
+scene.add(ambLight);
+
+const moonLight = new THREE.DirectionalLight(0x8899cc, 0.4);
+moonLight.position.set(-15, 20, -10);
+moonLight.castShadow = true;
+moonLight.shadow.mapSize.set(2048, 2048);
+moonLight.shadow.camera.near = 0.5;
+moonLight.shadow.camera.far = 60;
+moonLight.shadow.camera.left = -20;
+moonLight.shadow.camera.right = 20;
+moonLight.shadow.camera.top = 20;
+moonLight.shadow.camera.bottom = -20;
+moonLight.shadow.bias = -0.0005;
+scene.add(moonLight);
+
+const lantern = new THREE.PointLight(0xffaa44, 1.8, 12, 1.5);
+lantern.position.set(2.5, 2.8, 1);
+lantern.castShadow = true;
+lantern.shadow.mapSize.set(512, 512);
+scene.add(lantern);
+
+const lanternGlow = new THREE.PointLight(0xffcc66, 0.4, 8, 2);
+lanternGlow.position.set(2.5, 3.2, 1);
+scene.add(lanternGlow);
+
+const treeLight = new THREE.PointLight(0x66aa55, 0.3, 10, 2);
+treeLight.position.set(0, 4, 0);
+scene.add(treeLight);
+
+const warmFill = new THREE.PointLight(0xff9944, 0.15, 15, 2);
+warmFill.position.set(-3, 1.5, 3);
+scene.add(warmFill);
+
+/* ═══════════════════════════════════════════════════════════════
+   HELPERS
+   ═══════════════════════════════════════════════════════════════ */
+function box(w,h,d,mat,pos,shadow=true){
+  const g=new THREE.BoxGeometry(w,h,d);
+  const m=new THREE.Mesh(g,mat);
+  if(pos)m.position.copy(pos);
+  m.castShadow=shadow;m.receiveShadow=shadow;
+  return m;
+}
+function cyl(rT,rB,h,mat,pos,seg=12){
+  const g=new THREE.CylinderGeometry(rT,rB,h,seg);
+  const m=new THREE.Mesh(g,mat);
+  if(pos)m.position.copy(pos);
+  m.castShadow=true;m.receiveShadow=true;
+  return m;
 }
 
-function drawStars(t) {
-  starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
-  for (const s of stars) {
-    const a = s.alpha * (0.6 + 0.4 * Math.sin(t * s.twinkleSpeed + s.twinkleOffset));
-    starsCtx.beginPath();
-    starsCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    starsCtx.fillStyle = `rgba(240,230,210,${a})`;
-    starsCtx.fill();
-    if (s.r > 1.2) {
-      starsCtx.beginPath();
-      starsCtx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
-      starsCtx.fillStyle = `rgba(200,168,85,${a * 0.08})`;
-      starsCtx.fill();
+/* ═══════════════════════════════════════════════════════════════
+   THE GLASSHOUSE
+   ═══════════════════════════════════════════════════════════════ */
+const world = new THREE.Group();
+scene.add(world);
+
+/* ── Floor ── */
+const floorGeo = new THREE.PlaneGeometry(16, 14, 32, 32);
+const posAttr = floorGeo.attributes.position;
+for(let i=0;i<posAttr.count;i++){
+  const x=posAttr.getX(i), y=posAttr.getY(i);
+  posAttr.setZ(i, (Math.sin(x*0.5)*Math.cos(y*0.3))*0.03);
+}
+floorGeo.computeVertexNormals();
+const floor = new THREE.Mesh(floorGeo, M.concreteDark);
+floor.rotation.x = -Math.PI/2;
+floor.receiveShadow = true;
+world.add(floor);
+
+/* ── Concrete base / raised platform ── */
+const platform = box(16, 0.15, 14, M.concrete, new THREE.Vector3(0, -0.075, 0));
+world.add(platform);
+
+/* ── Walls (3 sides, front open) ── */
+const wallH = 4.2;
+const wallBack = box(16, wallH, 0.25, M.concrete, new THREE.Vector3(0, wallH/2, -7));
+world.add(wallBack);
+const wallLeft = box(0.25, wallH, 14, M.concrete, new THREE.Vector3(-8, wallH/2, 0));
+world.add(wallLeft);
+const wallRight = box(0.25, wallH, 14, M.concrete, new THREE.Vector3(8, wallH/2, 0));
+world.add(wallRight);
+
+/* ── Roof structure (concrete beams + glass) ── */
+for(let i=-2;i<=2;i++){
+  const beam = box(16, 0.15, 0.2, M.concrete, new THREE.Vector3(i*3.5, wallH+0.075, 0));
+  world.add(beam);
+}
+/* Glass roof panels */
+for(let i=-2;i<=1;i++){
+  const panelGeo = new THREE.PlaneGeometry(3.3, 14);
+  const panel = new THREE.Mesh(panelGeo, M.glass);
+  panel.rotation.x = Math.PI/2;
+  panel.position.set(i*3.5+1.75, wallH+0.16, 0);
+  world.add(panel);
+}
+
+/* ── Vertical glass walls (between concrete) ── */
+const glassWallL = new THREE.Mesh(new THREE.PlaneGeometry(14, wallH-0.5), M.glass);
+glassWallL.rotation.y = Math.PI/2;
+glassWallL.position.set(-7.87, wallH/2, 0);
+world.add(glassWallL);
+const glassWallR = new THREE.Mesh(new THREE.PlaneGeometry(14, wallH-0.5), M.glass);
+glassWallR.rotation.y = -Math.PI/2;
+glassWallR.position.set(7.87, wallH/2, 0);
+world.add(glassWallR);
+
+/* ── Back glass wall ── */
+const glassBack = new THREE.Mesh(new THREE.PlaneGeometry(16, wallH-0.5), M.glassFrost);
+glassBack.position.set(0, wallH/2, -6.87);
+world.add(glassBack);
+
+/* ═══════════════════════════════════════════════════════════════
+   THE TREE — Our Marriage
+   ═══════════════════════════════════════════════════════════════ */
+function createTree(){
+  const tree = new THREE.Group();
+  /* Trunk */
+  const trunkSegments = 8;
+  for(let i=0;i<trunkSegments;i++){
+    const t=i/trunkSegments;
+    const h = 0.5 + t*0.2;
+    const rBot = 0.22*(1-t*0.6);
+    const rTop = 0.18*(1-t*0.6);
+    const seg = cyl(rTop, rBot, h, M.bark, new THREE.Vector3(Math.sin(t*0.3)*0.1, 0.25+i*0.45, Math.cos(t*0.2)*0.05));
+    tree.add(seg);
+  }
+  /* Branches */
+  const branches = [
+    {origin:[0.05,3.2,0], dir:[-1,0.3,-0.2], len:2.2, thick:0.06},
+    {origin:[-0.05,3.0,0.05], dir:[1,0.4,-0.1], len:2.0, thick:0.055},
+    {origin:[0.03,3.5,-0.05], dir:[-0.8,0.5,0.6], len:1.8, thick:0.045},
+    {origin:[-0.02,3.4,0.03], dir:[0.6,0.6,-0.7], len:1.6, thick:0.04},
+    {origin:[0,3.7,0], dir:[-0.3,0.8,0.4], len:1.4, thick:0.035},
+    {origin:[0,3.6,0], dir:[0.4,0.7,-0.5], len:1.2, thick:0.03},
+    {origin:[0,3.8,0], dir:[0,1,0], len:0.8, thick:0.025},
+  ];
+  branches.forEach(b=>{
+    const dir = new THREE.Vector3(...b.dir).normalize();
+    const origin = new THREE.Vector3(...b.origin);
+    const segs = 4;
+    for(let i=0;i<segs;i++){
+      const t=i/segs;
+      const r = b.thick*(1-t*0.5);
+      const h = b.len/segs;
+      const p = origin.clone().add(dir.clone().multiplyScalar(t*b.len));
+      const branchSeg = cyl(r*0.8, r, h, M.bark, p);
+      branchSeg.lookAt(p.clone().add(dir));
+      branchSeg.rotateX(Math.PI/2);
+      tree.add(branchSeg);
+    }
+    /* Leaf clusters at branch tips */
+    const tipPos = origin.clone().add(dir.clone().multiplyScalar(b.len));
+    for(let j=0;j<5;j++){
+      const leafSize = 0.15+Math.random()*0.12;
+      const leafGeo = new THREE.SphereGeometry(leafSize, 6, 4);
+      leafGeo.scale(1, 0.4, 1);
+      const mat = Math.random()>0.3 ? M.leaf.clone() : M.leafBright.clone();
+      mat.color.offsetHSL(0, 0, (Math.random()-0.5)*0.15);
+      const leaf = new THREE.Mesh(leafGeo, mat);
+      leaf.position.copy(tipPos).add(new THREE.Vector3(
+        (Math.random()-0.5)*0.5,
+        (Math.random()-0.3)*0.4,
+        (Math.random()-0.5)*0.5
+      ));
+      leaf.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+      leaf.castShadow = true;
+      leaf.userData.sway = {speed:0.3+Math.random()*0.4, offset:Math.random()*Math.PI*2, amount:0.02+Math.random()*0.02};
+      tree.add(leaf);
+    }
+  });
+  /* Canopy layer — more leaves for density */
+  for(let i=0;i<40;i++){
+    const angle = Math.random()*Math.PI*2;
+    const radius = 0.5+Math.random()*1.8;
+    const height = 3.2+Math.random()*1.5;
+    const leafSize = 0.08+Math.random()*0.1;
+    const leafGeo = new THREE.SphereGeometry(leafSize, 5, 3);
+    leafGeo.scale(1, 0.35, 1);
+    const mat = Math.random()>0.4 ? M.leaf.clone() : M.leafBright.clone();
+    mat.color.offsetHSL(0, 0, (Math.random()-0.5)*0.2);
+    const leaf = new THREE.Mesh(leafGeo, mat);
+    leaf.position.set(Math.cos(angle)*radius, height, Math.sin(angle)*radius);
+    leaf.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+    leaf.castShadow = true;
+    leaf.userData.sway = {speed:0.2+Math.random()*0.3, offset:Math.random()*Math.PI*2, amount:0.01+Math.random()*0.02};
+    tree.add(leaf);
+  }
+  /* Roots */
+  for(let i=0;i<5;i++){
+    const angle = (i/5)*Math.PI*2 + Math.random()*0.3;
+    const rootGeo = new THREE.CylinderGeometry(0.02, 0.04, 0.6+Math.random()*0.3, 5);
+    const root = new THREE.Mesh(rootGeo, M.bark);
+    root.position.set(Math.cos(angle)*0.25, 0.1, Math.sin(angle)*0.25);
+    root.rotation.z = Math.cos(angle)*0.6;
+    root.rotation.x = Math.sin(angle)*0.6;
+    root.castShadow = true;
+    tree.add(root);
+  }
+  tree.position.set(0, 0, 0);
+  return tree;
+}
+const tree = createTree();
+world.add(tree);
+
+/* ═══════════════════════════════════════════════════════════════
+   THE BENCH — Presence
+   ═══════════════════════════════════════════════════════════════ */
+function createBench(){
+  const bench = new THREE.Group();
+  /* Seat */
+  bench.add(box(1.4, 0.06, 0.5, M.wood, new THREE.Vector3(0, 0.45, 0)));
+  bench.add(box(1.3, 0.04, 0.45, M.woodLight, new THREE.Vector3(0, 0.48, 0)));
+  /* Legs */
+  bench.add(box(0.06, 0.45, 0.06, M.metal, new THREE.Vector3(-0.55, 0.225, 0.15)));
+  bench.add(box(0.06, 0.45, 0.06, M.metal, new THREE.Vector3(0.55, 0.225, 0.15)));
+  bench.add(box(0.06, 0.45, 0.06, M.metal, new THREE.Vector3(-0.55, 0.225, -0.15)));
+  bench.add(box(0.06, 0.45, 0.06, M.metal, new THREE.Vector3(0.55, 0.225, -0.15)));
+  /* Backrest */
+  bench.add(box(1.4, 0.5, 0.04, M.wood, new THREE.Vector3(0, 0.75, -0.22)));
+  bench.add(box(1.3, 0.04, 0.03, M.woodLight, new THREE.Vector3(0, 0.6, -0.22)));
+  bench.add(box(1.3, 0.04, 0.03, M.woodLight, new THREE.Vector3(0, 0.85, -0.22)));
+  /* Coffee mug (Sharath) */
+  const mugGroup = new THREE.Group();
+  mugGroup.add(cyl(0.04, 0.035, 0.08, M.paper, new THREE.Vector3(0,0.04,0)));
+  const mugHandle = new THREE.Mesh(new THREE.TorusGeometry(0.025, 0.006, 6, 12, Math.PI), M.paper);
+  mugHandle.position.set(0.04, 0.04, 0);
+  mugHandle.rotation.y = Math.PI/2;
+  mugGroup.add(mugHandle);
+  /* Steam */
+  for(let i=0;i<3;i++){
+    const steamGeo = new THREE.SphereGeometry(0.008, 4, 4);
+    const steamMat = new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:0.08});
+    const steam = new THREE.Mesh(steamGeo, steamMat);
+    steam.position.set((Math.random()-0.5)*0.02, 0.09+i*0.025, (Math.random()-0.5)*0.02);
+    steam.userData.steam = {speed:0.5+Math.random()*0.3, offset:i*0.5};
+    mugGroup.add(steam);
+  }
+  mugGroup.position.set(-0.4, 0.51, 0);
+  bench.add(mugGroup);
+  /* Book (Rashmi) */
+  const bookGroup = new THREE.Group();
+  bookGroup.add(box(0.12, 0.015, 0.17, M.bookA, new THREE.Vector3(0, 0.0075, 0)));
+  bookGroup.add(box(0.11, 0.012, 0.16, M.bookB, new THREE.Vector3(0.005, 0.02, 0.005)));
+  bookGroup.position.set(0.35, 0.51, 0.02);
+  bench.add(bookGroup);
+  bench.position.set(3, 0, -2);
+  bench.userData.type = 'bench';
+  bench.userData.prompt = {text:'Two people. One bench. The same moon above them both.', attr:'Presence'};
+  return bench;
+}
+const bench = createBench();
+world.add(bench);
+
+/* ═══════════════════════════════════════════════════════════════
+   THE MAILBOX — Messages
+   ═══════════════════════════════════════════════════════════════ */
+function createMailbox(){
+  const mb = new THREE.Group();
+  mb.add(cyl(0.08, 0.08, 1.2, M.metalWarm, new THREE.Vector3(0, 0.6, 0)));
+  const boxGeo = new THREE.BoxGeometry(0.3, 0.22, 0.18);
+  const mailbox = new THREE.Mesh(boxGeo, M.metalWarm);
+  mailbox.position.set(0, 1.35, 0);
+  mailbox.castShadow = true;
+  mb.add(mailbox);
+  /* Flag */
+  const flag = box(0.02, 0.1, 0.02, M.metal, new THREE.Vector3(0.16, 1.42, 0));
+  mb.add(flag);
+  /* Slot */
+  mb.add(box(0.2, 0.01, 0.01, M.metal, new THREE.Vector3(0, 1.4, 0.09)));
+  mb.position.set(-4, 0, 4);
+  mb.userData.type = 'mailbox';
+  mb.userData.prompt = {text:'Every day, one thoughtful message. Quality over quantity.', attr:'The Mailbox'};
+  return mb;
+}
+const mailbox = createMailbox();
+world.add(mailbox);
+
+/* ═══════════════════════════════════════════════════════════════
+   THE LANTERN — Warmth
+   ═══════════════════════════════════════════════════════════════ */
+function createLantern(){
+  const l = new THREE.Group();
+  /* Base */
+  l.add(cyl(0.08, 0.1, 0.05, M.metal, new THREE.Vector3(0, 0.025, 0)));
+  /* Glass body */
+  const glassBody = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.07, 0.06, 0.18, 8, 1, true),
+    new THREE.MeshPhysicalMaterial({color:0xffeebb, transmission:0.5, roughness:0.1, transparent:true, opacity:0.3, side:THREE.DoubleSide})
+  );
+  glassBody.position.set(0, 0.14, 0);
+  l.add(glassBody);
+  /* Inner glow */
+  const innerGlow = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), M.glow);
+  innerGlow.position.set(0, 0.14, 0);
+  l.add(innerGlow);
+  /* Top */
+  l.add(cyl(0.04, 0.07, 0.04, M.metal, new THREE.Vector3(0, 0.25, 0)));
+  /* Handle */
+  const handle = new THREE.Mesh(new THREE.TorusGeometry(0.04, 0.005, 6, 16, Math.PI), M.metal);
+  handle.position.set(0, 0.28, 0);
+  l.add(handle);
+  l.position.set(2.5, 2.7, 1);
+  return l;
+}
+const lanternObj = createLantern();
+world.add(lanternObj);
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOKSHELF — Dreams
+   ═══════════════════════════════════════════════════════════════ */
+function createBookshelf(){
+  const shelf = new THREE.Group();
+  const w=1.2, h=2.0, d=0.35;
+  /* Frame */
+  shelf.add(box(w, h, 0.03, M.wood, new THREE.Vector3(0, h/2, -d/2+0.015)));
+  shelf.add(box(w, 0.03, d, M.wood, new THREE.Vector3(0, 0, 0)));
+  shelf.add(box(w, 0.03, d, M.wood, new THREE.Vector3(0, h*0.33, 0)));
+  shelf.add(box(w, 0.03, d, M.wood, new THREE.Vector3(0, h*0.66, 0)));
+  shelf.add(box(w, 0.03, d, M.wood, new THREE.Vector3(0, h, 0)));
+  shelf.add(box(0.03, h, d, M.wood, new THREE.Vector3(-w/2+0.015, h/2, 0)));
+  shelf.add(box(0.03, h, d, M.wood, new THREE.Vector3(w/2-0.015, h/2, 0)));
+  /* Books */
+  const bookMats = [M.bookA, M.bookB, M.bookC, M.bookD];
+  for(let row=0;row<3;row++){
+    const y = row*h*0.33+0.06;
+    let x = -w/2+0.08;
+    while(x < w/2-0.08){
+      const bw = 0.02+Math.random()*0.03;
+      const bh = 0.12+Math.random()*0.1;
+      const book = box(bw, bh, 0.18, bookMats[Math.floor(Math.random()*4)], new THREE.Vector3(x+bw/2, y+bh/2, 0));
+      shelf.add(book);
+      x += bw + 0.005;
     }
   }
+  shelf.position.set(-7.5, 0, -1);
+  shelf.rotation.y = Math.PI/2;
+  shelf.userData.type = 'bookshelf';
+  shelf.userData.prompt = {text:'Letters unwritten. Thoughts half-formed. Dreams waiting to be shared.', attr:'The Library'};
+  return shelf;
+}
+const bookshelf = createBookshelf();
+world.add(bookshelf);
+
+/* ═══════════════════════════════════════════════════════════════
+   PHOTO FRAME — Memories
+   ═══════════════════════════════════════════════════════════════ */
+function createPhotoFrame(){
+  const frame = new THREE.Group();
+  frame.add(box(0.4, 0.3, 0.02, M.wood, new THREE.Vector3(0, 0, 0)));
+  frame.add(box(0.32, 0.22, 0.025, M.paper, new THREE.Vector3(0, 0, 0.01)));
+  frame.add(box(0.36, 0.26, 0.01, M.metal, new THREE.Vector3(0, 0, -0.01)));
+  frame.position.set(-3, 1.4, -6.6);
+  frame.userData.type = 'photo';
+  frame.userData.prompt = {text:'23 May 2025. Coorg. The day everything began.', attr:'Memory'};
+  return frame;
+}
+const photoFrame = createPhotoFrame();
+world.add(photoFrame);
+
+/* ═══════════════════════════════════════════════════════════════
+   RECORD PLAYER — Sound
+   ═══════════════════════════════════════════════════════════════ */
+function createRecordPlayer(){
+  const rp = new THREE.Group();
+  /* Base */
+  rp.add(box(0.45, 0.06, 0.4, M.wood, new THREE.Vector3(0, 0.03, 0)));
+  /* Platter */
+  const platter = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.01, 32), M.metal);
+  platter.position.set(-0.03, 0.07, 0);
+  rp.add(platter);
+  /* Record */
+  const record = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.005, 32),
+    new THREE.MeshStandardMaterial({color:0x111111, roughness:0.3, metalness:0.5}));
+  record.position.set(-0.03, 0.075, 0);
+  rp.add(record);
+  /* Label */
+  const label = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.006, 16),
+    new THREE.MeshStandardMaterial({color:0xcc3333, roughness:0.6}));
+  label.position.set(-0.03, 0.078, 0);
+  rp.add(label);
+  /* Tonearm */
+  const arm = box(0.005, 0.005, 0.18, M.metalWarm, new THREE.Vector3(0.12, 0.09, -0.04));
+  arm.rotation.y = -0.3;
+  rp.add(arm);
+  rp.position.set(-5.5, 1.0, -6.3);
+  rp.userData.type = 'record';
+  rp.userData.prompt = {text:'The song you played on our first night apart. It still plays.', attr:'Shared Music'};
+  return rp;
+}
+const recordPlayer = createRecordPlayer();
+world.add(recordPlayer);
+
+/* ═══════════════════════════════════════════════════════════════
+   WATER FEATURE — Reflection
+   ═══════════════════════════════════════════════════════════════ */
+function createWaterFeature(){
+  const wf = new THREE.Group();
+  wf.add(box(1.2, 0.08, 0.6, M.concrete, new THREE.Vector3(0, 0.04, 0)));
+  const waterSurface = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.5), M.water);
+  waterSurface.rotation.x = -Math.PI/2;
+  waterSurface.position.set(0, 0.09, 0);
+  wf.add(waterSurface);
+  wf.position.set(-4, 0, -4);
+  wf.userData.type = 'water';
+  wf.userData.prompt = {text:'Still water reflects what the eye cannot see.', attr:'Reflection'};
+  return wf;
+}
+const waterFeature = createWaterFeature();
+world.add(waterFeature);
+
+/* ═══════════════════════════════════════════════════════════════
+   POTTED PLANTS — Life
+   ═══════════════════════════════════════════════════════════════ */
+function createPlant(pos, size=1){
+  const p = new THREE.Group();
+  const pot = cyl(0.1*size, 0.08*size, 0.15*size, M.concrete, new THREE.Vector3(0, 0.075*size, 0));
+  p.add(pot);
+  for(let i=0;i<5;i++){
+    const angle = (i/5)*Math.PI*2;
+    const stemH = 0.2*size+Math.random()*0.15*size;
+    const stem = cyl(0.005, 0.004, stemH, M.leaf, new THREE.Vector3(0, 0.15*size+stemH/2, 0));
+    p.add(stem);
+    const leafGeo = new THREE.SphereGeometry(0.04*size, 5, 3);
+    leafGeo.scale(1, 0.3, 0.6);
+    const leafMesh = new THREE.Mesh(leafGeo, M.leafBright.clone());
+    leafMesh.material.color.offsetHSL(0, 0, (Math.random()-0.5)*0.2);
+    leafMesh.position.set(Math.cos(angle)*0.06*size, 0.15*size+stemH, Math.sin(angle)*0.06*size);
+    leafMesh.rotation.set(Math.random()*0.5, angle, Math.random()*0.3);
+    leafMesh.userData.sway = {speed:0.3+Math.random()*0.3, offset:Math.random()*6, amount:0.015};
+    p.add(leafMesh);
+  }
+  p.position.copy(pos);
+  return p;
+}
+world.add(createPlant(new THREE.Vector3(6, 0, -5)));
+world.add(createPlant(new THREE.Vector3(-6, 0, -5), 0.8));
+world.add(createPlant(new THREE.Vector3(5.5, 0, 2)));
+world.add(createPlant(new THREE.Vector3(-5, 0, 3), 1.2));
+world.add(createPlant(new THREE.Vector3(-6.5, 0, -3), 0.7));
+world.add(createPlant(new THREE.Vector3(6.5, 0, -1), 0.9));
+world.add(createPlant(new THREE.Vector3(4, 0, -6), 0.6));
+
+/* ═══════════════════════════════════════════════════════════════
+   FIREFLIES
+   ═══════════════════════════════════════════════════════════════ */
+const ffCount = 60;
+const ffGeo = new THREE.BufferGeometry();
+const ffPositions = new Float32Array(ffCount*3);
+const ffSizes = new Float32Array(ffCount);
+S.fireflies = [];
+for(let i=0;i<ffCount;i++){
+  const x = (Math.random()-0.5)*12;
+  const y = 0.5+Math.random()*3;
+  const z = (Math.random()-0.5)*10;
+  ffPositions[i*3]=x; ffPositions[i*3+1]=y; ffPositions[i*3+2]=z;
+  ffSizes[i] = 2+Math.random()*3;
+  S.fireflies.push({
+    basePos: new THREE.Vector3(x,y,z),
+    vel: new THREE.Vector3((Math.random()-0.5)*0.3,(Math.random()-0.5)*0.1,(Math.random()-0.5)*0.3),
+    phase: Math.random()*Math.PI*2,
+    speed: 0.3+Math.random()*0.5,
+    pulseSpeed: 1+Math.random()*2,
+    wanderAngle: Math.random()*Math.PI*2
+  });
+}
+ffGeo.setAttribute('position', new THREE.BufferAttribute(ffPositions, 3));
+ffGeo.setAttribute('size', new THREE.BufferAttribute(ffSizes, 1));
+const ffMat = new THREE.ShaderMaterial({
+  uniforms:{time:{value:0}},
+  vertexShader:`
+    attribute float size;
+    varying float vAlpha;
+    uniform float time;
+    void main(){
+      vec4 mv=modelViewMatrix*vec4(position,1.0);
+      gl_PointSize=size*(300.0/-mv.z);
+      gl_Position=projectionMatrix*mv;
+      vAlpha=0.5+0.5*sin(time*2.0+position.x*10.0);
+    }`,
+  fragmentShader:`
+    varying float vAlpha;
+    void main(){
+      float d=length(gl_PointCoord-vec2(0.5));
+      if(d>0.5)discard;
+      float glow=1.0-smoothstep(0.0,0.5,d);
+      float core=1.0-smoothstep(0.0,0.15,d);
+      vec3 color=mix(vec3(0.8,0.65,0.2),vec3(1.0,0.9,0.5),core);
+      float alpha=glow*0.3*vAlpha+core*0.8*vAlpha;
+      gl_FragColor=vec4(color,alpha);
+    }`,
+  transparent:true, blending:THREE.AdditiveBlending, depthWrite:false
+});
+const fireflies = new THREE.Points(ffGeo, ffMat);
+scene.add(fireflies);
+
+/* ═══════════════════════════════════════════════════════════════
+   RAIN
+   ═══════════════════════════════════════════════════════════════ */
+const rainCount = 2000;
+const rainGeo = new THREE.BufferGeometry();
+const rainPositions = new Float32Array(rainCount*3);
+const rainVelocities = new Float32Array(rainCount);
+S.rain = [];
+for(let i=0;i<rainCount;i++){
+  rainPositions[i*3] = (Math.random()-0.5)*30;
+  rainPositions[i*3+1] = Math.random()*10;
+  rainPositions[i*3+2] = (Math.random()-0.5)*30;
+  rainVelocities[i] = 8+Math.random()*6;
+}
+rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
+const rainMat = new THREE.ShaderMaterial({
+  vertexShader:`
+    varying float vAlpha;
+    void main(){
+      vec4 mv=modelViewMatrix*vec4(position,1.0);
+      gl_PointSize=1.5*(200.0/-mv.z);
+      gl_Position=projectionMatrix*mv;
+      vAlpha=smoothstep(10.0,2.0,-mv.z)*0.3;
+    }`,
+  fragmentShader:`
+    varying float vAlpha;
+    void main(){
+      vec2 uv=gl_PointCoord-vec2(0.5);
+      float d=length(uv);
+      if(d>0.5)discard;
+      float a=1.0-smoothstep(0.0,0.5,d);
+      gl_FragColor=vec4(0.7,0.75,0.85,a*vAlpha);
+    }`,
+  transparent:true, depthWrite:false
+});
+const rain = new THREE.Points(rainGeo, rainMat);
+scene.add(rain);
+
+/* ═══════════════════════════════════════════════════════════════
+   FALLING LEAVES
+   ═══════════════════════════════════════════════════════════════ */
+const leafCount = 25;
+const leaves = [];
+for(let i=0;i<leafCount;i++){
+  const geo = new THREE.PlaneGeometry(0.06+Math.random()*0.04, 0.04+Math.random()*0.03);
+  const mat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color().setHSL(0.25+Math.random()*0.1, 0.4+Math.random()*0.2, 0.3+Math.random()*0.15),
+    side:THREE.DoubleSide, transparent:true, opacity:0.7
+  });
+  const leaf = new THREE.Mesh(geo, mat);
+  leaf.position.set((Math.random()-0.5)*6, 3+Math.random()*2, (Math.random()-0.5)*4);
+  leaf.userData.falling = {
+    vel: new THREE.Vector3((Math.random()-0.5)*0.3, -0.2-Math.random()*0.3, (Math.random()-0.5)*0.3),
+    rotSpeed: new THREE.Vector3(Math.random()*2, Math.random()*3, Math.random()*2),
+    windPhase: Math.random()*Math.PI*2,
+    resetY: 3+Math.random()*2
+  };
+  world.add(leaf);
+  leaves.push(leaf);
 }
 
-/* ── Fireflies Canvas ── */
-const ffCanvas = document.getElementById('fireflies');
-const ffCtx = ffCanvas.getContext('2d');
-let fireflies = [];
+/* ═══════════════════════════════════════════════════════════════
+   MOON (visible through glass)
+   ═══════════════════════════════════════════════════════════════ */
+const moonGroup = new THREE.Group();
+const moonMesh = new THREE.Mesh(
+  new THREE.SphereGeometry(1.5, 32, 32),
+  new THREE.MeshBasicMaterial({color:0xeeeedd})
+);
+moonGroup.add(moonMesh);
+const moonGlow = new THREE.Mesh(
+  new THREE.SphereGeometry(3, 32, 32),
+  new THREE.ShaderMaterial({
+    uniforms:{},
+    vertexShader:`varying vec3 vNormal;void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+    fragmentShader:`varying vec3 vNormal;void main(){float intensity=pow(0.65-dot(vNormal,vec3(0,0,1)),3.0);gl_FragColor=vec4(0.6,0.65,0.8,intensity*0.4);}`,
+    transparent:true, side:THREE.BackSide, blending:THREE.AdditiveBlending, depthWrite:false
+  })
+);
+moonGroup.add(moonGlow);
+moonGroup.position.set(-15, 18, -25);
+scene.add(moonGroup);
 
-function initFireflies() {
-  ffCanvas.width = window.innerWidth;
-  ffCanvas.height = window.innerHeight;
-  fireflies = [];
-  const count = Math.floor(window.innerWidth / 40);
-  for (let i = 0; i < count; i++) {
-    fireflies.push({
-      x: Math.random() * ffCanvas.width,
-      y: ffCanvas.height * 0.4 + Math.random() * ffCanvas.height * 0.5,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.2,
-      alpha: Math.random() * 0.5 + 0.2,
-      pulse: Math.random() * Math.PI * 2,
-      size: Math.random() * 1.5 + 1
+/* ═══════════════════════════════════════════════════════════════
+   INTERACTIVE OBJECTS
+   ═══════════════════════════════════════════════════════════════ */
+const interactives = [bench, mailbox, bookshelf, photoFrame, recordPlayer, waterFeature];
+
+/* ═══════════════════════════════════════════════════════════════
+   COLLISION
+   ═══════════════════════════════════════════════════════════════ */
+const bounds = {xMin:-7.5, xMax:7.5, zMin:-6.5, zMax:6.5};
+function clampPlayer(){
+  S.playerPos.x = Math.max(bounds.xMin, Math.min(bounds.xMax, S.playerPos.x));
+  S.playerPos.z = Math.max(bounds.zMin, Math.min(bounds.zMax, S.playerPos.z));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INPUT
+   ═══════════════════════════════════════════════════════════════ */
+const keys = {};
+document.addEventListener('keydown', e=>{
+  keys[e.code]=true;
+  if(e.code==='KeyW'||e.code==='KeyA'||e.code==='KeyS'||e.code==='KeyD'||e.code==='ArrowUp'||e.code==='ArrowDown'||e.code==='ArrowLeft'||e.code==='ArrowRight') e.preventDefault();
+});
+document.addEventListener('keyup', e=>{keys[e.code]=false;});
+
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e=>{
+  S.mouseX = (e.clientX/window.innerWidth)*2-1;
+  S.mouseY = (e.clientY/window.innerHeight)*2-1;
+  cursor.style.left = e.clientX+'px';
+  cursor.style.top = e.clientY+'px';
+  if(S.locked){
+    S.yaw -= e.movementX*0.002;
+    S.pitch -= e.movementY*0.002;
+    S.pitch = Math.max(-1.2, Math.min(1.2, S.pitch));
+  }
+});
+
+document.addEventListener('pointerlockchange', ()=>{
+  S.locked = document.pointerLockElement === renderer.domElement;
+  cursor.style.display = S.locked ? 'none' : 'block';
+  document.getElementById('crosshair').classList.toggle('show', S.locked);
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   TEXT PROMPTS
+   ═══════════════════════════════════════════════════════════════ */
+const promptEl = document.getElementById('prompt');
+const promptText = document.getElementById('promptText');
+const promptAttr = document.getElementById('promptAttr');
+let promptTimeout = null;
+
+function showPrompt(data){
+  if(S.currentPrompt === data.text) return;
+  S.currentPrompt = data.text;
+  promptText.textContent = data.text;
+  promptAttr.textContent = data.attr;
+  promptEl.classList.add('show');
+  clearTimeout(promptTimeout);
+  promptTimeout = setTimeout(()=>{ promptEl.classList.remove('show'); S.currentPrompt=null; },6000);
+}
+function hidePrompt(){
+  promptEl.classList.remove('show');
+  S.currentPrompt = null;
+  clearTimeout(promptTimeout);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UPDATE LOOP
+   ═══════════════════════════════════════════════════════════════ */
+const clock = new THREE.Clock();
+const moveDir = new THREE.Vector3();
+const moveSpeed = 4.0;
+const friction = 8.0;
+const headBob = {phase:0, amount:0};
+
+function update(){
+  S.delta = Math.min(clock.getDelta(), 0.05);
+  S.time += S.delta;
+  if(!S.started) return;
+
+  /* ── Movement ── */
+  moveDir.set(0,0,0);
+  if(keys.KeyW||keys.ArrowUp) moveDir.z -= 1;
+  if(keys.KeyS||keys.ArrowDown) moveDir.z += 1;
+  if(keys.KeyA||keys.ArrowLeft) moveDir.x -= 1;
+  if(keys.KeyD||keys.ArrowRight) moveDir.x += 1;
+  moveDir.normalize();
+  /* Rotate direction by yaw */
+  const sinY = Math.sin(S.yaw), cosY = Math.cos(S.yaw);
+  const worldDir = new THREE.Vector3(
+    moveDir.x*cosY - moveDir.z*sinY,
+    0,
+    moveDir.x*sinY + moveDir.z*cosY
+  );
+  S.vel.lerp(worldDir.multiplyScalar(moveSpeed), S.delta*friction);
+  S.playerPos.add(S.vel.clone().multiplyScalar(S.delta));
+  clampPlayer();
+
+  /* ── Head bob ── */
+  const isMoving = moveDir.length() > 0.01;
+  if(isMoving){
+    headBob.phase += S.delta * 8;
+    headBob.amount = THREE.MathUtils.lerp(headBob.amount, 0.04, S.delta*5);
+  } else {
+    headBob.amount = THREE.MathUtils.lerp(headBob.amount, 0, S.delta*3);
+  }
+
+  /* ── Camera ── */
+  const camTarget = new THREE.Vector3(
+    S.playerPos.x,
+    S.playerPos.y + Math.sin(headBob.phase)*headBob.amount,
+    S.playerPos.z
+  );
+  camera.position.lerp(camTarget, S.delta*12);
+  camera.rotation.order = 'YXZ';
+  camera.rotation.y = S.yaw;
+  camera.rotation.x = S.pitch;
+  /* Subtle breathing */
+  camera.rotation.z = Math.sin(S.time*0.3)*0.003;
+
+  /* ── Fireflies ── */
+  const ffPos = fireflies.geometry.attributes.position;
+  for(let i=0;i<ffCount;i++){
+    const f = S.fireflies[i];
+    f.wanderAngle += (Math.random()-0.5)*0.1;
+    f.vel.x += Math.cos(f.wanderAngle)*0.02;
+    f.vel.z += Math.sin(f.wanderAngle)*0.02;
+    f.vel.y += Math.sin(S.time*f.speed+f.phase)*0.01;
+    f.vel.multiplyScalar(0.98);
+    const nx = ffPos.getX(i)+f.vel.x*S.delta;
+    const ny = ffPos.getY(i)+f.vel.y*S.delta;
+    const nz = ffPos.getZ(i)+f.vel.z*S.delta;
+    if(Math.abs(nx)>6) f.vel.x*=-1;
+    if(ny<0.3||ny>3.5) f.vel.y*=-1;
+    if(Math.abs(nz)>5) f.vel.z*=-1;
+    ffPos.setXYZ(i, nx, ny, nz);
+  }
+  ffPos.needsUpdate = true;
+  ffMat.uniforms.time.value = S.time;
+
+  /* ── Rain ── */
+  const rPos = rain.geometry.attributes.position;
+  for(let i=0;i<rainCount;i++){
+    let y = rPos.getY(i) - rainVelocities[i]*S.delta;
+    let x = rPos.getX(i) + Math.sin(S.time+i)*0.02;
+    if(y < 0){
+      y = 8+Math.random()*4;
+      x = S.playerPos.x + (Math.random()-0.5)*20;
+      rPos.setZ(i, S.playerPos.z + (Math.random()-0.5)*20);
+    }
+    rPos.setXY(i, x, y);
+  }
+  rPos.needsUpdate = true;
+
+  /* ── Leaves ── */
+  leaves.forEach(l=>{
+    const f = l.userData.falling;
+    f.vel.x += Math.sin(S.time*0.5+f.windPhase)*0.005;
+    l.position.add(f.vel.clone().multiplyScalar(S.delta));
+    l.rotation.x += f.rotSpeed.x*S.delta;
+    l.rotation.y += f.rotSpeed.y*S.delta;
+    l.rotation.z += f.rotSpeed.z*S.delta;
+    if(l.position.y < 0.1){
+      l.position.set((Math.random()-0.5)*6, f.resetY, (Math.random()-0.5)*4);
+    }
+  });
+
+  /* ── Tree leaves sway ── */
+  tree.children.forEach(child=>{
+    if(child.userData.sway){
+      const s = child.userData.sway;
+      child.rotation.z = Math.sin(S.time*s.speed+s.offset)*s.amount;
+      child.rotation.x += Math.sin(S.time*s.speed*0.7+s.offset)*s.amount*0.5;
+    }
+  });
+
+  /* ── Water ripple ── */
+  waterFeature.children[1].material.roughness = 0.05+Math.sin(S.time*0.8)*0.02;
+
+  /* ── Lantern flicker ── */
+  lantern.intensity = 1.8+Math.sin(S.time*3)*0.15+Math.sin(S.time*7)*0.05;
+  lanternGlow.intensity = 0.4+Math.sin(S.time*2)*0.05;
+
+  /* ── Steam from mug ── */
+  bench.children.forEach(child=>{
+    if(child.isGroup) child.children.forEach(c=>{
+      if(c.userData.steam){
+        const s = c.userData.steam;
+        c.position.y = 0.09+Math.sin(S.time*s.speed+s.offset)*0.015+0.025;
+        c.material.opacity = 0.04+Math.sin(S.time*s.speed+s.offset)*0.03;
+      }
     });
+  });
+
+  /* ── Look-at interaction ── */
+  S.ray.setFromCamera(new THREE.Vector2(0,0), camera);
+  let hitObject = null;
+  let minDist = Infinity;
+  interactives.forEach(obj=>{
+    const hits = S.ray.intersectObject(obj, true);
+    if(hits.length > 0 && hits[0].distance < minDist && hits[0].distance < 6){
+      minDist = hits[0].distance;
+      hitObject = obj;
+    }
+  });
+  cursor.classList.toggle('look', !!hitObject);
+  if(hitObject && hitObject.userData.prompt){
+    showPrompt(hitObject.userData.prompt);
+  } else {
+    hidePrompt();
   }
 }
 
-function drawFireflies(t) {
-  ffCtx.clearRect(0, 0, ffCanvas.width, ffCanvas.height);
-  for (const f of fireflies) {
-    f.x += f.vx + Math.sin(t * 0.0005 + f.pulse) * 0.15;
-    f.y += f.vy + Math.cos(t * 0.0007 + f.pulse) * 0.1;
-    if (f.x < -10) f.x = ffCanvas.width + 10;
-    if (f.x > ffCanvas.width + 10) f.x = -10;
-    if (f.y < ffCanvas.height * 0.3) f.vy += 0.01;
-    if (f.y > ffCanvas.height) f.y = ffCanvas.height * 0.4;
-    const a = f.alpha * (0.4 + 0.6 * Math.sin(t * 0.003 + f.pulse));
-    ffCtx.beginPath();
-    ffCtx.arc(f.x, f.y, f.size * 4, 0, Math.PI * 2);
-    ffCtx.fillStyle = `rgba(200,168,85,${a * 0.12})`;
-    ffCtx.fill();
-    ffCtx.beginPath();
-    ffCtx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
-    ffCtx.fillStyle = `rgba(200,168,85,${a})`;
-    ffCtx.fill();
-  }
-}
-
-/* ── Animation Loop ── */
-function animate(t) {
-  drawStars(t);
-  if (STATE.entered) drawFireflies(t);
+/* ═══════════════════════════════════════════════════════════════
+   RENDER LOOP
+   ═══════════════════════════════════════════════════════════════ */
+function animate(){
   requestAnimationFrame(animate);
+  update();
+  composer.render();
 }
+animate();
 
-/* ── Entrance ── */
-function runEntrance() {
-  setTimeout(() => document.getElementById('nameR').classList.add('show'), 800);
-  setTimeout(() => document.getElementById('amp').classList.add('show'), 1800);
-  setTimeout(() => document.getElementById('nameS').classList.add('show'), 2400);
-  setTimeout(() => document.getElementById('eDate').classList.add('show'), 3400);
-  setTimeout(() => document.getElementById('eQuote').classList.add('show'), 4400);
-  setTimeout(() => document.getElementById('enterBtn').classList.add('show'), 5800);
+/* ═══════════════════════════════════════════════════════════════
+   LOADING
+   ═══════════════════════════════════════════════════════════════ */
+let loadProgress = 0;
+const loadBar = document.getElementById('loadBar');
+const loadPct = document.getElementById('loadPct');
+function updateLoad(p){
+  loadProgress = p;
+  loadBar.style.width = p+'%';
+  loadPct.textContent = Math.round(p);
 }
-
-function enterWorld() {
-  STATE.entered = true;
-  document.getElementById('entrance').classList.add('hidden');
-  document.getElementById('world').classList.add('show');
-  setTimeout(() => {
-    document.getElementById('mainNav').classList.add('show');
-    document.getElementById('infoPanel').classList.add('show');
-    document.getElementById('infoTime').classList.add('show');
-    document.getElementById('gardenInfo').classList.add('show');
-    document.getElementById('thinkBtn').classList.add('show');
-    showFlowers();
-    showPresence();
+function finishLoad(){
+  updateLoad(100);
+  setTimeout(()=>{
+    document.getElementById('load').classList.add('done');
+    setTimeout(showIntro, 1500);
   }, 800);
 }
 
-/* ── Flowers ── */
-function showFlowers() {
-  const flowers = document.querySelectorAll('.flower');
-  flowers.forEach((f, i) => {
-    setTimeout(() => f.classList.add('visible'), 400 + i * 300);
-  });
-}
-
-/* ── Presence ── */
-function showPresence() {
-  setTimeout(() => document.getElementById('presenceMug').classList.add('visible'), 2000);
-  setTimeout(() => document.getElementById('presenceBook').classList.add('visible'), 2500);
-}
-
-/* ── Clock ── */
-function updateClock() {
-  const now = new Date();
-  const dublin = new Intl.DateTimeFormat('en-IE', { timeZone:'Europe/Dublin', hour:'2-digit', minute:'2-digit', hour12:false }).format(now);
-  const bangalore = new Intl.DateTimeFormat('en-IN', { timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit', hour12:false }).format(now);
-  const dublinDate = new Intl.DateTimeFormat('en-IE', { timeZone:'Europe/Dublin', weekday:'short', day:'numeric', month:'short' }).format(now);
-  document.getElementById('clockDisplay').textContent = dublin;
-  document.getElementById('cityLabel').textContent = `Dublin ${dublinDate} · Bangalore ${bangalore}`;
-}
-
-/* ── Navigation ── */
-function switchSection(section) {
-  STATE.section = section;
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-
-  if (section === 'letter') {
-    document.getElementById('letterModal').classList.add('open');
-    document.getElementById('letterText').focus();
-  } else if (section === 'memories') {
-    showConstellationStars();
-  } else if (section === 'story') {
-    showStoryPage();
+/* ── Simulate load ── */
+let loadTick = 0;
+const loadInterval = setInterval(()=>{
+  loadTick += 3+Math.random()*8;
+  if(loadTick >= 100){
+    loadTick = 100;
+    clearInterval(loadInterval);
+    finishLoad();
   }
+  updateLoad(loadTick);
+}, 200);
+
+/* ═══════════════════════════════════════════════════════════════
+   INTRO SEQUENCE
+   ═══════════════════════════════════════════════════════════════ */
+function showIntro(){
+  const intro = document.getElementById('intro');
+  intro.classList.add('show');
+  setTimeout(()=>document.getElementById('l1').classList.add('on'), 800);
+  setTimeout(()=>document.getElementById('l2').classList.add('on'), 2200);
+  setTimeout(()=>document.getElementById('l3').classList.add('on'), 3800);
+  setTimeout(()=>{
+    document.getElementById('enterPrompt').classList.add('show');
+  }, 5200);
 }
 
-/* ── Letter ── */
-document.getElementById('letterText').addEventListener('input', function() {
-  const words = this.value.trim().split(/\s+/).filter(Boolean).length;
-  document.getElementById('letterCount').textContent = `${words} / 250 words`;
-  if (words > 250) {
-    document.getElementById('letterCount').style.color = '#dc2626';
-  } else {
-    document.getElementById('letterCount').style.color = '';
+/* ── Enter world ── */
+function enterWorld(){
+  if(S.started) return;
+  renderer.domElement.requestPointerLock();
+  S.started = true;
+  document.getElementById('intro').classList.add('hide');
+  document.getElementById('enterPrompt').classList.remove('show');
+  setTimeout(()=>{
+    document.getElementById('label').classList.add('show');
+    setTimeout(()=>document.getElementById('label').classList.remove('show'), 5000);
+    /* First prompt */
+    setTimeout(()=>showPrompt({text:'Welcome home.', attr:''}), 3000);
+  }, 1500);
+}
+
+renderer.domElement.addEventListener('click', ()=>{
+  if(!S.started){
+    enterWorld();
+  } else if(!S.locked){
+    renderer.domElement.requestPointerLock();
   }
 });
+document.getElementById('enterPrompt').addEventListener('click', enterWorld);
 
-function sendLetter() {
-  const text = document.getElementById('letterText').value.trim();
-  if (!text) return;
-  const words = text.split(/\s+/).filter(Boolean).length;
-  if (words > 250) { alert('Please keep your letter under 250 words.'); return; }
-  document.getElementById('letterForm').style.display = 'none';
-  document.getElementById('letterSent').style.display = 'block';
-  const letters = JSON.parse(localStorage.getItem('ph_letters') || '[]');
-  letters.push({ to: STATE.letterRecipient, text, date: new Date().toISOString(), words });
-  localStorage.setItem('ph_letters', JSON.stringify(letters));
-}
-
-function closeLetter() {
-  document.getElementById('letterModal').classList.remove('open');
-  setTimeout(() => {
-    document.getElementById('letterForm').style.display = '';
-    document.getElementById('letterSent').style.display = 'none';
-    document.getElementById('letterText').value = '';
-    document.getElementById('letterCount').textContent = '0 / 250 words';
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.nav-btn').classList.add('active');
-  }, 500);
-}
-
-/* ── Constellation ── */
-function showConstellationStars() {
-  const modal = document.getElementById('constellationModal');
-  const mem = STATE.memories[Math.floor(Math.random() * STATE.memories.length)];
-  document.getElementById('memDate').textContent = mem.date;
-  document.getElementById('memTitle').textContent = mem.title;
-  document.getElementById('memText').textContent = mem.text;
-  modal.classList.add('open');
-}
-
-function closeConstellation() {
-  document.getElementById('constellationModal').classList.remove('open');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.nav-btn').classList.add('active');
-}
-
-/* ── Story ── */
-function showStoryPage() {
-  const modal = document.getElementById('constellationModal');
-  const now = new Date();
-  const options = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
-  const dateStr = now.toLocaleDateString('en-IE', options);
-  const hour = now.getHours();
-  let timeWord = 'morning';
-  if (hour >= 12 && hour < 17) timeWord = 'afternoon';
-  else if (hour >= 17) timeWord = 'evening';
-  document.getElementById('memDate').textContent = `Our Story · ${dateStr}`;
-  document.getElementById('memTitle').textContent = `A ${timeWord} in two cities`;
-  const stories = [
-    `Dublin's ${timeWord} light filtered through the window while Bangalore hummed with its own rhythm. Between lectures and meetings, another day became part of a story that began in Coorg and stretches across continents.`,
-    `The ${timeWord} was quiet in Dublin. In Bangalore, the evening traffic was just beginning. Somewhere between those two worlds, a love story continued — not loud, not dramatic, just steady and true.`,
-    `Another ${timeWord}, another day of choosing each other. Rashmi closed her laptop after hours of studying AI. Sharath finished his last commit. Both tired. Both grateful. Both home — even when home is 5,000 miles apart.`,
-    `The rain came to Dublin this ${timeWord}. In Bangalore, the sun was setting. Different skies. Same moon. Same love. Another page written in the story of us.`,
-    `Between a ${timeWord} lecture on neural networks and a late-night sprint at work, two people remembered why they chose each other. Not because it was easy. Because it was right.`
-  ];
-  document.getElementById('memText').textContent = stories[Math.floor(Math.random() * stories.length)];
-  modal.classList.add('open');
-}
-
-/* ── Thinking of You ── */
-function thinkOfYou() {
-  const btn = document.getElementById('thinkBtn');
-  btn.classList.add('pulse');
-  setTimeout(() => btn.classList.remove('pulse'), 1000);
-  const notifications = JSON.parse(localStorage.getItem('ph_think') || '[]');
-  notifications.push({ from: 'Rashmi', time: new Date().toISOString() });
-  localStorage.setItem('ph_think', JSON.stringify(notifications));
-}
-
-/* ── Close modals on outside click ── */
-document.getElementById('letterModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeLetter(); });
-document.getElementById('constellationModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeConstellation(); });
-
-/* ── Resize ── */
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => { initStars(); initFireflies(); }, 200);
+/* ═══════════════════════════════════════════════════════════════
+   RESIZE
+   ═══════════════════════════════════════════════════════════════ */
+window.addEventListener('resize', ()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
 });
 
-/* ── Init ── */
-initStars();
-initFireflies();
-requestAnimationFrame(animate);
-runEntrance();
-updateClock();
-setInterval(updateClock, 10000);
+/* ── Set initial camera look ── */
+S.yaw = Math.PI;
+S.playerPos.set(0, 1.7, 6);
 </script>
 </body>
 </html>
