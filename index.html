@@ -15,158 +15,277 @@
   --silver:#b8c5d6;--silver-dim:rgba(184,197,214,0.2);
   --serif:'Cormorant Garamond',Georgia,serif;--sans:'Inter',-apple-system,sans-serif
 }
-html,body{width:100%;height:100%;overflow:hidden;background:var(--midnight-deep);color:var(--warm);font-family:var(--sans);-webkit-font-smoothing:antialiased;cursor:none}
-
-/* ── Custom Cursor ── */
-#cursor{position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:transform .15s cubic-bezier(.16,1,.3,1)}
-#cursor .dot{width:6px;height:6px;background:var(--gold);border-radius:50%;position:absolute;top:-3px;left:-3px;transition:transform .2s,background .3s,box-shadow .3s}
-#cursor .ring{width:36px;height:36px;border:1px solid rgba(200,168,85,0.35);border-radius:50%;position:absolute;top:-18px;left:-18px;transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s,width .3s,height .3s,top .3s,left .3s,background .3s}
-#cursor.hovering .dot{transform:scale(0);background:var(--aurora)}
-#cursor.hovering .ring{width:56px;height:56px;top:-28px;left:-28px;border-color:rgba(74,158,255,0.5);background:rgba(74,158,255,0.04)}
-#cursor.clicking .ring{transform:scale(.85)}
-
-/* ── Cursor Trail ── */
-.cursor-trail{position:fixed;pointer-events:none;z-index:9998;width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0;mix-blend-mode:screen}
-
-/* ── Cursor Glow ── */
-#cursorGlow{position:fixed;pointer-events:none;z-index:4;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,85,0.04) 0%,transparent 70%);transform:translate(-50%,-50%);transition:opacity .4s}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;color:var(--warm);font-family:var(--sans);-webkit-font-smoothing:antialiased;cursor:none}
 ::selection{background:var(--gold);color:var(--midnight)}
 
-#scene{position:fixed;inset:0;z-index:0}
-canvas{display:block}
+/* ── Custom Cursor ── */
+#cursor{position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen}
+.cursor-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;position:absolute;top:-3px;left:-3px;transition:transform .2s,background .3s}
+.cursor-ring{width:36px;height:36px;border:1px solid rgba(200,168,85,0.3);border-radius:50%;position:absolute;top:-18px;left:-18px;transition:transform .4s cubic-bezier(.16,1,.3,1),width .3s,height .3s,top .3s,left .3s,border-color .3s,background .3s}
+#cursor.hover .cursor-dot{transform:scale(0);background:var(--aurora)}
+#cursor.hover .cursor-ring{width:56px;height:56px;top:-28px;left:-28px;border-color:rgba(74,158,255,0.4);background:rgba(74,158,255,0.03)}
+#cursor.click .cursor-ring{transform:scale(.85)}
 
-#vignette{position:fixed;inset:0;pointer-events:none;z-index:5;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.7) 100%)}
+/* ── Cursor Trail ── */
+.ct{position:fixed;pointer-events:none;z-index:9998;border-radius:50%;background:var(--gold);mix-blend-mode:screen}
 
-/* ── Overlay Text ── */
-#overlayText{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;text-align:center;pointer-events:none;opacity:0;transition:opacity 2s cubic-bezier(0.16,1,0.3,1)}
-#overlayText.show{opacity:1}
-#overlayText h1{font-family:var(--serif);font-size:clamp(40px,8vw,96px);font-weight:300;letter-spacing:0.02em;line-height:1.1;color:var(--warm)}
-#overlayText h1 em{font-style:italic;color:var(--gold);font-weight:300}
-#overlayText .tagline{font-family:var(--sans);font-size:clamp(12px,1.8vw,16px);font-weight:200;color:var(--ivory);letter-spacing:0.12em;margin-top:20px}
-#overlayText .enter-prompt{margin-top:48px;font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(200,168,85,0.35);animation:breathe 3s ease-in-out infinite;cursor:pointer;pointer-events:auto}
-@keyframes breathe{0%,100%{opacity:0.25}50%{opacity:0.7}}
+/* ── Cursor Glow ── */
+#cursorGlow{position:fixed;pointer-events:none;z-index:4;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,85,0.03) 0%,transparent 70%);transform:translate(-50%,-50%)}
+
+/* ═══════════════════════════════════════════
+   ACT 1: CINEMATIC LANDING
+   ═══════════════════════════════════════════ */
+#landing{position:fixed;inset:0;z-index:50;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 2s cubic-bezier(.16,1,.3,1)}
+#landing.fade{opacity:0;pointer-events:none}
+
+/* Distance counter */
+#distText{font-family:var(--serif);font-size:clamp(28px,5vw,56px);font-weight:300;color:var(--warm);letter-spacing:.04em;opacity:0;transition:opacity 1.5s}
+#distText .km{font-size:.5em;color:var(--ivory);font-weight:200;letter-spacing:.08em}
+
+/* City dots */
+#cityDots{position:relative;width:min(500px,80vw);height:120px;margin-top:40px;opacity:0;transition:opacity 1.5s}
+.city-dot{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px}
+.city-dot .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 20px rgba(200,168,85,0.4);animation:dotPulse 2s ease-in-out infinite}
+.city-dot .label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:300}
+.city-dot.dublin{left:10%;top:20%}
+.city-dot.bangalore{right:10%;top:50%}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 20px rgba(200,168,85,0.3)}50%{box-shadow:0 0 35px rgba(200,168,85,0.6)}}
+
+/* Heartbeat line */
+#heartbeatLine{position:absolute;top:50%;left:10%;right:10%;height:1px;opacity:0;transition:opacity 1.5s}
+#heartbeatLine svg{width:100%;height:40px;overflow:visible}
+#heartbeatLine path{fill:none;stroke:var(--gold);stroke-width:1.5;stroke-dasharray:600;stroke-dashoffset:600;filter:drop-shadow(0 0 6px rgba(200,168,85,0.3))}
+#heartbeatLine.animate path{animation:drawLine 3s cubic-bezier(.16,1,.3,1) forwards,pulseLine 2s ease-in-out 3s infinite}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+@keyframes pulseLine{0%,100%{stroke-opacity:.4;stroke-width:1.5}50%{stroke-opacity:1;stroke-width:2}}
+
+/* Title */
+#titleBlock{text-align:center;margin-top:48px;opacity:0;transition:opacity 2s}
+#titleBlock h1{font-family:var(--serif);font-size:clamp(36px,7vw,80px);font-weight:300;letter-spacing:.03em;line-height:1.1;color:var(--warm)}
+#titleBlock h1 em{font-style:italic;color:var(--gold);font-weight:300}
+#titleBlock .tagline{font-family:var(--sans);font-size:clamp(11px,1.5vw,15px);font-weight:200;color:var(--ivory);letter-spacing:.12em;margin-top:16px}
+
+/* Enter button */
+#enterBtn{margin-top:48px;padding:12px 32px;border:1px solid rgba(200,168,85,0.2);border-radius:32px;background:transparent;color:var(--gold);font-family:var(--sans);font-size:11px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1)}
+#enterBtn:hover{background:rgba(200,168,85,0.06);border-color:rgba(200,168,85,0.4);transform:scale(1.04)}
+#enterBtn.show{animation:breathe 3s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* ═══════════════════════════════════════════
+   ACT 2: FLOATING UNIVERSE
+   ═══════════════════════════════════════════ */
+#universeCanvas{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 3s}
+#universeCanvas.show{opacity:1;pointer-events:auto}
 
 /* ── HUD ── */
-#hud{position:fixed;top:0;left:0;right:0;z-index:8;display:flex;justify-content:space-between;align-items:flex-start;padding:24px 32px;opacity:0;transition:opacity 1.5s;pointer-events:none}
+#hud{position:fixed;top:0;left:0;right:0;z-index:15;display:flex;justify-content:space-between;align-items:flex-start;padding:24px 32px;opacity:0;transition:opacity 1.5s;pointer-events:none}
 #hud.show{opacity:1;pointer-events:auto}
 .hud-city{text-align:right}
 .hud-city:first-child{text-align:left}
-.hud-city .city-name{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(200,168,85,0.35);font-weight:300}
-.hud-city .city-time{font-family:var(--serif);font-size:clamp(18px,2.5vw,28px);font-weight:300;color:var(--warm);letter-spacing:0.02em}
-.hud-city .city-weather{font-size:10px;color:var(--silver-dim);margin-top:2px;letter-spacing:0.08em}
+.hud-city .city-name{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,168,85,0.3);font-weight:300}
+.hud-city .city-time{font-family:var(--serif);font-size:clamp(16px,2vw,24px);font-weight:300;color:var(--warm);letter-spacing:.02em}
+.hud-city .city-time-period{font-size:9px;color:var(--ivory);margin-top:2px;letter-spacing:.08em}
 .hud-center{text-align:center}
-.hud-center .countdown-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(200,168,85,0.3);font-weight:300}
-.hud-center .countdown-val{font-family:var(--serif);font-size:14px;color:rgba(240,230,210,0.4);margin-top:2px}
+.hud-center .countdown-label{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,168,85,0.25);font-weight:300}
+.hud-center .countdown-val{font-family:var(--serif);font-size:13px;color:rgba(240,230,210,0.35);margin-top:2px}
 
 /* ── Scene Label ── */
-#sceneLabel{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:10;opacity:0;transition:opacity 1.5s cubic-bezier(0.16,1,0.3,1);pointer-events:none;text-align:center}
+#sceneLabel{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:15;opacity:0;transition:opacity 1.5s;pointer-events:none;text-align:center}
 #sceneLabel.show{opacity:1}
-.sl-name{font-family:var(--serif);font-size:clamp(14px,2vw,18px);font-weight:300;color:var(--gold);letter-spacing:0.06em}
-.sl-hint{font-size:10px;color:rgba(240,230,210,0.25);margin-top:6px;letter-spacing:0.15em;font-weight:300}
+.sl-name{font-family:var(--serif);font-size:clamp(14px,2vw,18px);font-weight:300;color:var(--gold);letter-spacing:.06em}
+.sl-hint{font-size:9px;color:rgba(240,230,210,0.2);margin-top:4px;letter-spacing:.15em;font-weight:300}
 
-/* ── Thinking of You ── */
-#thinkBtn{position:fixed;bottom:40px;right:32px;z-index:10;width:44px;height:44px;border-radius:50%;border:1px solid rgba(200,168,85,0.15);background:rgba(255,255,255,0.02);backdrop-filter:blur(20px);color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all 0.5s cubic-bezier(0.16,1,0.3,1);font-size:16px}
-#thinkBtn.show{opacity:0.5}
-#thinkBtn:hover{opacity:1;border-color:rgba(200,168,85,0.4);transform:scale(1.08)}
-#thinkBtn.sent{animation:heartPulse 1s cubic-bezier(0.34,1.56,0.64,1)}
-@keyframes heartPulse{0%{transform:scale(1)}30%{transform:scale(1.3);box-shadow:0 0 30px rgba(200,168,85,0.3)}100%{transform:scale(1)}}
+/* ── Constellation Nav ── */
+#constNav{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:15;display:flex;flex-direction:column;gap:0;opacity:0;transition:opacity 1.5s;pointer-events:none}
+#constNav.show{opacity:1;pointer-events:auto}
+.const-star{display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 0;transition:all .4s}
+.const-star .star-dot{width:6px;height:6px;border-radius:50%;border:1px solid rgba(200,168,85,0.25);background:transparent;transition:all .4s;flex-shrink:0}
+.const-star .star-label{font-size:9px;letter-spacing:.12em;color:rgba(200,168,85,0.2);font-weight:300;transition:color .4s;text-transform:uppercase;white-space:nowrap}
+.const-star:hover .star-dot{border-color:var(--gold);background:rgba(200,168,85,0.15);transform:scale(1.4)}
+.const-star:hover .star-label{color:rgba(200,168,85,0.6)}
+.const-star.active .star-dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(200,168,85,0.4)}
+.const-star.active .star-label{color:var(--gold)}
+
+/* ── I Miss You Button ── */
+#missBtn{position:fixed;bottom:40px;right:32px;z-index:15;width:48px;height:48px;border-radius:50%;border:1px solid rgba(200,168,85,0.12);background:rgba(255,255,255,0.01);backdrop-filter:blur(20px);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1);pointer-events:none}
+#missBtn.show{opacity:.5;pointer-events:auto}
+#missBtn:hover{opacity:1;border-color:rgba(200,168,85,0.3);transform:scale(1.08)}
+#missBtn .heart{width:16px;height:16px;position:relative}
+#missBtn .heart::before,#missBtn .heart::after{content:'';position:absolute;top:0;width:10px;height:16px;border-radius:10px 10px 0 0;background:var(--gold);transform-origin:bottom center}
+#missBtn .heart::before{left:0;transform:rotate(-45deg);transform-origin:bottom right}
+#missBtn .heart::after{left:6px;transform:rotate(45deg);transform-origin:bottom left}
+#missBtn.pulsing{animation:heartPulse 1.5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes heartPulse{0%{transform:scale(1)}20%{transform:scale(1.25);box-shadow:0 0 40px rgba(200,168,85,0.3)}100%{transform:scale(1)}}
+
+/* ── I Miss You Received Pulse ── */
+#missPulse{position:fixed;inset:0;z-index:12;background:radial-gradient(ellipse at center,rgba(200,168,85,0.08) 0%,transparent 70%);opacity:0;pointer-events:none;transition:opacity 0.6s}
+#missPulse.show{opacity:1}
+#missToast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.8s}
+#missToast.show{opacity:1}
+#missToast .miss-name{font-family:var(--serif);font-size:18px;color:var(--gold);font-weight:300;letter-spacing:.04em}
+#missToast .miss-sub{font-size:10px;color:var(--ivory);letter-spacing:.15em;margin-top:4px}
+
+/* ── Moon ── */
+#moonBtn{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:15;width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#eee 0%,#ccc 50%,#999 100%);box-shadow:0 0 20px rgba(200,200,180,0.15);cursor:pointer;opacity:0;transition:all .5s;pointer-events:none;border:none}
+#moonBtn.show{opacity:.6;pointer-events:auto}
+#moonBtn:hover{opacity:1;box-shadow:0 0 30px rgba(200,200,180,0.25);transform:translateX(-50%) scale(1.1)}
+
+/* ── Moon Message Overlay ── */
+#moonOverlay{position:fixed;inset:0;z-index:25;background:rgba(2,2,8,0.92);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
+#moonOverlay.open{opacity:1;visibility:visible}
+#moonOverlay .moon-big{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0%,#eee 30%,#ccc 60%,#999 100%);box-shadow:0 0 60px rgba(200,200,180,0.15),0 0 120px rgba(200,200,180,0.05);margin-bottom:32px}
+#moonOverlay .moon-date{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+#moonOverlay .moon-msg{font-family:var(--serif);font-size:clamp(18px,3vw,28px);font-weight:300;color:var(--warm);text-align:center;max-width:500px;line-height:1.6;font-style:italic}
+#moonOverlay .moon-close{margin-top:40px;padding:8px 24px;border:1px solid rgba(200,168,85,0.15);border-radius:20px;background:transparent;color:var(--gold);font-size:10px;letter-spacing:.15em;cursor:pointer;transition:all .3s}
+#moonOverlay .moon-close:hover{border-color:rgba(200,168,85,0.4);background:rgba(200,168,85,0.05)}
+
+/* ── Letter Writing Overlay ── */
+#letterOverlay{position:fixed;inset:0;z-index:25;background:rgba(2,2,8,0.92);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
+#letterOverlay.open{opacity:1;visibility:visible}
+.letter-envelope{width:min(440px,90vw);background:linear-gradient(145deg,rgba(15,18,30,0.95),rgba(10,12,25,0.98));border:1px solid rgba(200,168,85,0.1);border-radius:20px;padding:36px;transform:translateY(30px) scale(.95);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative}
+#letterOverlay.open .letter-envelope{transform:translateY(0) scale(1)}
+.letter-envelope h3{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--gold);margin-bottom:16px}
+.letter-envelope textarea{width:100%;min-height:140px;border:none;background:transparent;color:var(--warm);font-family:var(--serif);font-size:17px;line-height:1.8;resize:none;outline:none}
+.letter-envelope textarea::placeholder{color:rgba(240,230,210,0.12);font-style:italic}
+.letter-actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.03)}
+.letter-count{font-size:9px;color:rgba(240,230,210,0.25);letter-spacing:.08em}
+.letter-send{padding:8px 20px;border:1px solid rgba(200,168,85,0.2);border-radius:24px;background:rgba(200,168,85,0.04);color:var(--gold);font-family:var(--sans);font-size:10px;font-weight:400;cursor:pointer;transition:all .4s;letter-spacing:.06em}
+.letter-send:hover{background:rgba(200,168,85,0.1);border-color:rgba(200,168,85,0.4)}
+.letter-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);color:rgba(240,230,210,0.25);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px}
+
+/* ── Paper Airplane Animation ── */
+.paper-plane{position:fixed;z-index:30;pointer-events:none;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:12px solid var(--warm);filter:drop-shadow(0 0 6px rgba(200,168,85,0.3))}
+
+/* ── Firefly Notification ── */
+.firefly{position:fixed;z-index:30;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px rgba(200,168,85,0.5);pointer-events:auto;cursor:pointer;transition:box-shadow .3s}
+.firefly:hover{box-shadow:0 0 24px rgba(200,168,85,0.8)}
+.firefly.opening{animation:fireflyLand .8s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes fireflyLand{0%{transform:scale(1)}50%{transform:scale(1.5);box-shadow:0 0 40px rgba(200,168,85,0.6)}100%{transform:scale(0);opacity:0}}
 
 /* ── Toast ── */
-#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);z-index:20;background:rgba(5,8,22,0.92);backdrop-filter:blur(24px);border:1px solid rgba(200,168,85,0.15);border-radius:16px;padding:20px 32px;text-align:center;opacity:0;pointer-events:none;transition:all 0.6s cubic-bezier(0.16,1,0.3,1)}
+#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);z-index:30;background:rgba(5,8,22,0.92);backdrop-filter:blur(24px);border:1px solid rgba(200,168,85,0.12);border-radius:16px;padding:20px 32px;text-align:center;opacity:0;pointer-events:none;transition:all .6s cubic-bezier(.16,1,.3,1)}
 #toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.toast-icon{font-size:24px;margin-bottom:8px}
-.toast-text{font-family:var(--serif);font-size:16px;color:var(--warm);font-weight:300}
-
-/* ── Letter Modal ── */
-#letterOverlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(5,8,22,0.9);backdrop-filter:blur(16px);opacity:0;visibility:hidden;transition:all 0.8s cubic-bezier(0.16,1,0.3,1)}
-#letterOverlay.open{opacity:1;visibility:visible}
-.letter-envelope{width:min(440px,90vw);background:linear-gradient(145deg,rgba(15,18,30,0.95),rgba(10,12,25,0.98));border:1px solid rgba(200,168,85,0.1);border-radius:20px;padding:36px;transform:translateY(30px);transition:transform 0.8s cubic-bezier(0.16,1,0.3,1);position:relative}
-#letterOverlay.open .letter-envelope{transform:translateY(0)}
-.letter-envelope::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
-.letter-envelope h3{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--gold);margin-bottom:16px}
-.letter-envelope textarea{width:100%;min-height:160px;border:none;background:transparent;color:var(--warm);font-family:var(--serif);font-size:17px;line-height:1.8;resize:none;outline:none}
-.letter-envelope textarea::placeholder{color:rgba(240,230,210,0.15);font-style:italic}
-.letter-actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.04)}
-.letter-count{font-size:10px;color:rgba(240,230,210,0.3);letter-spacing:0.08em}
-.letter-send{padding:8px 20px;border:1px solid rgba(200,168,85,0.2);border-radius:24px;background:rgba(200,168,85,0.05);color:var(--gold);font-family:var(--sans);font-size:11px;font-weight:400;cursor:pointer;transition:all 0.4s;letter-spacing:0.06em}
-.letter-send:hover{background:rgba(200,168,85,0.12);border-color:rgba(200,168,85,0.4)}
-.letter-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:rgba(240,230,210,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
+.toast-text{font-family:var(--serif);font-size:15px;color:var(--warm);font-weight:300}
 
 /* ── Audio Controls ── */
-#audioControls{position:fixed;bottom:40px;left:32px;z-index:10;display:flex;gap:8px;opacity:0;transition:opacity 1.5s;pointer-events:none}
+#audioControls{position:fixed;bottom:40px;left:32px;z-index:15;display:flex;gap:8px;opacity:0;transition:opacity 1.5s;pointer-events:none}
 #audioControls.show{opacity:1;pointer-events:auto}
-.audio-btn{width:32px;height:32px;border-radius:50%;border:1px solid rgba(200,168,85,0.12);background:rgba(255,255,255,0.02);backdrop-filter:blur(12px);color:var(--silver);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all 0.3s}
+.audio-btn{width:28px;height:28px;border-radius:50%;border:1px solid rgba(200,168,85,0.1);background:rgba(255,255,255,0.01);color:var(--silver);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;transition:all .3s}
 .audio-btn:hover{border-color:rgba(200,168,85,0.3);color:var(--gold)}
-.audio-btn.active{background:rgba(200,168,85,0.08);border-color:rgba(200,168,85,0.25);color:var(--gold)}
+.audio-btn.active{background:rgba(200,168,85,0.06);border-color:rgba(200,168,85,0.2);color:var(--gold)}
 
-/* ── Scene Navigation ── */
-#sceneNav{position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:10;display:flex;flex-direction:column;gap:12px;opacity:0;transition:opacity 1.5s;pointer-events:none}
-#sceneNav.show{opacity:1;pointer-events:auto}
-.scene-dot{width:8px;height:8px;border-radius:50%;border:1px solid rgba(200,168,85,0.2);background:transparent;cursor:pointer;transition:all 0.4s}
-.scene-dot:hover{border-color:rgba(200,168,85,0.5);transform:scale(1.3)}
-.scene-dot.active{background:var(--gold);border-color:var(--gold)}
+/* ── Scroll Indicator ── */
+#scrollIndicator{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:15;text-align:center;opacity:0;transition:opacity 1s;pointer-events:none}
+#scrollIndicator.show{opacity:1}
+#scrollIndicator .scroll-text{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,168,85,0.2);margin-bottom:8px}
+#scrollIndicator .scroll-line{width:1px;height:24px;background:linear-gradient(to bottom,rgba(200,168,85,0.3),transparent);margin:0 auto;animation:scrollPulse 2s ease-in-out infinite}
+@keyframes scrollPulse{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:.8;transform:scaleY(1.3)}}
+
+/* ── Time of Day Overlay ── */
+#timeOverlay{position:fixed;inset:0;z-index:2;pointer-events:none;transition:background 2s}
 
 @media(max-width:768px){
   #hud{padding:16px 20px}
   .hud-center{display:none}
-  #thinkBtn{bottom:24px;right:20px;width:38px;height:38px}
-  #sceneLabel{bottom:24px}
-  #sceneNav{right:12px;gap:8px}
+  #constNav{right:12px}
+  .const-star .star-label{display:none}
+  #missBtn{bottom:24px;right:20px;width:40px;height:40px}
   #audioControls{bottom:24px;left:20px}
+  #moonBtn{top:48px;width:28px;height:28px}
 }
 </style>
 </head>
 <body>
 
-<canvas id="scene"></canvas>
-<div id="vignette"></div>
-
-<div id="cursor"><div class="dot"></div><div class="ring"></div></div>
-<div id="cursorGlow"></div>
-
-<div id="overlayText">
-  <h1 id="titleText"></h1>
-  <div class="tagline" id="tagline"></div>
-  <div class="enter-prompt" id="enterPrompt">Enter Our World</div>
+<!-- ═══ ACT 1: CINEMATIC LANDING ═══ -->
+<div id="landing">
+  <div id="distText"></div>
+  <div id="cityDots">
+    <div class="city-dot dublin"><div class="dot"></div><div class="label">Dublin</div></div>
+    <div class="city-dot bangalore"><div class="dot"></div><div class="label">Bangalore</div></div>
+    <div id="heartbeatLine">
+      <svg viewBox="0 0 500 40" preserveAspectRatio="none">
+        <path d="M0,20 Q60,20 80,20 Q95,20 105,5 Q115,35 125,20 Q140,20 180,20 Q200,20 220,20 Q235,20 245,5 Q255,35 265,20 Q280,20 320,20 Q340,20 360,20 Q375,20 385,5 Q395,35 405,20 Q420,20 500,20"/>
+      </svg>
+    </div>
+  </div>
+  <div id="titleBlock">
+    <h1><em>Parallel</em> Hearts</h1>
+    <div class="tagline">Different skies. Same heartbeat.</div>
+  </div>
+  <button id="enterBtn">Enter Our World</button>
 </div>
+
+<!-- ═══ ACT 2: UNIVERSE ═══ -->
+<div id="timeOverlay"></div>
+<canvas id="universeCanvas"></canvas>
 
 <div id="hud">
-  <div class="hud-city"><div class="city-name">Dublin</div><div class="city-time" id="clockDublin">--:--</div><div class="city-weather" id="weatherDublin"></div></div>
-  <div class="hud-center"><div class="countdown-label">Until we meet</div><div class="countdown-val" id="countdown"></div></div>
-  <div class="hud-city"><div class="city-name">Bangalore</div><div class="city-time" id="clockBangalore">--:--</div><div class="city-weather" id="weatherBangalore"></div></div>
+  <div class="hud-city">
+    <div class="city-name">Dublin</div>
+    <div class="city-time" id="clockDublin">--:--</div>
+    <div class="city-time-period" id="periodDublin"></div>
+  </div>
+  <div class="hud-center">
+    <div class="countdown-label">Until we meet</div>
+    <div class="countdown-val" id="countdown"></div>
+  </div>
+  <div class="hud-city">
+    <div class="city-name">Bangalore</div>
+    <div class="city-time" id="clockBangalore">--:--</div>
+    <div class="city-time-period" id="periodBangalore"></div>
+  </div>
 </div>
+
+<button id="moonBtn"></button>
+
+<div id="constNav">
+  <div class="const-star active" data-scene="universe"><div class="star-dot"></div><div class="star-label">Home</div></div>
+  <div class="const-star" data-scene="memories"><div class="star-dot"></div><div class="star-label">Memories</div></div>
+  <div class="const-star" data-scene="letters"><div class="star-dot"></div><div class="star-label">Letters</div></div>
+  <div class="const-star" data-scene="gallery"><div class="star-dot"></div><div class="star-label">Gallery</div></div>
+  <div class="const-star" data-scene="bucketlist"><div class="star-dot"></div><div class="star-label">Bucket List</div></div>
+  <div class="const-star" data-scene="music"><div class="star-dot"></div><div class="star-label">Our Music</div></div>
+  <div class="const-star" data-scene="future"><div class="star-dot"></div><div class="star-label">Our Future</div></div>
+  <div class="const-star" data-scene="ending"><div class="star-dot" style="opacity:0.3;border-style:dashed"></div><div class="star-label" style="opacity:0.3">...</div></div>
+</div>
+
+<button id="missBtn" title="I miss you"></button>
+
+<div id="missPulse"></div>
+<div id="missToast"><div class="miss-name" id="missName"></div><div class="miss-sub">is thinking about you</div></div>
 
 <div id="sceneLabel"><div class="sl-name" id="slName"></div><div class="sl-hint" id="slHint"></div></div>
 
-<div id="sceneNav">
-  <div class="scene-dot active" data-scene="arrival" title="Arrival"></div>
-  <div class="scene-dot" data-scene="glasshouse" title="The Glasshouse"></div>
-  <div class="scene-dot" data-scene="observatory" title="Observatory"></div>
-  <div class="scene-dot" data-scene="library" title="Library"></div>
-  <div class="scene-dot" data-scene="memoryGalaxy" title="Memory Galaxy"></div>
-  <div class="scene-dot" data-scene="balcony" title="Balcony"></div>
-</div>
-
-<button id="thinkBtn" title="Thinking of you">&#9825;</button>
-
-<div id="toast"><div class="toast-icon" id="toastIcon"></div><div class="toast-text" id="toastText"></div></div>
-
-<div id="letterOverlay">
-  <div class="letter-envelope">
-    <button class="letter-close" onclick="closeLetter()">&#10005;</button>
-    <h3 id="letterTitle">Write a Letter</h3>
-    <textarea id="letterText" placeholder="Write something from the heart..."></textarea>
-    <div class="letter-actions">
-      <span class="letter-count" id="letterCount">0 / 250 words</span>
-      <button class="letter-send" onclick="sendLetter()">Send with love</button>
-    </div>
-  </div>
-</div>
+<div id="scrollIndicator"><div class="scroll-text">Scroll to travel through time</div><div class="scroll-line"></div></div>
 
 <div id="audioControls">
   <button class="audio-btn" data-sound="piano" title="Piano">&#9835;</button>
   <button class="audio-btn" data-sound="rain" title="Rain">&#9729;</button>
-  <button class="audio-btn" data-sound="night" title="Night Sounds">&#9789;</button>
+  <button class="audio-btn" data-sound="night" title="Night">&#9789;</button>
+</div>
+
+<div id="toast"><div class="toast-text" id="toastText"></div></div>
+
+<!-- Moon Message Overlay -->
+<div id="moonOverlay">
+  <div class="moon-big"></div>
+  <div class="moon-date" id="moonDate"></div>
+  <div class="moon-msg" id="moonMsg"></div>
+  <button class="moon-close" onclick="document.getElementById('moonOverlay').classList.remove('open')">Close</button>
+</div>
+
+<!-- Letter Overlay -->
+<div id="letterOverlay">
+  <div class="letter-envelope">
+    <button class="letter-close" onclick="document.getElementById('letterOverlay').classList.remove('open')">&#10005;</button>
+    <h3>Write a Letter</h3>
+    <textarea id="letterText" placeholder="Write something from the heart..."></textarea>
+    <div class="letter-actions">
+      <span class="letter-count" id="letterCount">0 / 250 words</span>
+      <button class="letter-send" id="letterSend">Send with love</button>
+    </div>
+  </div>
 </div>
 
 <script type="importmap">
@@ -174,1034 +293,471 @@ canvas{display:block}
 </script>
 <script type="module">
 import*as THREE from'three';
-import{EffectComposer}from'three/addons/postprocessing/EffectComposer.js';
-import{RenderPass}from'three/addons/postprocessing/RenderPass.js';
-import{UnrealBloomPass}from'three/addons/postprocessing/UnrealBloomPass.js';
-import{ShaderPass}from'three/addons/postprocessing/ShaderPass.js';
 
 const $=id=>document.getElementById(id);
 const PI=Math.PI,TAU=PI*2;
 let W=window.innerWidth,H=window.innerHeight;
 let time=0,delta=0;
-let sceneState='arrival';
-let entered=false,locked=false;
-
-/* ═══════════════════════════════════════════
-   THREE.JS SETUP
-   ═══════════════════════════════════════════ */
-const renderer=new THREE.WebGLRenderer({canvas:$('scene'),antialias:true,powerPreference:'high-performance'});
-renderer.setSize(W,H);
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=0.7;
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-
-const cam=new THREE.PerspectiveCamera(50,W/H,0.1,500);
-cam.position.set(0,1.7,8);
-
-const sc=new THREE.Scene();
-sc.background=new THREE.Color(0x050816);
-sc.fog=new THREE.FogExp2(0x050816,0.012);
-
-const composer=new EffectComposer(renderer);
-composer.addPass(new RenderPass(sc,cam));
-const bloom=new UnrealBloomPass(new THREE.Vector2(W,H),0.5,0.4,0.85);
-composer.addPass(bloom);
-const vignetteShader={uniforms:{tDiffuse:{value:null}},vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`uniform sampler2D tDiffuse;varying vec2 vUv;void main(){vec4 t=texture2D(tDiffuse,vUv);vec2 u=(vUv-.5)*1.1;float v=1.-dot(u,u);t.rgb*=smoothstep(0.,1.,v/1.3);gl_FragColor=t;}`};
-composer.addPass(new ShaderPass(vignetteShader));
+let phase='landing';
+let scrollProgress=0;
 
 /* ═══════════════════════════════════════════
    CUSTOM CURSOR
    ═══════════════════════════════════════════ */
-const cursorEl=$('cursor');
-const cursorGlow=$('cursorGlow');
-let mouseX=W/2,mouseY=H/2;
-let cursorX=W/2,cursorY=H/2;
-let isHovering=false;
-
-/* Trail particles */
-const trailCount=12;
-const trails=[];
-for(let i=0;i<trailCount;i++){
-  const t=document.createElement('div');
-  t.className='cursor-trail';
-  t.style.width=`${3-i*.2}px`;
-  t.style.height=`${3-i*.2}px`;
-  document.body.appendChild(t);
-  trails.push({el:t,x:W/2,y:H/2});
+const cursorEl=$('cursor')||createCursor();
+function createCursor(){
+  const c=document.createElement('div');c.id='cursor';
+  c.innerHTML='<div class="cursor-dot"></div><div class="cursor-ring"></div>';
+  document.body.appendChild(c);return c;
 }
-const trailPos=trails.map(()=>({x:W/2,y:H/2}));
+const glowEl=$('cursorGlow')||(()=>{const g=document.createElement('div');g.id='cursorGlow';document.body.appendChild(g);return g})();
+let mouseX=W/2,mouseY=H/2,cursorX=W/2,cursorY=H/2;
 
-document.addEventListener('mousemove',e=>{
-  mouseX=e.clientX;mouseY=e.clientY;
-  cursorGlow.style.left=mouseX+'px';
-  cursorGlow.style.top=mouseY+'px';
-});
-
-document.addEventListener('mousedown',()=>cursorEl.classList.add('clicking'));
-document.addEventListener('mouseup',()=>cursorEl.classList.remove('clicking'));
-
-/* Detect hoverable elements */
-function checkHover(){
-  const els=document.querySelectorAll('button,a,.scene-dot,.audio-btn,#enterPrompt,.letter-send,.letter-close');
-  let hovering=false;
-  els.forEach(el=>{
-    const r=el.getBoundingClientRect();
-    if(mouseX>=r.left-10&&mouseX<=r.right+10&&mouseY>=r.top-10&&mouseY<=r.bottom+10)hovering=true;
-  });
-  if(hovering!==isHovering){
-    isHovering=hovering;
-    cursorEl.classList.toggle('hovering',hovering);
-  }
+const trailEls=[];const trailData=[];
+for(let i=0;i<10;i++){
+  const el=document.createElement('div');el.className='ct';
+  const sz=3-i*.25;el.style.width=sz+'px';el.style.height=sz+'px';
+  document.body.appendChild(el);trailEls.push(el);trailData.push({x:W/2,y:H/2});
 }
 
-function updateCursor(){
-  /* Smooth follow */
-  const ease=.12;
-  cursorX+=(mouseX-cursorX)*ease;
-  cursorY+=(mouseY-cursorY)*ease;
+document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;glowEl.style.left=mouseX+'px';glowEl.style.top=mouseY+'px'});
+document.addEventListener('mousedown',()=>cursorEl.classList.add('click'));
+document.addEventListener('mouseup',()=>cursorEl.classList.remove('click'));
+
+function tickCursor(){
+  cursorX+=(mouseX-cursorX)*.12;cursorY+=(mouseY-cursorY)*.12;
   cursorEl.style.transform=`translate(${cursorX}px,${cursorY}px)`;
-
-  /* Trail */
-  for(let i=0;i<trailCount;i++){
-    const prev=i===0?{x:cursorX,y:cursorY}:trailPos[i-1];
-    const t=trails[i];
-    const ease2=.15-i*.008;
-    trailPos[i].x+=(prev.x-trailPos[i].x)*ease2;
-    trailPos[i].y+=(prev.y-trailPos[i].y)*ease2;
-    t.el.style.transform=`translate(${trailPos[i].x-2}px,${trailPos[i].y-2}px)`;
-    t.el.style.opacity=(1-i/trailCount)*.3;
+  for(let i=0;i<10;i++){
+    const prev=i===0?{x:cursorX,y:cursorY}:trailData[i-1];
+    trailData[i].x+=(prev.x-trailData[i].x)*(.15-i*.01);
+    trailData[i].y+=(prev.y-trailData[i].y)*(.15-i*.01);
+    trailEls[i].style.transform=`translate(${trailData[i].x-1.5}px,${trailData[i].y-1.5}px)`;
+    trailEls[i].style.opacity=(1-i/10)*.25;
   }
-
-  checkHover();
-  requestAnimationFrame(updateCursor);
-}
-updateCursor();
-
-/* ═══════════════════════════════════════════
-   MATERIALS — Premium Palette
-   ═══════════════════════════════════════════ */
-const M={
-  concrete:new THREE.MeshStandardMaterial({color:0x3a3a3a,roughness:.92}),
-  concreteDark:new THREE.MeshStandardMaterial({color:0x2a2a2a,roughness:.95}),
-  glass:new THREE.MeshPhysicalMaterial({color:0x4a9eff,transmission:.85,roughness:.05,thickness:.02,ior:1.5,transparent:true,opacity:.25}),
-  glassFrost:new THREE.MeshPhysicalMaterial({color:0xb8c5d6,transmission:.6,roughness:.3,thickness:.05,transparent:true,opacity:.4}),
-  wood:new THREE.MeshStandardMaterial({color:0x5a3a20,roughness:.8}),
-  woodLight:new THREE.MeshStandardMaterial({color:0x7a5a3a,roughness:.75}),
-  metal:new THREE.MeshStandardMaterial({color:0x222222,roughness:.3,metalness:.85}),
-  metalWarm:new THREE.MeshStandardMaterial({color:0x8a7050,roughness:.4,metalness:.6}),
-  bark:new THREE.MeshStandardMaterial({color:0x2d1b0f,roughness:.95}),
-  leaf:new THREE.MeshStandardMaterial({color:0x3a6030,roughness:.7,side:THREE.DoubleSide}),
-  leafBright:new THREE.MeshStandardMaterial({color:0x5a8a40,roughness:.65,side:THREE.DoubleSide}),
-  paper:new THREE.MeshStandardMaterial({color:0xf0e6d0,roughness:.9}),
-  glow:new THREE.MeshStandardMaterial({color:0xffcc66,emissive:0xffcc66,emissiveIntensity:2}),
-  bookA:new THREE.MeshStandardMaterial({color:0x8b2500,roughness:.8}),
-  bookB:new THREE.MeshStandardMaterial({color:0x1a3a5a,roughness:.8}),
-  bookC:new THREE.MeshStandardMaterial({color:0x2a4a2a,roughness:.8}),
-  bookD:new THREE.MeshStandardMaterial({color:0x5a3a1a,roughness:.8}),
-  water:new THREE.MeshPhysicalMaterial({color:0x1a2a3a,roughness:.05,metalness:.1,transmission:.7,transparent:true,opacity:.55}),
-  starGlow:new THREE.MeshBasicMaterial({color:0xffeedd,transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false}),
-  aurora:new THREE.MeshBasicMaterial({color:0x4a9eff,transparent:true,opacity:.15,blending:THREE.AdditiveBlending,depthWrite:false}),
-};
-
-/* ═══════════════════════════════════════════
-   LIGHTING
-   ═══════════════════════════════════════════ */
-sc.add(new THREE.AmbientLight(0x0a0a1a,.12));
-const moonDir=new THREE.DirectionalLight(0x8899cc,.35);
-moonDir.position.set(-15,20,-10);
-moonDir.castShadow=true;
-moonDir.shadow.mapSize.set(2048,2048);
-moonDir.shadow.camera.near=.5;moonDir.shadow.camera.far=60;
-moonDir.shadow.camera.left=-20;moonDir.shadow.camera.right=20;
-moonDir.shadow.camera.top=20;moonDir.shadow.camera.bottom=-20;
-moonDir.shadow.bias=-.0005;
-sc.add(moonDir);
-
-const lantern=new THREE.PointLight(0xffaa44,1.8,12,1.5);
-lantern.position.set(2.5,2.8,1);lantern.castShadow=true;
-lantern.shadow.mapSize.set(512,512);
-sc.add(lantern);
-const lanternGlow=new THREE.PointLight(0xffcc66,.4,8,2);
-lanternGlow.position.set(2.5,3.2,1);sc.add(lanternGlow);
-const treeLight=new THREE.PointLight(0x66aa55,.25,10,2);
-treeLight.position.set(0,4,0);sc.add(treeLight);
-
-/* ═══════════════════════════════════════════
-   HELPERS
-   ═══════════════════════════════════════════ */
-function bx(w,h,d,mat,p,s=true){const g=new THREE.BoxGeometry(w,h,d),m=new THREE.Mesh(g,mat);if(p)m.position.copy(p);m.castShadow=s;m.receiveShadow=s;return m}
-function cy(rT,rB,h,mat,p,s=12){const g=new THREE.CylinderGeometry(rT,rB,h,s),m=new THREE.Mesh(g,mat);if(p)m.position.copy(p);m.castShadow=true;m.receiveShadow=true;return m}
-
-const world=new THREE.Group();sc.add(world);
-
-/* ═══════════════════════════════════════════
-   SCENE 1: ARRIVAL
-   ═══════════════════════════════════════════ */
-const arrivalStars=[];
-for(let i=0;i<800;i++){
-  arrivalStars.push({x:(Math.random()-.5)*2,y:(Math.random()-.5)*2,r:Math.random()*1.5+.3,a:Math.random()*.8+.2,ts:Math.random()*.02+.005,to:Math.random()*TAU});
-}
-const dublinPos={x:-.28,y:.05};
-const bangalorePos={x:.32,y:.15};
-
-function drawArrival(ctx,t){
-  ctx.clearRect(0,0,W,H);
-  for(const s of arrivalStars){
-    const a=s.a*(.5+.5*Math.sin(t*s.ts+s.to));
-    ctx.beginPath();ctx.arc((s.x*.5+.5)*W,(s.y*.5+.5)*H,s.r,0,TAU);
-    ctx.fillStyle=`rgba(240,230,210,${a})`;ctx.fill();
-    if(s.r>1.2){ctx.beginPath();ctx.arc((s.x*.5+.5)*W,(s.y*.5+.5)*H,s.r*3,0,TAU);ctx.fillStyle=`rgba(200,168,85,${a*.06})`;ctx.fill()}
-  }
-  const dx1=(dublinPos.x*.5+.5)*W,dy1=(dublinPos.y*.5+.5)*H;
-  const dx2=(bangalorePos.x*.5+.5)*W,dy2=(bangalorePos.y*.5+.5)*H;
-  const cpx=W*.5,cpy=H*.35;
-  const arcProgress=Math.min(1,Math.max(0,(t-1.5)/2));
-  if(arcProgress>0){
-    ctx.beginPath();ctx.moveTo(dx1,dy1);
-    const steps=60,endStep=Math.floor(steps*arcProgress);
-    for(let i=1;i<=endStep;i++){const frac=i/steps;ctx.lineTo((1-frac)*(1-frac)*dx1+2*(1-frac)*frac*cpx+frac*frac*dx2,(1-frac)*(1-frac)*dy1+2*(1-frac)*frac*cpy+frac*frac*dy2)}
-    ctx.strokeStyle=`rgba(200,168,85,${.15+.1*Math.sin(t*2)})`;ctx.lineWidth=1.5;ctx.stroke();
-    ctx.beginPath();ctx.moveTo(dx1,dy1);
-    for(let i=1;i<=endStep;i++){const frac=i/steps;ctx.lineTo((1-frac)*(1-frac)*dx1+2*(1-frac)*frac*cpx+frac*frac*dx2,(1-frac)*(1-frac)*dy1+2*(1-frac)*frac*cpy+frac*frac*dy2)}
-    ctx.strokeStyle=`rgba(200,168,85,${.04+.03*Math.sin(t*2)})`;ctx.lineWidth=6;ctx.stroke();
-  }
-  const dotPulse=.5+.5*Math.sin(t*1.5);
-  [{pos:dublinPos,name:'Dublin'},{pos:bangalorePos,name:'Bangalore'}].forEach(city=>{
-    const cx=(city.pos.x*.5+.5)*W,cy=(city.pos.y*.5+.5)*H;
-    const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,20);
-    grad.addColorStop(0,`rgba(200,168,85,${.12*dotPulse})`);grad.addColorStop(1,'transparent');
-    ctx.fillStyle=grad;ctx.fillRect(cx-20,cy-20,40,40);
-    ctx.beginPath();ctx.arc(cx,cy,3,0,TAU);ctx.fillStyle=`rgba(200,168,85,${.6+.3*dotPulse})`;ctx.fill();
-    ctx.font='300 10px Inter, sans-serif';ctx.fillStyle=`rgba(200,168,85,${.3+.2*dotPulse})`;ctx.textAlign='center';
-    ctx.fillText(city.name,cx,cy+16);
+  /* Hover detection */
+  let hovering=false;
+  document.querySelectorAll('button,a,.const-star,#enterBtn,.letter-send,.letter-close,.moon-close,.audio-btn').forEach(el=>{
+    const r=el.getBoundingClientRect();
+    if(mouseX>=r.left-8&&mouseX<=r.right+8&&mouseY>=r.top-8&&mouseY<=r.bottom+8)hovering=true;
   });
+  cursorEl.classList.toggle('hover',hovering);
+  requestAnimationFrame(tickCursor);
 }
+tickCursor();
 
 /* ═══════════════════════════════════════════
-   SCENE 2: THE GLASSHOUSE
+   ACT 1: CINEMATIC LANDING
    ═══════════════════════════════════════════ */
-function buildGlasshouse(){
-  const g=new THREE.Group();
-  const fg=new THREE.PlaneGeometry(16,14,32,32);
-  const fp=fg.attributes.position;
-  for(let i=0;i<fp.count;i++){fp.setZ(i,(Math.sin(fp.getX(i)*.5)*Math.cos(fp.getY(i)*.3))*.02)}
-  fg.computeVertexNormals();
-  const f=new THREE.Mesh(fg,M.concreteDark);f.rotation.x=-PI/2;f.receiveShadow=true;g.add(f);
-  g.add(bx(16,.12,14,M.concrete,new THREE.Vector3(0,-.06,0)));
-  const wH=4.2;
-  g.add(bx(16,wH,.25,M.concrete,new THREE.Vector3(0,wH/2,-7)));
-  g.add(bx(.25,wH,14,M.concrete,new THREE.Vector3(-8,wH/2,0)));
-  g.add(bx(.25,wH,14,M.concrete,new THREE.Vector3(8,wH/2,0)));
-  for(let i=-2;i<=2;i++)g.add(bx(16,.12,.18,M.concrete,new THREE.Vector3(i*3.5,wH+.06,0)));
-  for(let i=-2;i<=1;i++){const p=new THREE.Mesh(new THREE.PlaneGeometry(3.3,14),M.glass);p.rotation.x=PI/2;p.position.set(i*3.5+1.75,wH+.13,0);g.add(p)}
-  const gwL=new THREE.Mesh(new THREE.PlaneGeometry(14,wH-.5),M.glass);gwL.rotation.y=PI/2;gwL.position.set(-7.87,wH/2,0);g.add(gwL);
-  const gwR=new THREE.Mesh(new THREE.PlaneGeometry(14,wH-.5),M.glass);gwR.rotation.y=-PI/2;gwR.position.set(7.87,wH/2,0);g.add(gwR);
-  const gwB=new THREE.Mesh(new THREE.PlaneGeometry(16,wH-.5),M.glassFrost);gwB.position.set(0,wH/2,-6.87);g.add(gwB);
-  return g;
-}
-world.add(buildGlasshouse());
-
-/* ═══════════════════════════════════════════
-   THE TREE
-   ═══════════════════════════════════════════ */
-function buildTree(){
-  const t=new THREE.Group();
-  for(let i=0;i<8;i++){
-    const f=i/8;
-    t.add(cy(.18*(1-f*.6),.22*(1-f*.6),.5+f*.2,M.bark,new THREE.Vector3(Math.sin(f*.3)*.08,.25+i*.45,Math.cos(f*.2)*.04)));
-  }
-  [[[-.05,3.2,0],[-1,.3,-.2],2.2,.06],[[.05,3,.05],[1,.4,-.1],2,.055],[[.03,3.5,-.05],[-.8,.5,.6],1.8,.045],[[-.02,3.4,.03],[.6,-.7,-.5],1.6,.04],[[0,3.7,0],[-.3,.8,.4],1.4,.035]].forEach(b=>{
-    const dir=new THREE.Vector3(...b[1]).normalize();
-    const org=new THREE.Vector3(...b[0]);
-    for(let i=0;i<4;i++){
-      const f=i/4;const p=org.clone().add(dir.clone().multiplyScalar(f*b[2]));
-      const s=cy(b[3]*.8*(1-f*.5),b[3]*(1-f*.5),b[2]/4,M.bark,p);
-      s.lookAt(p.clone().add(dir));s.rotateX(PI/2);t.add(s);
+const REAL_DISTANCE=8580;
+let landingStep=0;
+const landingTimeline=[
+  {delay:800,fn:()=>{
+    /* Show distance counting up */
+    const el=$('distText');
+    el.style.opacity='1';
+    let current=0;
+    const target=REAL_DISTANCE;
+    const duration=2500;
+    const start=performance.now();
+    function tick(now){
+      const p=Math.min(1,(now-start)/duration);
+      const ease=1-Math.pow(1-p,3);
+      current=Math.floor(ease*target);
+      el.innerHTML=`${current.toLocaleString()}<span class="km"> km apart</span>`;
+      if(p<1)requestAnimationFrame(tick);
+      else el.innerHTML=`${target.toLocaleString()}<span class="km"> km apart</span>`;
     }
-    const tip=org.clone().add(dir.clone().multiplyScalar(b[2]));
-    for(let j=0;j<5;j++){
-      const ls=.12+Math.random()*.1;
-      const lg=new THREE.SphereGeometry(ls,6,4);lg.scale(1,.4,1);
-      const m=(Math.random()>.3?M.leaf:M.leafBright).clone();
-      m.color.offsetHSL(0,0,(Math.random()-.5)*.15);
-      const lf=new THREE.Mesh(lg,m);
-      lf.position.copy(tip).add(new THREE.Vector3((Math.random()-.5)*.5,(Math.random()-.3)*.4,(Math.random()-.5)*.5));
-      lf.rotation.set(Math.random()*PI,Math.random()*PI,0);lf.castShadow=true;
-      lf.userData.sway={s:.3+Math.random()*.4,o:Math.random()*TAU,a:.015+Math.random()*.02};
-      t.add(lf);
-    }
-  });
-  for(let i=0;i<35;i++){
-    const a=Math.random()*TAU,r=.5+Math.random()*1.8,h=3.2+Math.random()*1.5;
-    const ls=.06+Math.random()*.08;
-    const lg=new THREE.SphereGeometry(ls,5,3);lg.scale(1,.35,1);
-    const m=(Math.random()>.4?M.leaf:M.leafBright).clone();
-    m.color.offsetHSL(0,0,(Math.random()-.5)*.2);
-    const lf=new THREE.Mesh(lg,m);
-    lf.position.set(Math.cos(a)*r,h,Math.sin(a)*r);
-    lf.rotation.set(Math.random()*PI,Math.random()*PI,0);lf.castShadow=true;
-    lf.userData.sway={s:.2+Math.random()*.3,o:Math.random()*TAU,a:.01+Math.random()*.02};
-    t.add(lf);
-  }
-  for(let i=0;i<5;i++){
-    const a=(i/5)*TAU+Math.random()*.3;
-    const r=new THREE.Mesh(new THREE.CylinderGeometry(.02,.04,.5+Math.random()*.3,5),M.bark);
-    r.position.set(Math.cos(a)*.25,.1,Math.sin(a)*.25);
-    r.rotation.z=Math.cos(a)*.6;r.rotation.x=Math.sin(a)*.6;r.castShadow=true;t.add(r);
-  }
-  for(let i=0;i<2;i++){
-    const ring=new THREE.Mesh(new THREE.TorusGeometry(.25+i*.04,.008,8,32),new THREE.MeshStandardMaterial({color:0xc8a855,emissive:0xc8a855,emissiveIntensity:.3,transparent:true,opacity:.4-i*.1}));
-    ring.position.y=.15+i*.08;ring.rotation.x=PI/2;t.add(ring);
-  }
-  return t;
-}
-const tree=buildTree();world.add(tree);
-
-/* ═══════════════════════════════════════════
-   BENCH, MAILBOX, LANTERN, BOOKSHELF, etc.
-   ═══════════════════════════════════════════ */
-function buildBench(){
-  const b=new THREE.Group();
-  b.add(bx(1.4,.06,.5,M.wood,new THREE.Vector3(0,.45,0)));
-  b.add(bx(1.3,.04,.45,M.woodLight,new THREE.Vector3(0,.48,0)));
-  [[-.55,.15],[.55,.15],[-.55,-.15],[.55,-.15]].forEach(p=>b.add(bx(.06,.45,.06,M.metal,new THREE.Vector3(p[0],.225,p[1]))));
-  b.add(bx(1.4,.5,.04,M.wood,new THREE.Vector3(0,.75,-.22)));
-  const mg=new THREE.Group();
-  mg.add(cy(.04,.035,.08,M.paper,new THREE.Vector3(0,.04,0)));
-  const mh=new THREE.Mesh(new THREE.TorusGeometry(.025,.006,6,12,PI),M.paper);
-  mh.position.set(.04,.04,0);mh.rotation.y=PI/2;mg.add(mh);
-  for(let i=0;i<3;i++){
-    const s=new THREE.Mesh(new THREE.SphereGeometry(.008,4,4),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.06}));
-    s.position.set((Math.random()-.5)*.02,.09+i*.025,(Math.random()-.5)*.02);
-    s.userData.steam={s:.5+Math.random()*.3,o:i*.5};mg.add(s);
-  }
-  mg.position.set(-.4,.51,0);b.add(mg);
-  const bk=new THREE.Group();
-  bk.add(bx(.12,.015,.17,M.bookA,new THREE.Vector3(0,.0075,0)));
-  bk.add(bx(.11,.012,.16,M.bookB,new THREE.Vector3(.005,.02,.005)));
-  bk.position.set(.35,.51,.02);b.add(bk);
-  b.position.set(3,0,-2);
-  b.userData.interact={text:'Two people. One bench. The same moon above them both.',attr:'Presence'};
-  return b;
-}
-const bench=buildBench();world.add(bench);
-
-function buildMailbox(){
-  const m=new THREE.Group();
-  m.add(cy(.08,.08,1.2,M.metalWarm,new THREE.Vector3(0,.6,0)));
-  m.add(bx(.3,.22,.18,M.metalWarm,new THREE.Vector3(0,1.35,0)));
-  m.add(bx(.02,.1,.02,M.metal,new THREE.Vector3(.16,1.42,0)));
-  m.add(bx(.2,.01,.01,M.metal,new THREE.Vector3(0,1.4,.09)));
-  const env=bx(.12,.08,.01,M.paper,new THREE.Vector3(0,1.46,.1));
-  env.rotation.x=-.15;m.add(env);
-  m.position.set(-4,0,4);
-  m.userData.interact={text:'Every day, one thoughtful message. Quality over quantity.',attr:'The Mailbox'};
-  m.userData.type='mailbox';
-  return m;
-}
-const mailbox=buildMailbox();world.add(mailbox);
-
-function buildLantern(){
-  const l=new THREE.Group();
-  l.add(cy(.08,.1,.05,M.metal,new THREE.Vector3(0,.025,0)));
-  const gb=new THREE.Mesh(new THREE.CylinderGeometry(.07,.06,.18,8,1,true),new THREE.MeshPhysicalMaterial({color:0xffeebb,transmission:.5,roughness:.1,transparent:true,opacity:.3,side:THREE.DoubleSide}));
-  gb.position.set(0,.14,0);l.add(gb);
-  l.add(new THREE.Mesh(new THREE.SphereGeometry(.03,8,8),M.glow)).position.set(0,.14,0);
-  l.add(cy(.04,.07,.04,M.metal,new THREE.Vector3(0,.25,0)));
-  const h=new THREE.Mesh(new THREE.TorusGeometry(.04,.005,6,16,PI),M.metal);h.position.y=.28;l.add(h);
-  l.position.set(2.5,2.7,1);return l;
-}
-world.add(buildLantern());
-
-function buildBookshelf(){
-  const s=new THREE.Group();
-  const w=1.2,h=2,d=.35;
-  s.add(bx(w,h,.03,M.wood,new THREE.Vector3(0,h/2,-d/2+.015)));
-  [0,.33,.66,1].forEach(f=>s.add(bx(w,.03,d,M.wood,new THREE.Vector3(0,h*f,0))));
-  s.add(bx(.03,h,d,M.wood,new THREE.Vector3(-w/2+.015,h/2,0)));
-  s.add(bx(.03,h,d,M.wood,new THREE.Vector3(w/2-.015,h/2,0)));
-  const bms=[M.bookA,M.bookB,M.bookC,M.bookD];
-  for(let r=0;r<3;r++){
-    const y=r*h*.33+.06;let x=-w/2+.08;
-    while(x<w/2-.08){const bw=.02+Math.random()*.03,bh=.12+Math.random()*.1;s.add(bx(bw,bh,.18,bms[Math.floor(Math.random()*4)],new THREE.Vector3(x+bw/2,y+bh/2,0)));x+=bw+.005}
-  }
-  s.position.set(-7.5,0,-1);s.rotation.y=PI/2;
-  s.userData.interact={text:'Letters unwritten. Thoughts half-formed. Dreams waiting to be shared.',attr:'The Library'};
-  s.userData.type='bookshelf';
-  return s;
-}
-const bookshelf=buildBookshelf();world.add(bookshelf);
-
-function buildPhotoFrame(){
-  const f=new THREE.Group();
-  f.add(bx(.4,.3,.02,M.wood,new THREE.Vector3(0,0,0)));
-  f.add(bx(.32,.22,.025,M.paper,new THREE.Vector3(0,0,.01)));
-  f.add(bx(.36,.26,.01,M.metal,new THREE.Vector3(0,0,-.01)));
-  f.add(bx(.34,.24,.005,new THREE.MeshStandardMaterial({color:0xc8a855,roughness:.4,metalness:.6}),new THREE.Vector3(0,0,.015)));
-  f.position.set(-3,1.4,-6.6);
-  f.userData.interact={text:'23 May 2025. Coorg. The day everything began.',attr:'Memory'};
-  f.userData.type='photo';
-  return f;
-}
-const photoFrame=buildPhotoFrame();world.add(photoFrame);
-
-function buildRecordPlayer(){
-  const r=new THREE.Group();
-  r.add(bx(.45,.06,.4,M.wood,new THREE.Vector3(0,.03,0)));
-  r.add(new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.01,32),M.metal)).position.set(-.03,.07,0);
-  const rec=new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,.005,32),new THREE.MeshStandardMaterial({color:0x111111,roughness:.3,metalness:.5}));
-  rec.position.set(-.03,.075,0);r.add(rec);
-  const lb=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.006,16),new THREE.MeshStandardMaterial({color:0xcc3333,roughness:.6}));
-  lb.position.set(-.03,.078,0);r.add(lb);
-  r.add(bx(.005,.005,.18,M.metalWarm,new THREE.Vector3(.12,.09,-.04)));
-  r.position.set(-5.5,1,-6.3);
-  r.userData.interact={text:'The song you played on our first night apart. It still plays.',attr:'Shared Music'};
-  r.userData.type='record';
-  return r;
-}
-const recordPlayer=buildRecordPlayer();world.add(recordPlayer);
-
-function buildWaterFeature(){
-  const w=new THREE.Group();
-  w.add(bx(1.2,.08,.6,M.concrete,new THREE.Vector3(0,.04,0)));
-  const ws=new THREE.Mesh(new THREE.PlaneGeometry(1.1,.5),M.water);
-  ws.rotation.x=-PI/2;ws.position.set(0,.09,0);w.add(ws);
-  w.position.set(-4,0,-4);
-  w.userData.interact={text:'Still water reflects what the eye cannot see.',attr:'Reflection'};
-  return w;
-}
-const waterFeature=buildWaterFeature();world.add(waterFeature);
-
-function buildPlant(pos,sz=1){
-  const p=new THREE.Group();
-  p.add(cy(.1*sz,.08*sz,.15*sz,M.concrete,new THREE.Vector3(0,.075*sz,0)));
-  for(let i=0;i<5;i++){
-    const a=(i/5)*TAU;const sh=.2*sz+Math.random()*.15*sz;
-    p.add(cy(.005,.004,sh,M.leaf,new THREE.Vector3(0,.15*sz+sh/2,0)));
-    const lg=new THREE.SphereGeometry(.04*sz,5,3);lg.scale(1,.3,.6);
-    const lm=new THREE.Mesh(lg,M.leafBright.clone());lm.material.color.offsetHSL(0,0,(Math.random()-.5)*.2);
-    lm.position.set(Math.cos(a)*.06*sz,.15*sz+sh,Math.sin(a)*.06*sz);
-    lm.rotation.set(Math.random()*.5,a,Math.random()*.3);
-    lm.userData.sway={s:.3+Math.random()*.3,o:Math.random()*6,a:.015};
-    p.add(lm);
-  }
-  p.position.copy(pos);return p;
-}
-[[6,-5,1],[-6,-5,.8],[5.5,2],[-5,3,1.2],[-6.5,-3,.7],[6.5,-1,.9],[4,-6,.6]].forEach(p=>world.add(buildPlant(new THREE.Vector3(p[0],0,p[1]),p[2]||1)));
-
-function buildClockDisplay(){
-  const c=new THREE.Group();
-  const face=new THREE.Mesh(new THREE.CircleGeometry(.25,32),new THREE.MeshStandardMaterial({color:0x1a1a1a,roughness:.3,metalness:.5}));
-  face.position.set(0,2.5,-6.72);face.rotation.y=PI;c.add(face);
-  const rim=new THREE.Mesh(new THREE.TorusGeometry(.25,.015,8,32),M.metalWarm);
-  rim.position.set(0,2.5,-6.72);c.add(rim);
-  return c;
-}
-world.add(buildClockDisplay());
-
-/* ═══════════════════════════════════════════
-   FIREFLIES
-   ═══════════════════════════════════════════ */
-const ffN=50;
-const ffGeo=new THREE.BufferGeometry();
-const ffPos=new Float32Array(ffN*3);
-const ffSz=new Float32Array(ffN);
-const ffData=[];
-for(let i=0;i<ffN;i++){
-  const x=(Math.random()-.5)*12,y=.5+Math.random()*3,z=(Math.random()-.5)*10;
-  ffPos[i*3]=x;ffPos[i*3+1]=y;ffPos[i*3+2]=z;ffSz[i]=2+Math.random()*3;
-  ffData.push({vel:new THREE.Vector3((Math.random()-.5)*.3,(Math.random()-.5)*.1,(Math.random()-.5)*.3),ph:Math.random()*TAU,sp:.3+Math.random()*.5,ps:1+Math.random()*2,wa:Math.random()*TAU});
-}
-ffGeo.setAttribute('position',new THREE.BufferAttribute(ffPos,3));
-ffGeo.setAttribute('size',new THREE.BufferAttribute(ffSz,1));
-const ffMat=new THREE.ShaderMaterial({
-  uniforms:{time:{value:0}},
-  vertexShader:`attribute float size;varying float vA;uniform float time;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=size*(300./-mv.z);gl_Position=projectionMatrix*mv;vA=.5+.5*sin(time*2.+position.x*10.);}`,
-  fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-vec2(.5));if(d>.5)discard;float g=1.-smoothstep(0.,.5,d);float c=1.-smoothstep(0.,.15,d);vec3 col=mix(vec3(.8,.65,.2),vec3(1.,.9,.5),c);gl_FragColor=vec4(col,(g*.3+c*.8)*vA);}`,
-  transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
-});
-sc.add(new THREE.Points(ffGeo,ffMat));
-
-/* ═══════════════════════════════════════════
-   RAIN
-   ═══════════════════════════════════════════ */
-const rnN=1500;
-const rnGeo=new THREE.BufferGeometry();
-const rnPos=new Float32Array(rnN*3);
-const rnVel=new Float32Array(rnN);
-for(let i=0;i<rnN;i++){
-  rnPos[i*3]=(Math.random()-.5)*30;rnPos[i*3+1]=Math.random()*10;rnPos[i*3+2]=(Math.random()-.5)*30;
-  rnVel[i]=8+Math.random()*6;
-}
-rnGeo.setAttribute('position',new THREE.BufferAttribute(rnPos,3));
-const rnMat=new THREE.ShaderMaterial({
-  vertexShader:`varying float vA;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=1.5*(200./-mv.z);gl_Position=projectionMatrix*mv;vA=smoothstep(10.,2.,-mv.z)*.3;}`,
-  fragmentShader:`varying float vA;void main(){vec2 u=gl_PointCoord-vec2(.5);if(length(u)>.5)discard;gl_FragColor=vec4(.7,.75,.85,(1.-smoothstep(0.,.5,length(u)))*vA);}`,
-  transparent:true,depthWrite:false
-});
-sc.add(new THREE.Points(rnGeo,rnMat));
-
-/* ═══════════════════════════════════════════
-   FALLING LEAVES
-   ═══════════════════════════════════════════ */
-const lvN=20;
-const lvData=[];
-for(let i=0;i<lvN;i++){
-  const lg=new THREE.PlaneGeometry(.05+Math.random()*.03,.03+Math.random()*.02);
-  const lm=new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(.25+Math.random()*.1,.4+Math.random()*.2,.3+Math.random()*.15),side:THREE.DoubleSide,transparent:true,opacity:.6});
-  const lf=new THREE.Mesh(lg,lm);
-  lf.position.set((Math.random()-.5)*6,3+Math.random()*2,(Math.random()-.5)*4);
-  const d={v:new THREE.Vector3((Math.random()-.5)*.3,-.2-Math.random()*.3,(Math.random()-.5)*.3),r:new THREE.Vector3(Math.random()*2,Math.random()*3,Math.random()*2),wp:Math.random()*PI,ry:3+Math.random()*2};
-  lf.userData.falling=d;world.add(lf);lvData.push(lf);
-}
-
-/* ═══════════════════════════════════════════
-   MOON
-   ═══════════════════════════════════════════ */
-const moonG=new THREE.Group();
-moonG.add(new THREE.Mesh(new THREE.SphereGeometry(1.5,32,32),new THREE.MeshBasicMaterial({color:0xeeeedd})));
-const mg=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),new THREE.ShaderMaterial({
-  vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-  fragmentShader:`varying vec3 vN;void main(){float i=pow(.65-dot(vN,vec3(0,0,1)),3.);gl_FragColor=vec4(.6,.65,.8,i*.4);}`,
-  transparent:true,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false
-}));
-moonG.add(mg);moonG.position.set(-15,18,-25);sc.add(moonG);
-
-/* ═══════════════════════════════════════════
-   MEMORY GALAXY
-   ═══════════════════════════════════════════ */
-const memN=40;
-const memGeo=new THREE.BufferGeometry();
-const memPos=new Float32Array(memN*3);
-const memSz=new Float32Array(memN);
-const memData=[];
-const memories=[
-  {date:'23 May 2025',title:'The Day We Promised',text:'In the misty hills of Coorg, surrounded by family and coffee blossoms, we promised forever.'},
-  {date:'2 January 2026',title:'The Goodbye',text:'Dublin airport. Two cups of chai and a thousand unspoken words.'},
-  {date:'14 Feb 2026',title:'Apart But Never Alone',text:'Valentine\'s Day, 5,000 miles apart. A voice note at midnight.'},
-  {date:'23 May 2026',title:'One Year',text:'One year of choosing each other across time zones and ocean waves.'},
-  {date:'15 Mar 2026',title:'The Sunset Call',text:'We watched the same sunset over video — Dublin and Bangalore. Same sun. Two cities. One heart.'},
-  {date:'1 Jan 2026',title:'New Year\'s Promise',text:'Midnight Dublin. 5:30am Bangalore. "Next year, we close the distance."'},
-  {date:'10 Apr 2026',title:'The Package',text:'A box arrived from Bangalore. His handwriting on the label. Inside: her favourite incense.'},
-  {date:'20 Jun 2026',title:'Rain in Both Cities',text:'It rained in Dublin and Bangalore on the same day. We laughed about it for an hour.'},
-  {date:'3 Feb 2025',title:'Sharath\'s Birthday',text:'The first birthday we celebrated together. A quiet dinner. Two smiles.'},
-  {date:'20 Mar 2025',title:'Rashmi\'s Birthday',text:'Flowers delivered to the wrong address. The wrong address became our favourite story.'},
-  {date:'Dec 2024',title:'London Together',text:'Walking through Covent Garden. Rain on our coats. Hands in pockets. Together.'},
-  {date:'Jun 2025',title:'Dublin Adventures',text:'The first time she showed him her new city. He tried to like the weather.'},
+    requestAnimationFrame(tick);
+  }},
+  {delay:3500,fn:()=>{
+    /* Show city dots and heartbeat line */
+    $('cityDots').style.opacity='1';
+    setTimeout(()=>{$('heartbeatLine').style.opacity='1';$('heartbeatLine').classList.add('animate')},600);
+  }},
+  {delay:5500,fn:()=>{
+    /* Fade out distance, show title */
+    $('distText').style.transition='opacity 1.5s';
+    $('distText').style.opacity='0';
+    $('cityDots').style.transition='opacity 1.5s';
+    $('cityDots').style.opacity='0';
+    setTimeout(()=>{
+      $('titleBlock').style.opacity='1';
+      setTimeout(()=>{$('enterBtn').style.opacity='1';$('enterBtn').classList.add('show')},1200);
+    },800);
+  }}
 ];
-for(let i=0;i<memN;i++){
-  const a=Math.random()*TAU;
-  const elevation=(Math.random()-.3)*.6;
-  const r=15+Math.random()*10;
-  memPos[i*3]=Math.cos(a)*r*Math.cos(elevation);
-  memPos[i*3+1]=5+Math.sin(elevation)*r;
-  memPos[i*3+2]=Math.sin(a)*r*Math.cos(elevation);
-  memSz[i]=1+Math.random()*2;
-  memData.push(memories[i%memories.length]);
+
+function runLanding(){
+  landingTimeline.forEach(step=>setTimeout(step.fn,step.delay));
 }
-memGeo.setAttribute('position',new THREE.BufferAttribute(memPos,3));
-memGeo.setAttribute('size',new THREE.BufferAttribute(memSz,1));
-const memMat=new THREE.ShaderMaterial({
-  uniforms:{time:{value:0}},
-  vertexShader:`attribute float size;varying float vA;uniform float time;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=size*(400./-mv.z);gl_Position=projectionMatrix*mv;vA=.4+.6*sin(time+position.x*.5);}`,
-  fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-vec2(.5));if(d>.5)discard;float g=1.-smoothstep(0.,.5,d);vec3 col=vec3(.9,.8,.5);gl_FragColor=vec4(col,g*vA*.5);}`,
-  transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
-});
-const memStars=new THREE.Points(memGeo,memMat);
-sc.add(memStars);
+runLanding();
+
+$('enterBtn').addEventListener('click',enterUniverse);
+
+function enterUniverse(){
+  if(phase!=='landing')return;
+  phase='transition';
+  $('landing').classList.add('fade');
+  setTimeout(()=>{
+    $('landing').style.display='none';
+    phase='universe';
+    $('universeCanvas').classList.add('show');
+    $('hud').classList.add('show');
+    $('constNav').classList.add('show');
+    $('missBtn').classList.add('show');
+    $('audioControls').classList.add('show');
+    $('moonBtn').classList.add('show');
+    $('scrollIndicator').classList.add('show');
+    showLabel('Your Universe','Scroll to travel through time');
+    setTimeout(()=>$('scrollIndicator').classList.remove('show'),8000);
+    startUniverse();
+  },2000);
+}
 
 /* ═══════════════════════════════════════════
-   SCENE 3: OBSERVATORY — 3D Globe + Stars
+   ACT 2: FLOATING UNIVERSE (Three.js)
    ═══════════════════════════════════════════ */
-const observatory=new THREE.Group();
-observatory.visible=false;
+const renderer=new THREE.WebGLRenderer({canvas:$('universeCanvas'),antialias:true,alpha:true});
+renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=0.8;
 
-/* Globe */
-const globeWire=new THREE.Mesh(
+const cam=new THREE.PerspectiveCamera(50,W/H,0.1,500);
+cam.position.set(0,0,8);
+
+const sc=new THREE.Scene();
+sc.background=new THREE.Color(0x020510);
+sc.fog=new THREE.FogExp2(0x020510,0.008);
+
+/* ── Lighting ── */
+sc.add(new THREE.AmbientLight(0x1a1a2a,.15));
+const sunLight=new THREE.DirectionalLight(0xffeedd,.3);
+sunLight.position.set(-5,8,5);sc.add(sunLight);
+
+/* ── Star Field (background) ── */
+const starN=2000;
+const starGeo=new THREE.BufferGeometry();
+const starPos=new Float32Array(starN*3);
+const starSz=new Float32Array(starN);
+const starCol=new Float32Array(starN*3);
+for(let i=0;i<starN;i++){
+  const theta=Math.random()*TAU,phi=Math.acos(2*Math.random()-1);
+  const r=20+Math.random()*80;
+  starPos[i*3]=r*Math.sin(phi)*Math.cos(theta);
+  starPos[i*3+1]=r*Math.sin(phi)*Math.sin(theta);
+  starPos[i*3+2]=r*Math.cos(phi);
+  starSz[i]=Math.random()*2+.5;
+  const temp=Math.random();
+  starCol[i*3]=.9+temp*.1;starCol[i*3+1]=.85+temp*.1;starCol[i*3+2]=.8+temp*.2;
+}
+starGeo.setAttribute('position',new THREE.BufferAttribute(starPos,3));
+starGeo.setAttribute('size',new THREE.BufferAttribute(starSz,1));
+starGeo.setAttribute('color',new THREE.BufferAttribute(starCol,3));
+const starMat=new THREE.ShaderMaterial({
+  uniforms:{time:{value:0}},
+  vertexShader:`attribute float size;attribute vec3 color;varying vec3 vC;varying float vA;uniform float time;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=size*(200./-mv.z);gl_Position=projectionMatrix*mv;vA=.6+.4*sin(time*.5+position.x*.1+position.y*.1);}`,
+  fragmentShader:`varying vec3 vC;varying float vA;void main(){float d=length(gl_PointCoord-vec2(.5));if(d>.5)discard;float g=1.-smoothstep(0.,.5,d);gl_FragColor=vec4(vC,g*vA);}`,
+  transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
+});
+const stars=new THREE.Points(starGeo,starMat);
+sc.add(stars);
+
+/* ── Shared Moon ── */
+const moonGroup=new THREE.Group();
+const moonMesh=new THREE.Mesh(
   new THREE.SphereGeometry(1.2,32,32),
-  new THREE.MeshBasicMaterial({color:0x4a9eff,wireframe:true,transparent:true,opacity:.15,blending:THREE.AdditiveBlending,depthWrite:false})
+  new THREE.MeshBasicMaterial({color:0xeeeedd})
 );
-globeWire.position.set(0,1.5,0);
-observatory.add(globeWire);
-
-/* Connection arc on globe (Dublin-Bangalore) */
-const arcCurve=new THREE.QuadraticBezierCurve3(
-  new THREE.Vector3(-.6,.8,.6),
-  new THREE.Vector3(0,1.8,0),
-  new THREE.Vector3(.8,.4,-.5)
+moonGroup.add(moonMesh);
+const moonGlow=new THREE.Mesh(
+  new THREE.SphereGeometry(2,32,32),
+  new THREE.ShaderMaterial({
+    vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader:`varying vec3 vN;void main(){float i=pow(.6-dot(vN,vec3(0,0,1)),3.);gl_FragColor=vec4(.7,.72,.8,i*.35);}`,
+    transparent:true,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false
+  })
 );
-const arcGeo=new THREE.TubeGeometry(arcCurve,64,.008,8,false);
-const arcLine=new THREE.Mesh(arcGeo,new THREE.MeshBasicMaterial({color:0xc8a855,transparent:true,opacity:.6,blending:THREE.AdditiveBlending,depthWrite:false}));
-observatory.add(arcLine);
+moonGroup.add(moonGlow);
+moonGroup.position.set(0,4,-15);
+sc.add(moonGroup);
 
-/* City markers */
-[{pos:[-.6,.8,.6],name:'Dublin'},{pos:[.8,.4,-.5],name:'Bangalore'}].forEach(c=>{
-  const dot=new THREE.Mesh(new THREE.SphereGeometry(.03,12,12),new THREE.MeshBasicMaterial({color:0xffcc66,blending:THREE.AdditiveBlending,depthWrite:false}));
-  dot.position.set(...c.pos);observatory.add(dot);
+/* ── Constellation Lines (connecting nav stars) ── */
+const constGroup=new THREE.Group();
+const constStars=[];
+const constLabels=['Home','Memories','Letters','Gallery','Bucket List','Our Music','Our Future'];
+const constPositions=[
+  [0,0,0],[3,2,-2],[-2,3,-1],[4,-1,-3],[-3,-2,-2],[1,-3,-1],[-4,1,-2]
+];
+
+constPositions.forEach((p,i)=>{
+  const star=new THREE.Mesh(
+    new THREE.SphereGeometry(i===0?.08:.05,12,12),
+    new THREE.MeshBasicMaterial({
+      color:i===0?0xffcc66:0xc8a855,
+      transparent:true,opacity:i===0?1:.5,
+      blending:THREE.AdditiveBlending,depthWrite:false
+    })
+  );
+  star.position.set(...p);
+  constGroup.add(star);constStars.push(star);
 });
 
-/* Stars background */
-const obsStarCount=500;
-const obsStarGeo=new THREE.BufferGeometry();
-const obsStarPos=new Float32Array(obsStarCount*3);
-const obsStarSz=new Float32Array(obsStarCount);
-for(let i=0;i<obsStarCount;i++){
-  const theta=Math.random()*TAU;
-  const phi=Math.acos(2*Math.random()-1);
-  const r=8+Math.random()*15;
-  obsStarPos[i*3]=r*Math.sin(phi)*Math.cos(theta);
-  obsStarPos[i*3+1]=r*Math.sin(phi)*Math.sin(theta);
-  obsStarPos[i*3+2]=r*Math.cos(phi);
-  obsStarSz[i]=.5+Math.random()*1.5;
-}
-obsStarGeo.setAttribute('position',new THREE.BufferAttribute(obsStarPos,3));
-obsStarGeo.setAttribute('size',new THREE.BufferAttribute(obsStarSz,1));
-const obsStarMat=new THREE.ShaderMaterial({
-  uniforms:{time:{value:0}},
-  vertexShader:`attribute float size;varying float vA;uniform float time;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=size*(200./-mv.z);gl_Position=projectionMatrix*mv;vA=.5+.5*sin(time+position.x);}`,
-  fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-vec2(.5));if(d>.4)discard;gl_FragColor=vec4(.9,.9,1.,smoothstep(.4,0.,d)*vA*.7);}`,
-  transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
-});
-observatory.add(new THREE.Points(obsStarGeo,obsStarMat));
-
-world.add(observatory);
-
-/* ═══════════════════════════════════════════
-   SCENE 4: LIBRARY — Letters, Books
-   ═══════════════════════════════════════════ */
-const library=new THREE.Group();
-library.visible=false;
-
-/* Tall bookshelves */
-for(let sx=-2;sx<=2;sx++){
-  const shelf=new THREE.Group();
-  const sw=1,ssh=3,sd=.4;
-  shelf.add(bx(sw,ssh,.03,M.wood,new THREE.Vector3(0,ssh/2,-sd/2+.015)));
-  [0,.25,.5,.75,1].forEach(f=>shelf.add(bx(sw,.025,sd,M.wood,new THREE.Vector3(0,ssh*f,0))));
-  shelf.add(bx(.025,ssh,sd,M.wood,new THREE.Vector3(-sw/2+.012,ssh/2,0)));
-  shelf.add(bx(.025,ssh,sd,M.wood,new THREE.Vector3(sw/2-.012,ssh/2,0)));
-  const bms=[M.bookA,M.bookB,M.bookC,M.bookD];
-  for(let r=0;r<4;r++){
-    const y=r*ssh*.25+.04;let x=-sw/2+.06;
-    while(x<sw/2-.06){const bw=.015+Math.random()*.025,bh=.08+Math.random()*.08;shelf.add(bx(bw,bh,.15,bms[Math.floor(Math.random()*4)],new THREE.Vector3(x+bw/2,y+bh/2,0)));x+=bw+.004}
-  }
-  shelf.position.set(sx*2.2,0,-3);
-  library.add(shelf);
+/* Lines between adjacent stars */
+for(let i=0;i<constPositions.length-1;i++){
+  const a=new THREE.Vector3(...constPositions[i]);
+  const b=new THREE.Vector3(...constPositions[i+1]);
+  const mid=a.clone().add(b).multiplyScalar(.5).add(new THREE.Vector3(0,.3,0));
+  const curve=new THREE.QuadraticBezierCurve3(a,mid,b);
+  const pts=curve.getPoints(30);
+  const lineGeo=new THREE.BufferGeometry().setFromPoints(pts);
+  const lineMat=new THREE.LineBasicMaterial({color:0xc8a855,transparent:true,opacity:.1,blending:THREE.AdditiveBlending,depthWrite:false});
+  constGroup.add(new THREE.Line(lineGeo,lineMat));
 }
 
-/* Writing desk */
-const desk=new THREE.Group();
-desk.add(bx(1,.04,.6,M.wood,new THREE.Vector3(0,.75,0)));
-[[-.4,.375,-.25],[.4,.375,-.25],[-.4,.375,.25],[.4,.375,.25]].forEach(p=>desk.add(bx(.04,.75,.04,M.metal,new THREE.Vector3(p[0],p[1],p[2]))));
-desk.add(bx(.8,.02,.5,M.paper,new THREE.Vector3(0,.77,0)));
-/* Pen */
-desk.add(cy(.005,.005,.2,M.metalWarm,new THREE.Vector3(.25,.82,0)));
-/* Inkwell */
-desk.add(cy(.02,.015,.03,M.metal,new THREE.Vector3(-.25,.77,0)));
-desk.position.set(0,0,1);
-library.add(desk);
-
-/* Floating letters (decorative) */
-for(let i=0;i<12;i++){
-  const letter=new THREE.Mesh(new THREE.PlaneGeometry(.08,.05),M.paper);
-  letter.position.set((Math.random()-.5)*6,1+Math.random()*2,(Math.random()-.5)*6);
-  letter.rotation.set(Math.random()*.4,Math.random()*.4,Math.random()*.2);
-  letter.userData.floating={ph:Math.random()*TAU,sp:.3+Math.random()*.3,amp:.1+Math.random()*.1};
-  library.add(letter);
-}
-
-world.add(library);
-
-/* ═══════════════════════════════════════════
-   SCENE 5: MEMORY GALAXY — Interactive Constellation
-   ═══════════════════════════════════════════ */
-const memoryGalaxy=new THREE.Group();
-memoryGalaxy.visible=false;
-
-/* Central glowing orb */
-const coreOrb=new THREE.Mesh(
-  new THREE.SphereGeometry(.3,32,32),
-  new THREE.MeshBasicMaterial({color:0xffcc66,transparent:true,opacity:.3,blending:THREE.AdditiveBlending,depthWrite:false})
+/* Unfinished constellation (the ending) */
+const endingStarPositions=[[-3,3,-4],[-2,4,-5],[-1,3.5,-4.5],[0,4.5,-5.5],[1,3.8,-4.8],[2,4.2,-5.2],[3,3.5,-4.5]];
+const endingLinePositions=[[-3,3,-4],[-2,4,-5],[-1,3.5,-4.5],[0,4.5,-5.5],[1,3.8,-4.8],[2,4.2,-5.2],[3,3.5,-4.5]];
+/* Last star is dim/dashed — the unfinished one */
+const lastStarPos=endingStarPositions[endingStarPositions.length-1];
+const lastStar=new THREE.Mesh(
+  new THREE.SphereGeometry(.02,8,8),
+  new THREE.MeshBasicMaterial({color:0xc8a855,transparent:true,opacity:.15,blending:THREE.AdditiveBlending,depthWrite:false})
 );
-coreOrb.position.set(0,1.5,0);
-memoryGalaxy.add(coreOrb);
+lastStar.position.set(...lastStarPos);
+constGroup.add(lastStar);
 
-/* Constellation lines */
-const constellationLines=[];
-const constellationPoints=[];
+/* Lines for ending constellation (except last segment) */
+for(let i=0;i<endingLinePositions.length-2;i++){
+  const a=new THREE.Vector3(...endingLinePositions[i]);
+  const b=new THREE.Vector3(...endingLinePositions[i+1]);
+  const pts=[a,b];
+  const lineGeo=new THREE.BufferGeometry().setFromPoints(pts);
+  const lineMat=new THREE.LineBasicMaterial({color:0xc8a855,transparent:true,opacity:.08,blending:THREE.AdditiveBlending,depthWrite:false});
+  constGroup.add(new THREE.Line(lineGeo,lineMat));
+}
+/* Dashed last segment */
+const dashPts=[new THREE.Vector3(...endingLinePositions[endingLinePositions.length-2]),new THREE.Vector3(...lastStarPos)];
+const dashGeo=new THREE.BufferGeometry().setFromPoints(dashPts);
+const dashMat=new THREE.LineDashedMaterial({color:0xc8a855,transparent:true,opacity:.06,dashSize:.2,gapSize:.15,blending:THREE.AdditiveBlending,depthWrite:false});
+const dashLine=new THREE.Line(dashGeo,dashMat);
+dashLine.computeLineDistances();
+constGroup.add(dashLine);
+
+constGroup.position.set(0,0,-5);
+sc.add(constGroup);
+
+/* ── Drifting Clouds ── */
+const clouds=[];
 for(let i=0;i<8;i++){
-  const a=(i/8)*TAU;
-  const r=2+Math.random();
-  const h=1+Math.random()*1.5;
-  const pt=new THREE.Vector3(Math.cos(a)*r,h,Math.sin(a)*r);
-  constellationPoints.push(pt);
-  const star=new THREE.Mesh(new THREE.SphereGeometry(.05,12,12),new THREE.MeshBasicMaterial({color:0xffcc66,emissive:0xffcc66,emissiveIntensity:1,blending:THREE.AdditiveBlending,depthWrite:false}));
-  star.position.copy(pt);
-  memoryGalaxy.add(star);
-}
-/* Connect points to center */
-for(let i=0;i<8;i++){
-  const curve=new THREE.LineCurve3(new THREE.Vector3(0,1.5,0),constellationPoints[i]);
-  const lineGeo=new THREE.BufferGeometry().setFromPoints(curve.getPoints(20));
-  const lineMat=new THREE.LineBasicMaterial({color:0xc8a855,transparent:true,opacity:.2,blending:THREE.AdditiveBlending,depthWrite:false});
-  const line=new THREE.Line(lineGeo,lineMat);
-  memoryGalaxy.add(line);
-}
-/* Connect adjacent points */
-for(let i=0;i<7;i++){
-  const curve=new THREE.LineCurve3(constellationPoints[i],constellationPoints[i+1]);
-  const lineGeo=new THREE.BufferGeometry().setFromPoints(curve.getPoints(20));
-  const lineMat=new THREE.LineBasicMaterial({color:0x4a9eff,transparent:true,opacity:.15,blending:THREE.AdditiveBlending,depthWrite:false});
-  const line=new THREE.Line(lineGeo,lineMat);
-  memoryGalaxy.add(line);
-}
-
-/* Memory particles */
-const memPartN=100;
-const memPartGeo=new THREE.BufferGeometry();
-const memPartPos=new Float32Array(memPartN*3);
-const memPartSz=new Float32Array(memPartN);
-for(let i=0;i<memPartN;i++){
-  const a=Math.random()*TAU;
-  const r=1+Math.random()*3;
-  const h=Math.random()*3;
-  memPartPos[i*3]=Math.cos(a)*r;memPartPos[i*3+1]=h;memPartPos[i*3+2]=Math.sin(a)*r;
-  memPartSz[i]=.5+Math.random()*1.5;
-}
-memPartGeo.setAttribute('position',new THREE.BufferAttribute(memPartPos,3));
-memPartGeo.setAttribute('size',new THREE.BufferAttribute(memPartSz,1));
-const memPartMat=new THREE.ShaderMaterial({
-  uniforms:{time:{value:0}},
-  vertexShader:`attribute float size;varying float vA;uniform float time;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=size*(200./-mv.z);gl_Position=projectionMatrix*mv;vA=.3+.7*sin(time*2.+position.y*3.);}`,
-  fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-vec2(.5));if(d>.5)discard;vec3 col=mix(vec3(.3,.6,1.),vec3(1.,.8,.4),vA);gl_FragColor=vec4(col,smoothstep(.5,0.,d)*vA*.6);}`,
-  transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
-});
-memoryGalaxy.add(new THREE.Points(memPartGeo,memPartMat));
-
-world.add(memoryGalaxy);
-
-/* ═══════════════════════════════════════════
-   SCENE 6: BALCONY — Moon, Presence
-   ═══════════════════════════════════════════ */
-const balcony=new THREE.Group();
-balcony.visible=false;
-
-/* Railing */
-const railing=new THREE.Group();
-for(let i=-3;i<=3;i++){
-  railing.add(bx(.03,1,.03,M.metal,new THREE.Vector3(i*1,0.5,-2)));
-}
-railing.add(bx(6,.04,.04,M.metal,new THREE.Vector3(0,1,-2)));
-railing.add(bx(6,.04,.04,M.metal,new THREE.Vector3(0,.2,-2)));
-balcony.add(railing);
-
-/* Floor */
-const balconyFloor=new THREE.Mesh(new THREE.PlaneGeometry(6,4),M.concreteDark);
-balconyFloor.rotation.x=-PI/2;balconyFloor.receiveShadow=true;
-balcony.add(balconyFloor);
-
-/* Two chairs */
-const chairMat=M.wood;
-const buildChair=(x)=>{
-  const c=new THREE.Group();
-  c.add(bx(.4,.03,.4,chairMat,new THREE.Vector3(0,.4,0)));
-  c.add(bx(.4,.4,.03,chairMat,new THREE.Vector3(0,.6,-.18)));
-  [[-0.15,.2,-.15],[.15,.2,-.15],[-.15,.2,.15],[.15,.2,.15]].forEach(p=>c.add(bx(.03,.4,.03,M.metal,new THREE.Vector3(p[0],p[1],p[2]))));
-  c.position.set(x,0,0);
-  return c;
-};
-balcony.add(buildChair(-1.2));
-balcony.add(buildChair(1.2));
-
-/* Small table between */
-const smallTable=new THREE.Group();
-smallTable.add(bx(.5,.02,.3,M.wood,new THREE.Vector3(0,.5,0)));
-smallTable.add(cy(.02,.02,.5,M.metal,new THREE.Vector3(0,.25,0)));
-smallTable.add(bx(.3,.02,.2,M.paper,new THREE.Vector3(0,.52,0)));
-smallTable.position.set(0,0,-.8);
-balcony.add(smallTable);
-
-/* Big moon in this scene */
-const balconyMoon=new THREE.Mesh(new THREE.SphereGeometry(2,32,32),new THREE.MeshBasicMaterial({color:0xeeeedd}));
-balconyMoon.position.set(0,8,-20);
-balcony.add(balconyMoon);
-const balconyMoonGlow=new THREE.Mesh(new THREE.SphereGeometry(3,32,32),new THREE.ShaderMaterial({
-  vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-  fragmentShader:`varying vec3 vN;void main(){float i=pow(.6-dot(vN,vec3(0,0,1)),3.);gl_FragColor=vec4(.6,.65,.8,i*.5);}`,
-  transparent:true,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false
-}));
-balconyMoonGlow.position.copy(balconyMoon.position);
-balcony.add(balconyMoonGlow);
-
-/* City skyline silhouette */
-const skylineMat=new THREE.MeshBasicMaterial({color:0x050816,side:THREE.DoubleSide});
-const buildings=[[-4,.5,-18],[-3.5,1.2,-18],[-2.8,.8,-18],[-2,1.5,-18],[-1,.6,-18],[0,2,-18],[1,1.3,-18],[2,.7,-18],[2.8,1.8,-18],[3.5,.9,-18],[4,1.1,-18]];
-buildings.forEach(b=>{
-  const building=new THREE.Mesh(new THREE.PlaneGeometry(.8,b[1]),skylineMat);
-  building.position.set(b[0],b[1]/2,b[2]);
-  balcony.add(building);
-});
-
-world.add(balcony);
-
-/* ═══════════════════════════════════════════
-   INTERACTIVE OBJECTS
-   ═══════════════════════════════════════════ */
-const interactives=[bench,mailbox,bookshelf,photoFrame,recordPlayer,waterFeature];
-const ray=new THREE.Raycaster();
-
-/* ═══════════════════════════════════════════
-   MOVEMENT & CAMERA
-   ═══════════════════════════════════════════ */
-const keys={};
-let yaw=PI,pitch=0;
-const vel=new THREE.Vector3();
-const playerPos=new THREE.Vector3(0,1.7,6);
-const headBob={ph:0,am:0};
-const bounds={xMin:-7.5,xMax:7.5,zMin:-6.5,zMax:6.5};
-
-document.addEventListener('keydown',e=>{keys[e.code]=true;if('wasdArrowUp ArrowDown ArrowLeft ArrowRight'.includes(e.code))e.preventDefault()});
-document.addEventListener('keyup',e=>{keys[e.code]=false});
-document.addEventListener('mousemove',e=>{
-  if(locked){yaw-=e.movementX*.002;pitch=Math.max(-1.2,Math.min(1.2,pitch-e.movementY*.002))}
-});
-document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===renderer.domElement});
-
-/* ═══════════════════════════════════════════
-   TEXT PROMPT SYSTEM
-   ═══════════════════════════════════════════ */
-let currentPrompt=null,promptTimer=null;
-function showOverlay(title,sub,dur=5000){
-  const el=$('overlayText');
-  $('titleText').innerHTML=title;
-  $('tagline').textContent=sub||'';
-  $('enterPrompt').style.display='none';
-  el.classList.add('show');
-  clearTimeout(promptTimer);
-  promptTimer=setTimeout(()=>el.classList.remove('show'),dur);
-}
-function showPrompt(data){
-  if(currentPrompt===data.text)return;
-  currentPrompt=data.text;
-  showOverlay(data.text,data.attr,6000);
-}
-function hidePrompt(){currentPrompt=null}
-
-/* ═══════════════════════════════════════════
-   SCENE TRANSITIONS
-   ═══════════════════════════════════════════ */
-const scenes=['arrival','glasshouse','observatory','library','memoryGalaxy','balcony'];
-const sceneNames={arrival:'Arrival',glasshouse:'The Glasshouse',observatory:'Observatory',library:'The Library',memoryGalaxy:'Memory Galaxy',balcony:'The Balcony'};
-
-function transitionTo(newScene){
-  const old=sceneState;
-  sceneState=newScene;
-
-  /* Hide scene nav dots */
-  document.querySelectorAll('.scene-dot').forEach(d=>d.classList.toggle('active',d.dataset.scene===newScene));
-
-  if(newScene==='arrival'){
-    arrivalAlpha=1;arrivalCanvas.style.opacity='1';
-    entered=false;
-    world.visible=false;
-    $('hud').classList.remove('show');
-    $('thinkBtn').classList.remove('show');
-    $('audioControls').classList.remove('show');
-  }
-  else if(newScene==='glasshouse'){
-    arrivalAlpha=0;arrivalCanvas.style.opacity='0';arrivalCanvas.style.transition='opacity 2s';
-    entered=true;world.visible=true;
-    observatory.visible=false;library.visible=false;memoryGalaxy.visible=false;balcony.visible=false;
-    renderer.domElement.requestPointerLock();
-    setTimeout(()=>{showOverlay('Welcome home.','',4000)},2000);
-    setTimeout(()=>{$('hud').classList.add('show');$('thinkBtn').classList.add('show');$('audioControls').classList.add('show');$('sceneLabel').classList.add('show');
-      $('slName').textContent=sceneNames[newScene];
-      $('slHint').textContent='WASD to move · mouse to look';
-      setTimeout(()=>$('sceneLabel').classList.remove('show'),6000);
-    },4500);
-  }
-  else{
-    arrivalAlpha=0;arrivalCanvas.style.opacity='0';arrivalCanvas.style.transition='opacity 1s';
-    world.visible=true;
-    observatory.visible=newScene==='observatory';
-    library.visible=newScene==='library';
-    memoryGalaxy.visible=newScene==='memoryGalaxy';
-    balcony.visible=newScene==='balcony';
-
-    /* Reset camera for new scene */
-    if(newScene==='observatory'){cam.position.set(0,2,5);yaw=PI;pitch=0}
-    if(newScene==='library'){cam.position.set(0,1.5,3);yaw=PI;pitch=0}
-    if(newScene==='memoryGalaxy'){cam.position.set(0,1.5,4);yaw=PI;pitch=0}
-    if(newScene==='balcony'){cam.position.set(0,1.5,2);yaw=PI;pitch=0}
-
-    setTimeout(()=>{$('sceneLabel').classList.add('show');
-      $('slName').textContent=sceneNames[newScene];
-      $('slHint').textContent='WASD to move · mouse to look';
-      setTimeout(()=>$('sceneLabel').classList.remove('show'),6000);
-    },1000);
-  }
-}
-
-/* Scene nav click handlers */
-document.querySelectorAll('.scene-dot').forEach(dot=>{
-  dot.addEventListener('click',()=>{
-    if(!entered&&dot.dataset.scene!=='arrival')return;
-    transitionTo(dot.dataset.scene);
+  const cloudGeo=new THREE.PlaneGeometry(4+Math.random()*6,1+Math.random()*2);
+  const cloudMat=new THREE.MeshBasicMaterial({
+    color:0x1a2040,transparent:true,opacity:.03+Math.random()*.03,
+    blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide
   });
+  const cloud=new THREE.Mesh(cloudGeo,cloudMat);
+  cloud.position.set((Math.random()-.5)*30,(Math.random()-.5)*10,-5-Math.random()*15);
+  cloud.rotation.z=Math.random()*.3;
+  cloud.userData.speed=.002+Math.random()*.005;
+  cloud.userData.driftY=(Math.random()-.5)*.001;
+  sc.add(cloud);clouds.push(cloud);
+}
+
+/* ═══════════════════════════════════════════
+   TIME OF DAY SYSTEM (Scroll-based)
+   ═══════════════════════════════════════════ */
+/* Dublin hours: 6am(dawn)→12pm(noon)→17pm(golden)→22pm(night) */
+/* Bangalore: +5:30 offset, different sky color */
+const timeColors={
+  dawn:{bg:0x0a1020,ambient:0x4a6090,sky:'linear-gradient(180deg, #0a1020 0%, #1a2a4a 40%, #3a4a6a 70%, #6a7a9a 100%)'},
+  morning:{bg:0x101828,ambient:0x8090a0,sky:'linear-gradient(180deg, #101828 0%, #2a3a5a 40%, #5a7a9a 100%)'},
+  noon:{bg:0x182030,ambient:0xaab0b8,sky:'linear-gradient(180deg, #182030 0%, #3a5070 40%, #7090b0 100%)'},
+  golden:{bg:0x1a1820,ambient:0xc8a855,sky:'linear-gradient(180deg, #1a1820 0%, #3a2a20 40%, #8a5a30 70%, #c8a060 100%)'},
+  dusk:{bg:0x12101a,ambient:0x6a5080,sky:'linear-gradient(180deg, #12101a 0%, #2a1a30 40%, #4a2a40 70%, #6a4a50 100%)'},
+  night:{bg:0x050810,ambient:0x202040,sky:'linear-gradient(180deg, #050810 0%, #0a1020 40%, #101830 100%)'}
+};
+
+function getTimeOfDay(hour){
+  if(hour<7)return'dawn';if(hour<11)return'morning';if(hour<15)return'noon';
+  if(hour<18)return'golden';if(hour<20)return'dusk';return'night';
+}
+
+function getTimePeriodName(hour){
+  if(hour<7)return'Dawn';if(hour<11)return'Morning';if(hour<15)return'Afternoon';
+  if(hour<18)return'Golden Hour';if(hour<20)return'Dusk';return'Night';
+}
+
+function updateTimeOfDay(){
+  if(phase!=='universe')return;
+  const now=new Date();
+  const dublinHour=parseInt(new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'numeric',hour12:false}).format(now));
+  const bangaloreHour=parseInt(new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'numeric',hour12:false}).format(now));
+
+  /* Use scroll to blend between time periods */
+  const dublinPeriod=getTimeOfDay((dublinHour+Math.floor(scrollProgress*16))%24);
+  const colors=timeColors[dublinPeriod];
+
+  sc.background.set(colors.bg);
+  sc.fog.color.set(colors.bg);
+  sunLight.color.set(colors.ambient);
+
+  $('timeOverlay').style.background=colors.sky;
+  $('timeOverlay').style.opacity=.15;
+
+  /* Update period labels */
+  const dp=getTimePeriodName((dublinHour+Math.floor(scrollProgress*16))%24);
+  const bp=getTimePeriodName((bangaloreHour+Math.floor(scrollProgress*16))%24);
+  $('periodDublin').textContent=dp;
+  $('periodBangalore').textContent=bp;
+}
+
+/* ═══════════════════════════════════════════
+   FIREFLY NOTIFICATIONS
+   ═══════════════════════════════════════════ */
+const fireflies=[];
+function spawnFirefly(msg){
+  const el=document.createElement('div');
+  el.className='firefly';
+  el.title='A message from Sharath';
+  const startX=Math.random()*W*.6+W*.2;
+  const startY=H+20;
+  el.style.left=startX+'px';el.style.top=startY+'px';
+  document.body.appendChild(el);
+
+  const flyData={el,x:startX,y:startY,vx:(Math.random()-.5)*2,vy:-1-Math.random()*2,phase:Math.random()*TAU,msg};
+  fireflies.push(flyData);
+
+  el.addEventListener('click',()=>{
+    el.classList.add('opening');
+    setTimeout(()=>{
+      el.remove();
+      fireflies.splice(fireflies.indexOf(flyData),1);
+      showToast(msg);
+    },800);
+  });
+}
+
+function tickFireflies(){
+  fireflies.forEach(f=>{
+    f.phase+=.02;
+    f.x+=Math.sin(f.phase)*1.5+f.vx;
+    f.y+=Math.cos(f.phase*.7)*.8+f.vy;
+    if(f.y<-20){f.y=H+20;f.x=Math.random()*W*.6+W*.2}
+    f.el.style.left=f.x+'px';f.el.style.top=f.y+'px';
+    f.el.style.opacity=.5+.5*Math.sin(f.phase*3);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   PAPER AIRPLANE LETTERS
+   ═══════════════════════════════════════════ */
+function sendPaperAirplane(text){
+  const plane=document.createElement('div');
+  plane.className='paper-plane';
+  document.body.appendChild(plane);
+
+  const startX=W*.5;
+  const startY=H*.5;
+  plane.style.left=startX+'px';plane.style.top=startY+'px';
+
+  const endX=W*.15;
+  const endY=H*.15;
+  const duration=3000;
+  const start=performance.now();
+
+  function anim(now){
+    const p=Math.min(1,(now-start)/duration);
+    const ease=1-Math.pow(1-p,3);
+    const x=startX+(endX-startX)*ease;
+    const y=startY+(endY-startY)*ease-Math.sin(p*PI)*150;
+    const rot=-45+p*360;
+    plane.style.left=x+'px';
+    plane.style.top=y+'px';
+    plane.style.transform=`rotate(${rot}deg) scale(${1-p*.5})`;
+    plane.style.opacity=1-p*.7;
+    if(p<1)requestAnimationFrame(anim);
+    else{plane.remove();showToast('✉️ Letter sent across the stars')}
+  }
+  requestAnimationFrame(anim);
+}
+
+$('letterSend').addEventListener('click',()=>{
+  const text=$('letterText').value.trim();
+  if(!text)return;
+  const words=text.split(/\s+/).filter(Boolean).length;
+  if(words>250){showToast('Keep it under 250 words');return}
+  $('letterOverlay').classList.remove('open');
+  $('letterText').value='';
+  sendPaperAirplane(text);
+});
+
+$('letterText')?.addEventListener('input',function(){
+  const w=this.value.trim().split(/\s+/).filter(Boolean).length;
+  $('letterCount').textContent=`${w} / 250 words`;
 });
 
 /* ═══════════════════════════════════════════
-   UPDATE
+   SHARED MOON — Today's Message
    ═══════════════════════════════════════════ */
-const clock=new THREE.Clock();
-function update(){
-  delta=Math.min(clock.getDelta(),.05);
-  time+=delta;
-  if(!entered)return;
+const dailyMessages=[
+  {date:'23 May',msg:'The day we said forever in the misty hills of Coorg.'},
+  {date:'3 Feb',msg:'Happy birthday, Sharath. She thinks of you first thing every morning.'},
+  {date:'20 Mar',msg:'Happy birthday, Rashmi. He planned something beautiful. Wait and see.'},
+  {date:'1 Jan',msg:'New year. Same promise. This is the year we close the distance.'},
+  {date:'14 Feb',msg:'Valentine\'s Day. 5,000 miles apart. A voice note at midnight.'},
+  {date:'Default',msg:'The same moon watches over Dublin tonight. And Bangalore. And you.'}
+];
 
-  /* Movement */
-  const md=new THREE.Vector3();
-  if(keys.KeyW||keys.ArrowUp)md.z-=1;
-  if(keys.KeyS||keys.ArrowDown)md.z+=1;
-  if(keys.KeyA||keys.ArrowLeft)md.x-=1;
-  if(keys.KeyD||keys.ArrowRight)md.x+=1;
-  md.normalize();
-  const sinY=Math.sin(yaw),cosY=Math.cos(yaw);
-  const wd=new THREE.Vector3(md.x*cosY-md.z*sinY,0,md.x*sinY+md.z*cosY);
-  vel.lerp(wd.multiplyScalar(4),delta*8);
-  playerPos.add(vel.clone().multiplyScalar(delta));
-  playerPos.x=Math.max(bounds.xMin,Math.min(bounds.xMax,playerPos.x));
-  playerPos.z=Math.max(bounds.zMin,Math.min(bounds.zMax,playerPos.z));
+$('moonBtn').addEventListener('click',()=>{
+  const now=new Date();
+  const day=now.getDate();
+  const month=now.toLocaleString('en',{month:'short'});
+  const today=dailyMessages.find(m=>m.date===`${day} ${month}`)||dailyMessages.find(m=>m.date==='Default');
+  $('moonDate').textContent=`${month} ${day}`;
+  $('moonMsg').textContent=today.msg;
+  $('moonOverlay').classList.add('open');
+});
 
-  const moving=md.length()>.01;
-  if(moving){headBob.ph+=delta*8;headBob.am=THREE.MathUtils.lerp(headBob.am,.04,delta*5)}
-  else headBob.am=THREE.MathUtils.lerp(headBob.am,0,delta*3);
+/* ═══════════════════════════════════════════
+   I MISS YOU
+   ═══════════════════════════════════════════ */
+$('missBtn').addEventListener('click',()=>{
+  $('missBtn').classList.add('pulsing');
+  setTimeout(()=>$('missBtn').classList.remove('pulsing'),1500);
+  showToast('💌 He knows');
+  /* In a real app this would send via WebSocket/Supabase */
+});
 
-  const ct=new THREE.Vector3(playerPos.x,playerPos.y+Math.sin(headBob.ph)*headBob.am,playerPos.z);
-  cam.position.lerp(ct,delta*12);
-  cam.rotation.order='YXZ';cam.rotation.y=yaw;cam.rotation.x=pitch;
-  cam.rotation.z=Math.sin(time*.3)*.003;
-
-  /* Fireflies */
-  const fp=ffGeo.attributes.position;
-  for(let i=0;i<ffN;i++){
-    const f=ffData[i];
-    f.wa+=(Math.random()-.5)*.1;
-    f.vel.x+=Math.cos(f.wa)*.02;f.vel.z+=Math.sin(f.wa)*.02;
-    f.vel.y+=Math.sin(time*f.sp+f.ph)*.01;f.vel.multiplyScalar(.98);
-    let nx=fp.getX(i)+f.vel.x*delta,ny=fp.getY(i)+f.vel.y*delta,nz=fp.getZ(i)+f.vel.z*delta;
-    if(Math.abs(nx)>6)f.vel.x*=-1;if(ny<.3||ny>3.5)f.vel.y*=-1;if(Math.abs(nz)>5)f.vel.z*=-1;
-    fp.setXYZ(i,nx,ny,nz);
-  }
-  fp.needsUpdate=true;ffMat.uniforms.time.value=time;
-
-  /* Rain */
-  const rp=rnGeo.attributes.position;
-  for(let i=0;i<rnN;i++){
-    let y=rp.getY(i)-rnVel[i]*delta;
-    if(y<0){y=8+Math.random()*4;rp.setX(i,playerPos.x+(Math.random()-.5)*20);rp.setZ(i,playerPos.z+(Math.random()-.5)*20)}
-    rp.setY(i,y);rp.setX(i,rp.getX(i)+Math.sin(time+i)*.02);
-  }
-  rp.needsUpdate=true;
-
-  /* Leaves */
-  lvData.forEach(l=>{const f=l.userData.falling;f.v.x+=Math.sin(time*.5+f.wp)*.005;l.position.add(f.v.clone().multiplyScalar(delta));l.rotation.x+=f.r.x*delta;l.rotation.y+=f.r.y*delta;l.rotation.z+=f.r.z*delta;if(l.position.y<.1)l.position.set((Math.random()-.5)*6,f.ry,(Math.random()-.5)*.4)});
-
-  /* Tree sway */
-  tree.children.forEach(c=>{if(c.userData.sway){const s=c.userData.sway;c.rotation.z=Math.sin(time*s.s+s.o)*s.a}});
-
-  /* Water */
-  waterFeature.children[1].material.roughness=.05+Math.sin(time*.8)*.02;
-
-  /* Lantern flicker */
-  lantern.intensity=1.8+Math.sin(time*3)*.15+Math.sin(time*7)*.05;
-  lanternGlow.intensity=.4+Math.sin(time*2)*.05;
-
-  /* Steam */
-  bench.traverse(c=>{if(c.userData.steam){const s=c.userData.steam;c.position.y=.09+Math.sin(time*s.s+s.o)*.015+.025;c.material.opacity=.04+Math.sin(time*s.s+s.o)*.03}});
-
-  /* Memory stars */
-  memMat.uniforms.time.value=time;
-
-  /* Observatory globe rotation */
-  if(observatory.visible){
-    globeWire.rotation.y=time*.1;
-    obsStarMat.uniforms.time.value=time;
-  }
-
-  /* Library floating letters */
-  if(library.visible){
-    library.children.forEach(c=>{if(c.userData.floating){const f=c.userData.floating;c.position.y=1+Math.sin(time*f.sp+f.ph)*f.amp}});
-  }
-
-  /* Memory galaxy particles */
-  if(memoryGalaxy.visible){
-    coreOrb.material.opacity=.2+.1*Math.sin(time);
-    memPartMat.uniforms.time.value=time;
-  }
-
-  /* Balcony moon glow pulse */
-  if(balcony.visible){
-    balconyMoonGlow.material.uniforms&&0;
-  }
-
-  /* Gaze interaction */
-  ray.setFromCamera(new THREE.Vector2(0,0),cam);
-  let hit=null,minD=Infinity;
-  if(sceneState==='glasshouse'){
-    interactives.forEach(obj=>{const h=ray.intersectObject(obj,true);if(h.length&&h[0].distance<minD&&h[0].distance<6){minD=h[0].distance;hit=obj}});
-  }
-  if(hit&&hit.userData.interact)showPrompt(hit.userData.interact);
-  else hidePrompt();
+function receiveMissYou(){
+  $('missPulse').classList.add('show');
+  $('missName').textContent='Sharath';
+  $('missToast').classList.add('show');
+  setTimeout(()=>{$('missPulse').classList.remove('show');$('missToast').classList.remove('show')},3000);
+  /* Spawn a firefly as bonus */
+  spawnFirefly('Thinking of you');
 }
 
 /* ═══════════════════════════════════════════
-   RENDER LOOP
+   SCROLL — Time Travel
    ═══════════════════════════════════════════ */
-const arrivalCanvas=document.createElement('canvas');
-const arrivalCtx=arrivalCanvas.getContext('2d');
-arrivalCanvas.style.cssText='position:fixed;inset:0;z-index:1;pointer-events:none;transition:opacity 2s';
-document.body.appendChild(arrivalCanvas);
-let arrivalAlpha=1;
+window.addEventListener('wheel',e=>{
+  if(phase!=='universe')return;
+  scrollProgress=Math.max(0,Math.min(1,scrollProgress+e.deltaY*.0005));
+  updateTimeOfDay();
+},{passive:true});
 
-function animate(){
-  requestAnimationFrame(animate);
-  update();
-
-  if(sceneState==='arrival'){
-    arrivalCanvas.width=W;arrivalCanvas.height=H;
-    arrivalCtx.globalAlpha=arrivalAlpha;
-    drawArrival(arrivalCtx,time);
-  }
-
-  composer.render();
-}
-animate();
+/* Touch scroll */
+let touchStart=0;
+window.addEventListener('touchstart',e=>{touchStart=e.touches[0].clientY});
+window.addEventListener('touchmove',e=>{
+  if(phase!=='universe')return;
+  const dy=touchStart-e.touches[0].clientY;
+  touchStart=e.touches[0].clientY;
+  scrollProgress=Math.max(0,Math.min(1,scrollProgress+dy*.002));
+  updateTimeOfDay();
+},{passive:true});
 
 /* ═══════════════════════════════════════════
-   LOADING & ENTRANCE
-   ═══════════════════════════════════════════ */
-world.visible=false;
-setTimeout(()=>{
-  $('overlayText').classList.add('show');
-  $('titleText').innerHTML='<em>Parallel</em> Hearts';
-  $('tagline').textContent='Different skies. Same heartbeat.';
-  $('enterPrompt').style.display='';
-},1500);
-
-function enterWorld(){
-  if(entered)return;
-  transitionTo('glasshouse');
-  setTimeout(()=>$('sceneNav').classList.add('show'),5000);
-}
-$('enterPrompt').addEventListener('click',enterWorld);
-renderer.domElement.addEventListener('click',()=>{if(!entered)enterWorld();else if(!locked)renderer.domElement.requestPointerLock()});
-
-/* ═══════════════════════════════════════════
-   HUD — Clocks & Weather
+   HUD CLOCKS
    ═══════════════════════════════════════════ */
 function updateClocks(){
   const now=new Date();
@@ -1210,195 +766,124 @@ function updateClocks(){
   const target=new Date('2026-12-01');
   const diff=target-now;
   $('countdown').textContent=diff>0?`${Math.floor(diff/86400000)} days`:'Home';
+  updateTimeOfDay();
 }
 updateClocks();setInterval(updateClocks,10000);
 
-async function fetchWeather(){
-  try{
-    const [d,b]=await Promise.all([
-      fetch('https://wttr.in/Dublin?format=%C+%t').then(r=>r.text()).catch(()=>''),
-      fetch('https://wttr.in/Bangalore?format=%C+%t').then(r=>r.text()).catch(()=>'')
-    ]);
-    if(d)$('weatherDublin').textContent=d.trim();
-    if(b)$('weatherBangalore').textContent=b.trim();
-  }catch(e){}
-}
-fetchWeather();setInterval(fetchWeather,600000);
-
 /* ═══════════════════════════════════════════
-   THINKING OF YOU
+   CONSTELLATION NAVIGATION
    ═══════════════════════════════════════════ */
-$('thinkBtn').addEventListener('click',()=>{
-  const btn=$('thinkBtn');
-  btn.classList.add('sent');setTimeout(()=>btn.classList.remove('sent'),1000);
-  showToast('💌','Thinking of you');
-  const data=JSON.parse(localStorage.getItem('ph_think')||'[]');
-  data.push({from:'Rashmi',time:new Date().toISOString()});
-  localStorage.setItem('ph_think',JSON.stringify(data));
-});
-
-function showToast(icon,text){
-  $('toastIcon').textContent=icon;$('toastText').textContent=text;
-  $('toast').classList.add('show');
-  setTimeout(()=>$('toast').classList.remove('show'),2500);
-}
-
-/* ═══════════════════════════════════════════
-   LETTER
-   ═══════════════════════════════════════════ */
-window.closeLetter=()=>{$('letterOverlay').classList.remove('open')};
-window.sendLetter=()=>{
-  const text=$('letterText').value.trim();
-  if(!text)return;
-  const words=text.split(/\s+/).filter(Boolean).length;
-  if(words>250){alert('Keep it under 250 words.');return}
-  const letters=JSON.parse(localStorage.getItem('ph_letters')||'[]');
-  letters.push({text,date:new Date().toISOString(),words});
-  localStorage.setItem('ph_letters',JSON.stringify(letters));
-  $('letterOverlay').classList.remove('open');
-  showToast('✉️','Letter sent with love');
-  $('letterText').value='';
-};
-$('letterText')?.addEventListener('input',function(){
-  const w=this.value.trim().split(/\s+/).filter(Boolean).length;
-  $('letterCount').textContent=`${w} / 250 words`;
-});
-
-/* ═══════════════════════════════════════════
-   AMBIENT AUDIO — Web Audio API
-   ═══════════════════════════════════════════ */
-let audioCtx=null;
-const activeSounds={};
-
-function initAudio(){
-  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx.state==='suspended')audioCtx.resume();
-}
-
-function createPianoAmbient(){
-  if(activeSounds.piano)return stopSound('piano');
-  initAudio();
-  const osc1=audioCtx.createOscillator();
-  const osc2=audioCtx.createOscillator();
-  const gain=audioCtx.createGain();
-  const filter=audioCtx.createBiquadFilter();
-
-  osc1.type='sine';osc1.frequency.value=220;
-  osc2.type='sine';osc2.frequency.value=330;
-  filter.type='lowpass';filter.frequency.value=400;
-  gain.gain.value=0;
-
-  osc1.connect(filter);osc2.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
-  osc1.start();osc2.start();
-
-  /* Gentle fade in */
-  gain.gain.linearRampToValueAtTime(0.03,audioCtx.currentTime+2);
-
-  /* Slow frequency modulation */
-  const lfo=audioCtx.createOscillator();
-  const lfoGain=audioCtx.createGain();
-  lfo.frequency.value=0.1;lfoGain.gain.value=20;
-  lfo.connect(lfoGain);lfoGain.connect(osc1.frequency);
-  lfo.start();
-
-  activeSounds.piano={osc:[osc1,osc2],gain,lfo,lfoGain,filter};
-  document.querySelector('[data-sound="piano"]').classList.add('active');
-}
-
-function createRainAmbient(){
-  if(activeSounds.rain)return stopSound('rain');
-  initAudio();
-
-  /* Brown noise for rain */
-  const bufferSize=2*audioCtx.sampleRate;
-  const noiseBuffer=audioCtx.createBuffer(1,bufferSize,audioCtx.sampleRate);
-  const output=noiseBuffer.getChannelData(0);
-  let lastOut=0;
-  for(let i=0;i<bufferSize;i++){
-    const white=Math.random()*2-1;
-    output[i]=(lastOut+(0.02*white))/1.02;
-    lastOut=output[i];
-    output[i]*=3.5;
-  }
-
-  const noise=audioCtx.createBufferSource();
-  noise.buffer=noiseBuffer;noise.loop=true;
-  const filter=audioCtx.createBiquadFilter();
-  filter.type='bandpass';filter.frequency.value=800;filter.Q.value=0.5;
-  const gain=audioCtx.createGain();
-  gain.gain.value=0;
-
-  noise.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
-  noise.start();
-
-  gain.gain.linearRampToValueAtTime(0.04,audioCtx.currentTime+2);
-  activeSounds.rain={noise,gain,filter};
-  document.querySelector('[data-sound="rain"]').classList.add('active');
-}
-
-function createNightAmbient(){
-  if(activeSounds.night)return stopSound('night');
-  initAudio();
-
-  /* Gentle wind/chimes */
-  const osc=audioCtx.createOscillator();
-  const osc2=audioCtx.createOscillator();
-  const gain=audioCtx.createGain();
-  const filter=audioCtx.createBiquadFilter();
-
-  osc.type='sine';osc.frequency.value=440;
-  osc2.type='triangle';osc2.frequency.value=554;
-  filter.type='lowpass';filter.frequency.value=600;
-  gain.gain.value=0;
-
-  osc.connect(filter);osc2.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
-  osc.start();osc2.start();
-
-  gain.gain.linearRampToValueAtTime(0.015,audioCtx.currentTime+3);
-
-  /* Random chime effects */
-  const chimeInterval=setInterval(()=>{
-    if(!activeSounds.night){clearInterval(chimeInterval);return}
-    const freq=[440,554,659,880][Math.floor(Math.random()*4)];
-    osc.frequency.linearRampToValueAtTime(freq,audioCtx.currentTime+0.5);
-  },3000+Math.random()*4000);
-
-  activeSounds.night={osc,osc2,gain,filter,chimeInterval};
-  document.querySelector('[data-sound="night"]').classList.add('active');
-}
-
-function stopSound(type){
-  const s=activeSounds[type];
-  if(!s)return;
-  if(s.gain)s.gain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1);
-  setTimeout(()=>{
-    if(s.osc){(Array.isArray(s.osc)?s.osc:[s.osc]).forEach(o=>{try{o.stop()}catch(e){}})}
-    if(s.lfo)try{s.lfo.stop()}catch(e){}
-    if(s.noise)try{s.noise.stop()}catch(e){}
-    if(s.chimeInterval)clearInterval(s.chimeInterval);
-  },1100);
-  delete activeSounds[type];
-  document.querySelector(`[data-sound="${type}"]`)?.classList.remove('active');
-}
-
-document.querySelectorAll('.audio-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const sound=btn.dataset.sound;
-    if(sound==='piano')createPianoAmbient();
-    if(sound==='rain')createRainAmbient();
-    if(sound==='night')createNightAmbient();
+document.querySelectorAll('.const-star').forEach(star=>{
+  star.addEventListener('click',()=>{
+    const scene=star.dataset.scene;
+    document.querySelectorAll('.const-star').forEach(s=>s.classList.remove('active'));
+    star.classList.add('active');
+    if(scene==='letters'){$('letterOverlay').classList.add('open');return}
+    showLabel(star.querySelector('.star-label').textContent,'');
   });
 });
 
 /* ═══════════════════════════════════════════
-   EASTER EGGS
+   SCENE LABEL
    ═══════════════════════════════════════════ */
-let easterClicks=0;
-document.addEventListener('keydown',e=>{
-  if(e.key==='l'||e.key==='L'){easterClicks++;if(easterClicks>=5){showToast('🌳','The tree remembers.');easterClicks=0}}
-  if(e.key==='m'||e.key==='M')showToast('🌙','Same moon.');
-  if(e.key==='h'||e.key==='H')showToast('💌','Someone is thinking of you.');
-});
+let labelTimer;
+function showLabel(name,hint){
+  $('slName').textContent=name;
+  $('slHint').textContent=hint||'';
+  $('sceneLabel').classList.add('show');
+  clearTimeout(labelTimer);
+  labelTimer=setTimeout(()=>$('sceneLabel').classList.remove('show'),5000);
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════ */
+let toastTimer;
+function showToast(text){
+  $('toastText').textContent=text;
+  $('toast').classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3000);
+}
+
+/* ═══════════════════════════════════════════
+   AMBIENT AUDIO
+   ═══════════════════════════════════════════ */
+let audioCtx=null;const activeSounds={};
+function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}
+
+function createPiano(){if(activeSounds.piano)return stopSound('piano');initAudio();const o1=audioCtx.createOscillator(),o2=audioCtx.createOscillator(),g=audioCtx.createGain(),f=audioCtx.createBiquadFilter();o1.type='sine';o1.frequency.value=220;o2.type='sine';o2.frequency.value=330;f.type='lowpass';f.frequency.value=400;g.gain.value=0;o1.connect(f);o2.connect(f);f.connect(g);g.connect(audioCtx.destination);o1.start();o2.start();g.gain.linearRampToValueAtTime(.03,audioCtx.currentTime+2);const lfo=audioCtx.createOscillator(),lg=audioCtx.createGain();lfo.frequency.value=.1;lg.gain.value=20;lfo.connect(lg);lg.connect(o1.frequency);lfo.start();activeSounds.piano={osc:[o1,o2],gain:g};document.querySelector('[data-sound="piano"]').classList.add('active')}
+
+function createRain(){if(activeSounds.rain)return stopSound('rain');initAudio();const buf=audioCtx.createBuffer(1,2*audioCtx.sampleRate,audioCtx.sampleRate),d=buf.getChannelData(0);let last=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;d[i]=(last+.02*w)/1.02;last=d[i];d[i]*=3.5}const n=audioCtx.createBufferSource();n.buffer=buf;n.loop=true;const f=audioCtx.createBiquadFilter();f.type='bandpass';f.frequency.value=800;f.Q.value=.5;const g=audioCtx.createGain();g.gain.value=0;n.connect(f);f.connect(g);g.connect(audioCtx.destination);n.start();g.gain.linearRampToValueAtTime(.04,audioCtx.currentTime+2);activeSounds.rain={noise:n,gain:g};document.querySelector('[data-sound="rain"]').classList.add('active')}
+
+function createNight(){if(activeSounds.night)return stopSound('night');initAudio();const o=audioCtx.createOscillator(),o2=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=440;o2.type='triangle';o2.frequency.value=554;g.gain.value=0;o.connect(g);o2.connect(g);g.connect(audioCtx.destination);o.start();o2.start();g.gain.linearRampToValueAtTime(.015,audioCtx.currentTime+3);activeSounds.night={osc:[o,o2],gain:g};document.querySelector('[data-sound="night"]').classList.add('active')}
+
+function stopSound(type){const s=activeSounds[type];if(!s)return;if(s.gain)s.gain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1);setTimeout(()=>{if(s.osc)(Array.isArray(s.osc)?s.osc:[s.osc]).forEach(o=>{try{o.stop()}catch(e){}});if(s.noise)try{s.noise.stop()}catch(e){}},1100);delete activeSounds[type];document.querySelector(`[data-sound="${type}"]`)?.classList.remove('active')}
+
+document.querySelectorAll('.audio-btn').forEach(btn=>btn.addEventListener('click',()=>{
+  const s=btn.dataset.sound;if(s==='piano')createPiano();if(s==='rain')createRain();if(s==='night')createNight();
+}));
+
+/* ═══════════════════════════════════════════
+   UNIVERSE RENDER LOOP
+   ═══════════════════════════════════════════ */
+const clock=new THREE.Clock();
+function startUniverse(){
+  function animate(){
+    requestAnimationFrame(animate);
+    delta=Math.min(clock.getDelta(),.05);
+    time+=delta;
+
+    /* Stars slow drift */
+    stars.rotation.y=time*.003;
+    stars.rotation.x=Math.sin(time*.01)*.002;
+    starMat.uniforms.time.value=time;
+
+    /* Moon gentle bob */
+    moonGroup.position.y=4+Math.sin(time*.2)*.3;
+    moonGroup.rotation.y=time*.05;
+
+    /* Clouds drift */
+    clouds.forEach(c=>{
+      c.position.x+=c.userData.speed;
+      c.position.y+=c.userData.driftY;
+      if(c.position.x>20)c.position.x=-20;
+    });
+
+    /* Constellation stars pulse */
+    constStars.forEach((s,i)=>{
+      const pulse=.5+.5*Math.sin(time*1.5+i*1.2);
+      s.material.opacity=(i===0?.8:.3)+pulse*.2;
+      s.scale.setScalar(1+pulse*.1);
+    });
+
+    /* Unfinished star faint pulse */
+    lastStar.material.opacity=.05+.1*Math.sin(time*.5);
+    lastStar.scale.setScalar(.8+.2*Math.sin(time*.5));
+
+    /* Fireflies */
+    tickFireflies();
+
+    cam.position.x=Math.sin(time*.05)*.3;
+    cam.position.y=Math.cos(time*.03)*.2;
+    cam.lookAt(0,0,-5);
+
+    composer.render();
+  }
+  animate();
+}
+
+/* Post-processing */
+import{EffectComposer}from'three/addons/postprocessing/EffectComposer.js';
+import{RenderPass}from'three/addons/postprocessing/RenderPass.js';
+import{UnrealBloomPass}from'three/addons/postprocessing/UnrealBloomPass.js';
+import{ShaderPass}from'three/addons/postprocessing/ShaderPass.js';
+
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(sc,cam));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(W,H),.6,.4,.85));
+const vigShader={uniforms:{tDiffuse:{value:null}},vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`uniform sampler2D tDiffuse;varying vec2 vUv;void main(){vec4 t=texture2D(tDiffuse,vUv);vec2 u=(vUv-.5)*1.1;float v=1.-dot(u,u);t.rgb*=smoothstep(0.,1.,v/1.3);gl_FragColor=t;}`};
+composer.addPass(new ShaderPass(vigShader));
 
 /* ═══════════════════════════════════════════
    RESIZE
@@ -1408,6 +893,21 @@ window.addEventListener('resize',()=>{
   cam.aspect=W/H;cam.updateProjectionMatrix();
   renderer.setSize(W,H);composer.setSize(W,H);
 });
+
+/* ═══════════════════════════════════════════
+   EASTER EGGS
+   ═══════════════════════════════════════════ */
+let easterClicks=0;
+document.addEventListener('keydown',e=>{
+  if(e.key==='l'||e.key==='L'){easterClicks++;if(easterClicks>=5){showToast('The tree remembers.');easterClicks=0}}
+  if(e.key==='m'||e.key==='M')showToast('Same moon.');
+  if(e.key==='h'||e.key==='H')receiveMissYou();
+});
+
+/* ═══════════════════════════════════════════
+   DEMO: Spawn a firefly after 15 seconds
+   ═══════════════════════════════════════════ */
+setTimeout(()=>{if(phase==='universe')spawnFirefly('Missing you from Bangalore')},15000);
 </script>
 </body>
 </html>
