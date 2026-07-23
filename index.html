@@ -22,25 +22,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#f0e6d2;f
 /* ── Landing ── */
 #landing{position:fixed;inset:0;z-index:50;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 2.5s cubic-bezier(.16,1,.3,1)}
 #landing.out{opacity:0;pointer-events:none}
-#distText{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(28px,5vw,52px);font-weight:300;color:#f0e6d2;letter-spacing:.03em;opacity:0;transition:opacity 1.5s}
-#distText .u{font-size:.45em;color:rgba(240,230,210,.4);font-weight:200;letter-spacing:.1em;margin-left:6px}
-#cityDots{position:relative;width:min(520px,85vw);height:100px;margin-top:32px;opacity:0;transition:opacity 1.5s}
-.cd{position:absolute;display:flex;flex-direction:column;align-items:center;gap:5px}
-.cd .dot{width:6px;height:6px;border-radius:50%;background:#c8a855;box-shadow:0 0 16px rgba(200,168,85,.35);animation:dp 2.5s ease-in-out infinite}
-.cd .nm{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(200,168,85,.5);font-weight:300}
-.cd.dub{left:8%}.cd.ban{right:8%;top:55%}
-@keyframes dp{0%,100%{box-shadow:0 0 16px rgba(200,168,85,.25)}50%{box-shadow:0 0 28px rgba(200,168,85,.5)}}
-#hbLine{position:absolute;top:50%;left:8%;right:8%;height:1px;opacity:0;transition:opacity 1.5s}
-#hbLine svg{width:100%;height:30px;overflow:visible}
-#hbLine path{fill:none;stroke:#c8a855;stroke-width:1.2;stroke-dasharray:600;stroke-dashoffset:600;filter:drop-shadow(0 0 4px rgba(200,168,85,.2))}
-#hbLine.on path{animation:draw 3s cubic-bezier(.16,1,.3,1) forwards,pulse 2.5s ease-in-out 3s infinite}
-@keyframes draw{to{stroke-dashoffset:0}}
-@keyframes pulse{0%,100%{stroke-opacity:.35;stroke-width:1.2}50%{stroke-opacity:.9;stroke-width:1.8}}
-#titleBlock{text-align:center;margin-top:40px;opacity:0;transition:opacity 2s}
+#landCanvas{position:absolute;inset:0;width:100%;height:100%}
+#titleBlock{text-align:center;position:relative;z-index:2;opacity:0;transition:opacity 2.5s cubic-bezier(.16,1,.3,1)}
 #titleBlock h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(34px,7vw,76px);font-weight:300;letter-spacing:.03em;line-height:1.05;color:#f0e6d2}
 #titleBlock h1 em{font-style:italic;color:#c8a855}
-#titleBlock .tag{font-family:'Inter',sans-serif;font-size:clamp(10px,1.4vw,14px);font-weight:200;color:rgba(240,230,210,.35);letter-spacing:.12em;margin-top:14px}
-#enterBtn{margin-top:40px;padding:11px 28px;border:1px solid rgba(200,168,85,.15);border-radius:28px;background:transparent;color:#c8a855;font-family:'Inter',sans-serif;font-size:10px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1)}
+#enterBtn{margin-top:36px;padding:11px 28px;border:1px solid rgba(200,168,85,.15);border-radius:28px;background:transparent;color:#c8a855;font-family:'Inter',sans-serif;font-size:10px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1);position:relative;z-index:2}
 #enterBtn:hover{background:rgba(200,168,85,.04);border-color:rgba(200,168,85,.35);transform:scale(1.03)}
 #enterBtn.show{animation:br 3s ease-in-out infinite}
 @keyframes br{0%,100%{opacity:.35}50%{opacity:.9}}
@@ -102,19 +88,53 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#f0e6d2;f
 #missToast .mn{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#c8a855;font-weight:300;letter-spacing:.04em}
 #missToast .ms{font-size:9px;color:rgba(240,230,210,.35);letter-spacing:.15em;margin-top:3px}
 
-/* ── Letter Overlay ── */
-#letOv{position:fixed;inset:0;z-index:20;background:rgba(2,4,12,.92);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
+/* ── Letter System ── */
+#letOv{position:fixed;inset:0;z-index:20;background:rgba(2,4,12,.94);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
 #letOv.open{opacity:1;visibility:visible}
-.letEnv{width:min(420px,90vw);background:linear-gradient(145deg,rgba(12,14,24,.95),rgba(8,10,20,.98));border:1px solid rgba(200,168,85,.08);border-radius:16px;padding:32px;transform:translateY(24px) scale(.97);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative}
+.letEnv{width:min(600px,92vw);max-height:80vh;background:linear-gradient(145deg,rgba(12,14,24,.95),rgba(8,10,20,.98));border:1px solid rgba(200,168,85,.08);border-radius:16px;padding:0;transform:translateY(24px) scale(.97);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;display:flex;flex-direction:column}
 #letOv.open .letEnv{transform:translateY(0) scale(1)}
-.letEnv h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:300;color:#c8a855;margin-bottom:14px}
-.letEnv textarea{width:100%;min-height:130px;border:none;background:transparent;color:#f0e6d2;font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;line-height:1.8;resize:none;outline:none}
-.letEnv textarea::placeholder{color:rgba(240,230,210,.1);font-style:italic}
-.letAct{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,.02)}
-.letCnt{font-size:9px;color:rgba(240,230,210,.2);letter-spacing:.08em}
+.letX{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.04);background:rgba(255,255,255,.01);color:rgba(240,230,210,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;z-index:2}
+/* Letter Tabs */
+.letTabs{display:flex;border-bottom:1px solid rgba(200,168,85,.06);padding:0 24px}
+.letTab{padding:14px 20px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:rgba(200,168,85,.25);cursor:pointer;border-bottom:1px solid transparent;transition:all .3s;font-weight:300}
+.letTab:hover{color:rgba(200,168,85,.5)}
+.letTab.active{color:#c8a855;border-bottom-color:#c8a855}
+.letTab .badge{display:inline-block;width:6px;height:6px;border-radius:50%;background:#c8a855;margin-left:6px;opacity:0;transition:opacity .3s}
+.letTab .badge.on{opacity:1}
+/* Letter Panels */
+.letPanels{flex:1;overflow-y:auto;padding:20px 24px;scrollbar-width:thin;scrollbar-color:rgba(200,168,85,.1) transparent}
+.letPanel{display:none}
+.letPanel.active{display:block}
+/* Inbox */
+.letItem{padding:14px 16px;border:1px solid rgba(200,168,85,.05);border-radius:10px;margin-bottom:10px;cursor:pointer;transition:all .3s;position:relative}
+.letItem:hover{border-color:rgba(200,168,85,.15);background:rgba(200,168,85,.02)}
+.letItem.unread{border-left:2px solid #c8a855}
+.letItem .li-from{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;color:#f0e6d2;font-weight:300}
+.letItem .li-preview{font-size:11px;color:rgba(240,230,210,.3);margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.letItem .li-date{font-size:8px;color:rgba(200,168,85,.2);margin-top:6px;letter-spacing:.1em}
+.letItem .li-dot{position:absolute;top:18px;right:14px;width:6px;height:6px;border-radius:50%;background:#c8a855;opacity:0;transition:opacity .3s}
+.letItem.unread .li-dot{opacity:.6}
+/* Letter Read View */
+.letRead{display:none;padding:24px}
+.letRead.active{display:block}
+.letRead .lr-back{font-size:9px;color:rgba(200,168,85,.3);cursor:pointer;letter-spacing:.1em;margin-bottom:16px;display:inline-block;transition:color .3s}
+.letRead .lr-back:hover{color:#c8a855}
+.letRead .lr-from{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:#c8a855;font-weight:300}
+.letRead .lr-date{font-size:8px;color:rgba(200,168,85,.2);letter-spacing:.1em;margin-top:4px}
+.letRead .lr-body{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#f0e6d2;line-height:1.9;margin-top:20px;font-weight:300;white-space:pre-wrap}
+.letRead .lr-sig{font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;color:#c8a855;margin-top:24px;font-style:italic;text-align:right}
+/* Write Letter */
+.letWrite{display:none;padding:24px}
+.letWrite.active{display:block}
+.letWrite h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:300;color:#c8a855;margin-bottom:14px}
+.letWrite textarea{width:100%;min-height:140px;border:none;background:transparent;color:#f0e6d2;font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;line-height:1.8;resize:none;outline:none}
+.letWrite textarea::placeholder{color:rgba(240,230,210,.1);font-style:italic}
+.letWrite .letAct{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,.02)}
+.letWrite .letCnt{font-size:9px;color:rgba(240,230,210,.2);letter-spacing:.08em}
 .letSend{padding:7px 18px;border:1px solid rgba(200,168,85,.15);border-radius:20px;background:rgba(200,168,85,.03);color:#c8a855;font-size:9px;cursor:pointer;transition:all .3s;letter-spacing:.06em}
 .letSend:hover{background:rgba(200,168,85,.08);border-color:rgba(200,168,85,.3)}
-.letX{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.04);background:rgba(255,255,255,.01);color:rgba(240,230,210,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px}
+/* Empty State */
+.letEmpty{text-align:center;padding:40px 20px;color:rgba(200,168,85,.15);font-size:11px;letter-spacing:.1em;font-style:italic}
 
 /* ── Firefly ── */
 .ff{position:fixed;z-index:15;width:6px;height:6px;border-radius:50%;background:#c8a855;box-shadow:0 0 10px rgba(200,168,85,.4),0 0 20px rgba(200,168,85,.15);pointer-events:auto;cursor:pointer;transition:box-shadow .3s}
@@ -200,13 +220,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#f0e6d2;f
 
 <!-- Landing -->
 <div id="landing">
-  <div id="distText"></div>
-  <div id="cityDots">
-    <div class="cd dub"><div class="dot"></div><div class="nm">Dublin</div></div>
-    <div class="cd ban"><div class="dot"></div><div class="nm">Bangalore</div></div>
-    <div id="hbLine"><svg viewBox="0 0 520 30" preserveAspectRatio="none"><path d="M0,15 Q65,15 85,15 Q100,15 110,4 Q120,26 130,15 Q145,15 190,15 Q210,15 230,15 Q245,15 255,4 Q265,26 275,15 Q290,15 330,15 Q350,15 370,15 Q385,15 395,4 Q405,26 415,15 Q430,15 520,15"/></svg></div>
-  </div>
-  <div id="titleBlock"><h1><em>Parallel</em> Hearts</h1><div class="tag">Different skies. Same heartbeat.</div></div>
+  <canvas id="landCanvas"></canvas>
+  <div id="titleBlock"><h1><em>Parallel</em> Hearts</h1></div>
   <button id="enterBtn">Enter Our World</button>
 </div>
 
@@ -261,15 +276,39 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#f0e6d2;f
   <button class="mcl" onclick="document.getElementById('moonOv').classList.remove('open')">Close</button>
 </div>
 
-<!-- Letter Overlay -->
+<!-- Letter System -->
 <div id="letOv">
   <div class="letEnv">
-    <button class="letX" onclick="document.getElementById('letOv').classList.remove('open')">&#10005;</button>
-    <h3>Write a Letter</h3>
-    <textarea id="letTx" placeholder="Write something from the heart..."></textarea>
-    <div class="letAct">
-      <span class="letCnt" id="letCnt">0 / 250 words</span>
-      <button class="letSend" id="letSend">Send with love</button>
+    <button class="letX" onclick="closeLetters()">&#10005;</button>
+    <!-- Tabs -->
+    <div class="letTabs">
+      <div class="letTab active" data-tab="inbox">Inbox <span class="badge on" id="inboxBadge"></span></div>
+      <div class="letTab" data-tab="outbox">Sent</div>
+      <div class="letTab" data-tab="write">Write</div>
+    </div>
+    <!-- Panels -->
+    <div class="letPanels">
+      <!-- Inbox -->
+      <div class="letPanel active" id="inboxPanel"></div>
+      <!-- Outbox -->
+      <div class="letPanel" id="outboxPanel"></div>
+      <!-- Write -->
+      <div class="letWrite active" id="writePanel">
+        <h3>Write a Letter to Sharath</h3>
+        <textarea id="letTx" placeholder="Write something from the heart..."></textarea>
+        <div class="letAct">
+          <span class="letCnt" id="letCnt">0 words</span>
+          <button class="letSend" id="letSend">Send with love</button>
+        </div>
+      </div>
+      <!-- Read View -->
+      <div class="letRead" id="readPanel">
+        <div class="lr-back" onclick="showList()">&#8592; Back</div>
+        <div class="lr-from" id="lrFrom"></div>
+        <div class="lr-date" id="lrDate"></div>
+        <div class="lr-body" id="lrBody"></div>
+        <div class="lr-sig" id="lrSig"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -562,23 +601,206 @@ function drawSky(ctx,date,lat,lng,offsetX){
 }
 
 /* ═══════════════════════════════════════════
-   ACT 1: LANDING
+   ACT 1: LANDING — Stars Being Born
    ═══════════════════════════════════════════ */
-const REAL_DIST=8580;
-const landingSeq=[
-  {d:600,fn:()=>{
-    $('distText').style.opacity='1';
-    let cur=0;const dur=2500;const st=performance.now();
-    (function tick(now){const p=Math.min(1,(now-st)/dur);const e=1-Math.pow(1-p,3);cur=Math.floor(e*REAL_DIST);$('distText').innerHTML=`${cur.toLocaleString()}<span class="u">km apart</span>`;if(p<1)requestAnimationFrame(tick);else $('distText').innerHTML=`${REAL_DIST.toLocaleString()}<span class="u">km apart</span>`})(performance.now());
-  }},
-  {d:3500,fn:()=>{$('cityDots').style.opacity='1';setTimeout(()=>{$('hbLine').style.opacity='1';$('hbLine').classList.add('on')},600)}},
-  {d:5500,fn:()=>{
-    $('distText').style.opacity='0';$('distText').style.transition='opacity 1.5s';
-    $('cityDots').style.opacity='0';$('cityDots').style.transition='opacity 1.5s';
-    setTimeout(()=>{$('titleBlock').style.opacity='1';setTimeout(()=>{$('enterBtn').style.opacity='1';$('enterBtn').classList.add('show')},1200)},800);
-  }}
+const lCanvas=$('landCanvas');
+const lCtx=lCanvas.getContext('2d');
+let lW,lH;
+function resizeLanding(){lW=lCanvas.width=innerWidth;lH=lCanvas.height=innerHeight}
+resizeLanding();
+addEventListener('resize',resizeLanding);
+
+/* Constellation stars — positions for forming patterns */
+const constellationStars=[
+  /* Random background stars that appear first */
+  ...Array.from({length:40},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.2+.3,bright:Math.random()*.4+.1,flicker:Math.random()*TAU,group:'bg'})),
+  /* Constellation pattern stars (form shapes) */
+  {x:.15,y:.25,r:1.5,bright:.5,group:'const'},
+  {x:.18,y:.2,r:1.2,bright:.45,group:'const'},
+  {x:.12,y:.32,r:1.3,bright:.48,group:'const'},
+  {x:.2,y:.35,r:1.1,bright:.42,group:'const'},
+  {x:.14,y:.38,r:1.4,bright:.5,group:'const'},
+  {x:.75,y:.3,r:1.5,bright:.5,group:'const'},
+  {x:.78,y:.22,r:1.2,bright:.45,group:'const'},
+  {x:.72,y:.35,r:1.3,bright:.48,group:'const'},
+  {x:.8,y:.32,r:1.1,bright:.42,group:'const'},
+  {x:.77,y:.4,r:1.4,bright:.5,group:'const'},
+  /* More scattered constellation stars */
+  {x:.3,y:.15,r:1,bright:.35,group:'const'},
+  {x:.6,y:.18,r:1.1,bright:.38,group:'const'},
+  {x:.45,y:.7,r:1,bright:.33,group:'const'},
+  {x:.55,y:.75,r:1.1,bright:.36,group:'const'},
+  {x:.25,y:.65,r:.9,bright:.3,group:'const'},
+  {x:.85,y:.6,r:1,bright:.34,group:'const'},
 ];
-landingSeq.forEach(s=>setTimeout(s.fn,s.d));
+
+/* Constellation lines — connections between stars */
+const constLines=[
+  [40,41],[41,42],[42,43],[43,44],/* left constellation */
+  [45,46],[46,47],[47,48],[48,49],/* right constellation */
+  [40,50],[45,51],/* scattered */
+  [50,51],[52,53],[54,55],/* more */
+];
+
+/* The two special stars — Rashmi and Sharath */
+const heartStars=[
+  {x:.38,y:.48,r:3,bright:0,targetBright:1,name:'Rashmi',group:'heart'},
+  {x:.62,y:.48,r:3,bright:0,targetBright:1,name:'Sharath',group:'heart'},
+];
+
+/* Thread connecting them */
+let threadProgress=0;
+let threadTarget=0;
+
+/* Animation phases */
+let landPhase=0;/* 0: first star, 1: more stars, 2: constellations, 3: heart stars, 4: thread, 5: zoom out, 6: title */
+let landStart=performance.now();
+const phaseTimings=[800,2500,4500,6500,8000,10000,12500];/* when each phase starts */
+
+/* Camera zoom */
+let zoom=1;
+let zoomTarget=1;
+let panX=0,panY=0;
+
+function drawLanding(ts){
+  if(phase!=='landing')return;
+  const elapsed=ts-landStart;
+
+  /* Determine current phase */
+  let newPhase=0;
+  for(let i=phaseTimings.length-1;i>=0;i--){
+    if(elapsed>phaseTimings[i]){newPhase=i+1;break}
+  }
+  if(newPhase!==landPhase){
+    landPhase=newPhase;
+    if(landPhase===3){heartStars[0].targetBright=1;heartStars[1].targetBright=1}
+    if(landPhase===4)threadTarget=1;
+    if(landPhase===5){zoomTarget=.6;panX=(Math.random()-.5)*40;panY=(Math.random()-.5)*20}
+    if(landPhase===6){
+      $('titleBlock').style.opacity='1';
+      setTimeout(()=>{$('enterBtn').style.opacity='1';$('enterBtn').classList.add('show')},1500);
+    }
+  }
+
+  /* Clear */
+  lCtx.fillStyle='#000';
+  lCtx.fillRect(0,0,lW,lH);
+
+  /* Apply camera transform */
+  lCtx.save();
+  zoom+=(zoomTarget-zoom)*.008;
+  lCtx.translate(lW/2+panX,lH/2+panY);
+  lCtx.scale(zoom,zoom);
+  lCtx.translate(-lW/2,-lH/2);
+
+  /* Draw background stars — appear gradually */
+  const bgCount=Math.min(constellationStars.filter(s=>s.group==='bg').length,Math.floor(elapsed/60));
+  constellationStars.filter(s=>s.group==='bg').slice(0,bgCount).forEach(s=>{
+    const flick=.7+Math.sin(ts*.002+s.flicker)*.3;
+    lCtx.fillStyle=`rgba(240,230,210,${s.bright*flick})`;
+    lCtx.beginPath();
+    lCtx.arc(s.x*lW,s.y*lH,s.r,0,TAU);
+    lCtx.fill();
+  });
+
+  /* Draw constellation stars — appear after phase 1 */
+  if(landPhase>=1){
+    const cStart=phaseTimings[1];
+    const cCount=Math.min(constellationStars.filter(s=>s.group==='const').length,Math.floor((elapsed-cStart)/80));
+    constellationStars.filter(s=>s.group==='const').slice(0,cCount).forEach(s=>{
+      const flick=.7+Math.sin(ts*.002+s.flicker)*.3;
+      lCtx.fillStyle=`rgba(240,230,210,${s.bright*flick})`;
+      lCtx.beginPath();
+      lCtx.arc(s.x*lW,s.y*lH,s.r,0,TAU);
+      lCtx.fill();
+    });
+  }
+
+  /* Draw constellation lines — appear after phase 2 */
+  if(landPhase>=2){
+    const lStart=phaseTimings[2];
+    const lProgress=Math.min(1,(elapsed-lStart)/2000);
+    lCtx.strokeStyle=`rgba(200,168,85,${.08*lProgress})`;
+    lCtx.lineWidth=.5;
+    constLines.forEach((line,i)=>{
+      if(i/constLines.length>lProgress)return;
+      const a=constellationStars[line[0]],b=constellationStars[line[1]];
+      if(!a||!b)return;
+      lCtx.beginPath();
+      lCtx.moveTo(a.x*lW,a.y*lH);
+      lCtx.lineTo(b.x*lW,b.y*lH);
+      lCtx.stroke();
+    });
+  }
+
+  /* Draw heart stars — Rashmi and Sharath */
+  heartStars.forEach(h=>{
+    h.bright+=(h.targetBright-h.bright)*.015;
+    if(h.bright<.01)return;
+    const pulse=.8+Math.sin(ts*.002)*.2;
+    /* Outer glow */
+    const grad=lCtx.createRadialGradient(h.x*lW,h.y*lH,0,h.x*lW,h.y*lH,h.r*8);
+    grad.addColorStop(0,`rgba(200,168,85,${h.bright*.25*pulse})`);
+    grad.addColorStop(1,'rgba(200,168,85,0)');
+    lCtx.fillStyle=grad;
+    lCtx.beginPath();
+    lCtx.arc(h.x*lW,h.y*lH,h.r*8,0,TAU);
+    lCtx.fill();
+    /* Core */
+    lCtx.fillStyle=`rgba(255,215,100,${h.bright*pulse})`;
+    lCtx.beginPath();
+    lCtx.arc(h.x*lW,h.y*lH,h.r,0,TAU);
+    lCtx.fill();
+    /* Inner bright core */
+    lCtx.fillStyle=`rgba(255,255,240,${h.bright*pulse*.8})`;
+    lCtx.beginPath();
+    lCtx.arc(h.x*lW,h.y*lH,h.r*.4,0,TAU);
+    lCtx.fill();
+  });
+
+  /* Draw thread connecting them */
+  threadProgress+=(threadTarget-threadProgress)*.012;
+  if(threadProgress>.01){
+    const sx=heartStars[0].x*lW,sy=heartStars[0].y*lH;
+    const ex=heartStars[1].x*lW,ey=heartStars[1].y*lH;
+    const mx=(sx+ex)/2,my=Math.min(sy,ey)-60;/* curve upward */
+    /* Draw glowing thread */
+    lCtx.strokeStyle=`rgba(200,168,85,${threadProgress*.3})`;
+    lCtx.lineWidth=1.5;
+    lCtx.shadowBlur=8;
+    lCtx.shadowColor='rgba(200,168,85,.3)';
+    lCtx.beginPath();
+    lCtx.moveTo(sx,sy);
+    lCtx.quadraticCurveTo(mx,my,sx+(ex-sx)*threadProgress,sy+(ey-sy)*threadProgress);
+    lCtx.stroke();
+    lCtx.shadowBlur=0;
+    /* Travelling particle on thread */
+    if(threadProgress>.1){
+      const tp=(ts*.0003)%1;
+      const px=sx+(ex-sx)*tp;
+      const py=sy+(ey-sy)*tp-(1-tp)*tp*120;/* arc */
+      lCtx.fillStyle=`rgba(200,168,85,${threadProgress*.5})`;
+      lCtx.beginPath();
+      lCtx.arc(px,py,2,0,TAU);
+      lCtx.fill();
+    }
+  }
+
+  /* Draw name labels for heart stars */
+  if(landPhase>=3){
+    const labelAlpha=Math.min(1,(elapsed-phaseTimings[3])/1500);
+    lCtx.font='300 13px "Cormorant Garamond"';
+    lCtx.fillStyle=`rgba(200,168,85,${labelAlpha*.6})`;
+    lCtx.textAlign='center';
+    lCtx.fillText('Rashmi ✦',heartStars[0].x*lW,heartStars[0].y*lH+28);
+    lCtx.fillText('Sharath ✦',heartStars[1].x*lW,heartStars[1].y*lH+28);
+  }
+
+  lCtx.restore();
+
+  requestAnimationFrame(drawLanding);
+}
+requestAnimationFrame(drawLanding);
 
 $('enterBtn').addEventListener('click',()=>{
   if(phase!=='landing')return;
@@ -716,15 +938,151 @@ function spawnFF(msg){
 function tickFireflies(){ffs.forEach(f=>{f.ph+=.015;f.x+=Math.sin(f.ph)*1.2+f.vx;f.y+=Math.cos(f.ph*.6)*.6+f.vy;if(f.y<-10){f.y=H+10;f.x=Math.random()*W*.6+W*.2}f.el.style.left=f.x+'px';f.el.style.top=f.y+'px';f.el.style.opacity=.4+.4*Math.sin(f.ph*2.5)})}
 
 /* ═══════════════════════════════════════════
-   PAPER AIRPLANE LETTERS
+   BIDIRECTIONAL LETTERS
    ═══════════════════════════════════════════ */
+const LETTERS_KEY='parallel_hearts_letters';
+
+/* Sample letters from Sharath */
+const defaultLetters=[
+  {id:'s1',from:'Sharath',to:'Rashmi',date:'2026-01-05',body:'I know you just left yesterday. The house feels different already. I walked into the kitchen this morning and your coffee mug was still on the counter. I didn\'t move it.\n\nI keep telling myself this is temporary. December will come. You\'ll come home. But right now, sitting in this quiet apartment, temporary feels like forever.\n\nI miss the way you hum when you cook. I miss hearing your keys in the door. I miss knowing you were just in the next room.\n\nBe safe in Dublin. Study hard. And know that every night, I look up at the same moon you do.\n\nI love you.',read:false,starred:false},
+  {id:'s2',from:'Sharath',to:'Rashmi',date:'2026-01-15',body:'Two weeks. It\'s been two weeks and I still reach for my phone to call you at 6pm before remembering you\'re 5:30 hours behind.\n\nI went to our biryani place today. The one near Brigade Road. The owner asked where you were. I said Ireland. He looked confused. I think he thought I was joking.\n\nSometimes I sit in the car after work and just... stay there. Because the apartment is too quiet without you.\n\nBut I\'m proud of you. What you\'re doing takes courage. Most people wouldn\'t leave everything they know to chase something bigger.\n\nYou\'re not most people.\n\nCome home to me in December.',read:false,starred:false},
+  {id:'s3',from:'Sharath',to:'Rashmi',date:'2026-02-03',body:'Happy birthday to me, I guess. You called at midnight your time. I pretended to be asleep but I was smiling so hard my face hurt.\n\nThank you for the video message. I watched it four times. The way you said "I wish I was there" — I could hear it in your voice. I feel the same way every single day.\n\nYour birthday is next month. I\'ll be counting the days.\n\nI love you more than biryani. And you know how much I love biryani.\n\nAlways,\nSharath',read:false,starred:false},
+  {id:'s4',from:'Sharath',to:'Rashmi',date:'2026-03-20',body:'Happy birthday, my love.\n\nI know it\'s hard being away on your birthday. I know you wanted to celebrate together. I know this isn\'t what we planned.\n\nBut here\'s what I know for sure: one day we\'ll look back at this year and realize it was the thing that made us unbreakable.\n\nEat some cake for me. Light a candle. Make a wish.\n\nI already know what I\'m wishing for.\n\nDecember. You. Home.\n\nForever yours,\nSharath',read:false,starred:false},
+  {id:'s5',from:'Sharath',to:'Rashmi',date:'2026-04-12',body:'I had a dream about you last night. We were at the beach in Goa, the one we went to before the wedding. You were laughing at something I said. I don\'t remember what, but I remember the sound.\n\nI woke up and for a second I thought you were in the next room. Then I remembered.\n\n8,580 km. That\'s what the internet says. But it doesn\'t feel like a number. It feels like every quiet evening, every meal alone, every time I reach for you and you\'re not there.\n\nBut then I see your messages. Your photos. The way you\'re building something in Dublin. And I think — she\'s coming back. She\'s coming back to me.\n\nThat\'s enough to keep going.\n\nMiss you always.',read:false,starred:false},
+  {id:'s6',from:'Sharath',to:'Rashmi',date:'2026-05-23',body:'One year.\n\nOne year ago today, you walked toward me in that white dress and I forgot every word I\'d prepared. I just stood there, watching you, thinking — how did I get this lucky?\n\nI\'m sorry I can\'t be there today. I\'m sorry we can\'t celebrate together. But I want you to know: marrying you was the best decision I ever made. Even the distance can\'t change that.\n\nEspecially the distance.\n\nIt taught me that love isn\'t about proximity. It\'s about choosing someone, every day, even when they\'re 8,580 km away.\n\nHappy anniversary, Rashmi. I\'ll be looking at our wedding photos tonight.\n\nAlways yours,\nSharath',read:false,starred:false},
+  {id:'s7',from:'Sharath',to:'Rashmi',date:'2026-06-10',body:'Something small happened today that I wanted to tell you about.\n\nI was walking home from work and I passed a couple holding hands. They were laughing about something. And for the first time, it didn\'t hurt to see that. It just made me think of you.\n\nI thought about the way you hold my hand — how you always interlock your fingers first. I thought about how you squeeze twice when you want me to know you\'re there.\n\nI can\'t hold your hand right now. But I can remember how it feels. And I can wait for the day I get to hold it again.\n\nSix more months. I\'m counting.\n\nLove,\nSharath',read:false,starred:false},
+];
+
+/* Load letters from localStorage or use defaults */
+function loadLetters(){
+  const stored=localStorage.getItem(LETTERS_KEY);
+  if(stored){
+    try{return JSON.parse(stored)}catch(e){}
+  }
+  /* First time: store defaults */
+  localStorage.setItem(LETTERS_KEY,JSON.stringify(defaultLetters));
+  return[...defaultLetters];
+}
+let letters=loadLetters();
+
+/* Save letters */
+function saveLetters(){localStorage.setItem(LETTERS_KEY,JSON.stringify(letters))}
+
+/* Get unread count */
+function unreadCount(){return letters.filter(l=>l.from==='Sharath'&&!l.read).length}
+
+/* Render inbox */
+function renderInbox(){
+  const panel=$('inboxPanel');
+  const sharathLetters=letters.filter(l=>l.from==='Sharath').sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(sharathLetters.length===0){
+    panel.innerHTML='<div class="letEmpty">No letters yet. He\'ll write soon.</div>';
+    return;
+  }
+  panel.innerHTML=sharathLetters.map(l=>`
+    <div class="letItem ${l.read?'':'unread'}" onclick="openLetter('${l.id}')">
+      <div class="li-from">${l.from}</div>
+      <div class="li-preview">${l.body.substring(0,120)}...</div>
+      <div class="li-date">${formatDate(l.date)}</div>
+      <div class="li-dot"></div>
+    </div>
+  `).join('');
+}
+
+/* Render outbox */
+function renderOutbox(){
+  const panel=$('outboxPanel');
+  const myLetters=letters.filter(l=>l.from==='Rashmi').sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(myLetters.length===0){
+    panel.innerHTML='<div class="letEmpty">No sent letters yet. Write one?</div>';
+    return;
+  }
+  panel.innerHTML=myLetters.map(l=>`
+    <div class="letItem" onclick="openLetter('${l.id}')">
+      <div class="li-from">To: ${l.to}</div>
+      <div class="li-preview">${l.body.substring(0,120)}...</div>
+      <div class="li-date">${formatDate(l.date)}</div>
+    </div>
+  `).join('');
+}
+
+/* Format date */
+function formatDate(d){
+  const date=new Date(d);
+  return date.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+
+/* Open a letter */
+function openLetter(id){
+  const l=letters.find(x=>x.id===id);
+  if(!l)return;
+  if(!l.read){l.read=true;saveLetters();updateBadge()}
+  $('lrFrom').textContent=l.from==='Sharath'?`${l.from} ✦`:`To: ${l.to}`;
+  $('lrDate').textContent=formatDate(l.date);
+  $('lrBody').textContent=l.body;
+  $('lrSig').textContent=l.from==='Sharath'?`— ${l.from}`:'With love, Rashmi';
+  /* Hide panels, show read view */
+  document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));
+  $('readPanel').classList.add('active');
+}
+
+/* Show list view */
+function showList(){
+  $('readPanel').classList.remove('active');
+  const activeTab=document.querySelector('.letTab.active');
+  if(activeTab){
+    const tab=activeTab.dataset.tab;
+    if(tab==='inbox')$('inboxPanel').classList.add('active');
+    else if(tab==='outbox')$('outboxPanel').classList.add('active');
+    else if(tab==='write')$('writePanel').classList.add('active');
+  }
+}
+
+/* Update badge */
+function updateBadge(){
+  const count=unreadCount();
+  const badge=$('inboxBadge');
+  if(count>0){badge.classList.add('on');badge.textContent=count}
+  else badge.classList.remove('on');
+}
+
+/* Tab switching */
+document.querySelectorAll('.letTab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.letTab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));
+    $('readPanel').classList.remove('active');
+    const t=tab.dataset.tab;
+    if(t==='inbox')$('inboxPanel').classList.add('active');
+    else if(t==='outbox')$('outboxPanel').classList.add('active');
+    else if(t==='write')$('writePanel').classList.add('active');
+  });
+});
+
+/* Send letter */
 function sendPlane(){
   const text=$('letTx').value.trim();
   if(!text)return;
   const words=text.split(/\s+/).filter(Boolean).length;
   if(words>250){toast('Keep it under 250 words');return}
-  $('letOv').classList.remove('open');
+  /* Add to letters */
+  const newLetter={
+    id:'r'+Date.now(),
+    from:'Rashmi',
+    to:'Sharath',
+    date:new Date().toISOString().split('T')[0],
+    body:text,
+    read:true,
+    starred:false
+  };
+  letters.push(newLetter);
+  saveLetters();
   $('letTx').value='';
+  $('letCnt').textContent='0 words';
+  renderOutbox();
+  /* Paper airplane animation */
+  $('letOv').classList.remove('open');
   const plane=document.createElement('div');plane.className='pp';
   plane.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8a855" stroke-width="1"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>';
   document.body.appendChild(plane);
@@ -741,8 +1099,16 @@ function sendPlane(){
   })(performance.now());
 }
 
+/* Close letters */
+function closeLetters(){$('letOv').classList.remove('open')}
+
 $('letSend').addEventListener('click',sendPlane);
-$('letTx')?.addEventListener('input',function(){$('letCnt').textContent=`${this.value.trim().split(/\s+/).filter(Boolean).length} / 250 words`});
+$('letTx')?.addEventListener('input',function(){$('letCnt').textContent=`${this.value.trim().split(/\s+/).filter(Boolean).length} words`});
+
+/* Initialize inbox */
+renderInbox();
+renderOutbox();
+updateBadge();
 
 /* ═══════════════════════════════════════════
    I MISS YOU
