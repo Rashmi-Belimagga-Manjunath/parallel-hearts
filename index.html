@@ -8,906 +8,792 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --gold:#c8a855;--gold-dim:rgba(200,168,85,0.3);--warm:#f0e6d2;--ivory:rgba(240,230,210,0.45);
-  --midnight:#050816;--midnight-deep:#020510;
-  --aurora:#4a9eff;--aurora-dim:rgba(74,158,255,0.15);
-  --silver:#b8c5d6;--silver-dim:rgba(184,197,214,0.2);
-  --serif:'Cormorant Garamond',Georgia,serif;--sans:'Inter',-apple-system,sans-serif
-}
-html,body{width:100%;height:100%;overflow:hidden;background:#000;color:var(--warm);font-family:var(--sans);-webkit-font-smoothing:antialiased;cursor:none}
-::selection{background:var(--gold);color:var(--midnight)}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#f0e6d2;font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;cursor:none}
+::selection{background:#c8a855;color:#050816}
 
-/* ── Custom Cursor ── */
-#cursor{position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen}
-.cursor-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;position:absolute;top:-3px;left:-3px;transition:transform .2s,background .3s}
-.cursor-ring{width:36px;height:36px;border:1px solid rgba(200,168,85,0.3);border-radius:50%;position:absolute;top:-18px;left:-18px;transition:transform .4s cubic-bezier(.16,1,.3,1),width .3s,height .3s,top .3s,left .3s,border-color .3s,background .3s}
-#cursor.hover .cursor-dot{transform:scale(0);background:var(--aurora)}
-#cursor.hover .cursor-ring{width:56px;height:56px;top:-28px;left:-28px;border-color:rgba(74,158,255,0.4);background:rgba(74,158,255,0.03)}
-#cursor.click .cursor-ring{transform:scale(.85)}
+#cursor{position:fixed;pointer-events:none;z-index:9999}
+#cursor .d{width:5px;height:5px;background:#c8a855;border-radius:50%;position:absolute;top:-2.5px;left:-2.5px;transition:transform .15s}
+#cursor .r{width:32px;height:32px;border:1px solid rgba(200,168,85,.3);border-radius:50%;position:absolute;top:-16px;left:-16px;transition:transform .3s cubic-bezier(.16,1,.3,1),width .3s,height .3s,top .3s,left .3s,border-color .3s}
+#cursor.hov .d{transform:scale(0)}
+#cursor.hov .r{width:48px;height:48px;top:-24px;left:-24px;border-color:rgba(200,168,85,.5)}
+.ct{position:fixed;pointer-events:none;z-index:9998;border-radius:50%;background:#c8a855;mix-blend-mode:screen}
+#cGlow{position:fixed;pointer-events:none;z-index:4;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,85,.02) 0%,transparent 70%);transform:translate(-50%,-50%)}
 
-/* ── Cursor Trail ── */
-.ct{position:fixed;pointer-events:none;z-index:9998;border-radius:50%;background:var(--gold);mix-blend-mode:screen}
+/* ── Landing ── */
+#landing{position:fixed;inset:0;z-index:50;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 2.5s cubic-bezier(.16,1,.3,1)}
+#landing.out{opacity:0;pointer-events:none}
+#distText{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(28px,5vw,52px);font-weight:300;color:#f0e6d2;letter-spacing:.03em;opacity:0;transition:opacity 1.5s}
+#distText .u{font-size:.45em;color:rgba(240,230,210,.4);font-weight:200;letter-spacing:.1em;margin-left:6px}
+#cityDots{position:relative;width:min(520px,85vw);height:100px;margin-top:32px;opacity:0;transition:opacity 1.5s}
+.cd{position:absolute;display:flex;flex-direction:column;align-items:center;gap:5px}
+.cd .dot{width:6px;height:6px;border-radius:50%;background:#c8a855;box-shadow:0 0 16px rgba(200,168,85,.35);animation:dp 2.5s ease-in-out infinite}
+.cd .nm{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(200,168,85,.5);font-weight:300}
+.cd.dub{left:8%}.cd.ban{right:8%;top:55%}
+@keyframes dp{0%,100%{box-shadow:0 0 16px rgba(200,168,85,.25)}50%{box-shadow:0 0 28px rgba(200,168,85,.5)}}
+#hbLine{position:absolute;top:50%;left:8%;right:8%;height:1px;opacity:0;transition:opacity 1.5s}
+#hbLine svg{width:100%;height:30px;overflow:visible}
+#hbLine path{fill:none;stroke:#c8a855;stroke-width:1.2;stroke-dasharray:600;stroke-dashoffset:600;filter:drop-shadow(0 0 4px rgba(200,168,85,.2))}
+#hbLine.on path{animation:draw 3s cubic-bezier(.16,1,.3,1) forwards,pulse 2.5s ease-in-out 3s infinite}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pulse{0%,100%{stroke-opacity:.35;stroke-width:1.2}50%{stroke-opacity:.9;stroke-width:1.8}}
+#titleBlock{text-align:center;margin-top:40px;opacity:0;transition:opacity 2s}
+#titleBlock h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(34px,7vw,76px);font-weight:300;letter-spacing:.03em;line-height:1.05;color:#f0e6d2}
+#titleBlock h1 em{font-style:italic;color:#c8a855}
+#titleBlock .tag{font-family:'Inter',sans-serif;font-size:clamp(10px,1.4vw,14px);font-weight:200;color:rgba(240,230,210,.35);letter-spacing:.12em;margin-top:14px}
+#enterBtn{margin-top:40px;padding:11px 28px;border:1px solid rgba(200,168,85,.15);border-radius:28px;background:transparent;color:#c8a855;font-family:'Inter',sans-serif;font-size:10px;font-weight:300;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1)}
+#enterBtn:hover{background:rgba(200,168,85,.04);border-color:rgba(200,168,85,.35);transform:scale(1.03)}
+#enterBtn.show{animation:br 3s ease-in-out infinite}
+@keyframes br{0%,100%{opacity:.35}50%{opacity:.9}}
 
-/* ── Cursor Glow ── */
-#cursorGlow{position:fixed;pointer-events:none;z-index:4;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(200,168,85,0.03) 0%,transparent 70%);transform:translate(-50%,-50%)}
-
-/* ═══════════════════════════════════════════
-   ACT 1: CINEMATIC LANDING
-   ═══════════════════════════════════════════ */
-#landing{position:fixed;inset:0;z-index:50;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 2s cubic-bezier(.16,1,.3,1)}
-#landing.fade{opacity:0;pointer-events:none}
-
-/* Distance counter */
-#distText{font-family:var(--serif);font-size:clamp(28px,5vw,56px);font-weight:300;color:var(--warm);letter-spacing:.04em;opacity:0;transition:opacity 1.5s}
-#distText .km{font-size:.5em;color:var(--ivory);font-weight:200;letter-spacing:.08em}
-
-/* City dots */
-#cityDots{position:relative;width:min(500px,80vw);height:120px;margin-top:40px;opacity:0;transition:opacity 1.5s}
-.city-dot{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px}
-.city-dot .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 20px rgba(200,168,85,0.4);animation:dotPulse 2s ease-in-out infinite}
-.city-dot .label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:300}
-.city-dot.dublin{left:10%;top:20%}
-.city-dot.bangalore{right:10%;top:50%}
-@keyframes dotPulse{0%,100%{box-shadow:0 0 20px rgba(200,168,85,0.3)}50%{box-shadow:0 0 35px rgba(200,168,85,0.6)}}
-
-/* Heartbeat line */
-#heartbeatLine{position:absolute;top:50%;left:10%;right:10%;height:1px;opacity:0;transition:opacity 1.5s}
-#heartbeatLine svg{width:100%;height:40px;overflow:visible}
-#heartbeatLine path{fill:none;stroke:var(--gold);stroke-width:1.5;stroke-dasharray:600;stroke-dashoffset:600;filter:drop-shadow(0 0 6px rgba(200,168,85,0.3))}
-#heartbeatLine.animate path{animation:drawLine 3s cubic-bezier(.16,1,.3,1) forwards,pulseLine 2s ease-in-out 3s infinite}
-@keyframes drawLine{to{stroke-dashoffset:0}}
-@keyframes pulseLine{0%,100%{stroke-opacity:.4;stroke-width:1.5}50%{stroke-opacity:1;stroke-width:2}}
-
-/* Title */
-#titleBlock{text-align:center;margin-top:48px;opacity:0;transition:opacity 2s}
-#titleBlock h1{font-family:var(--serif);font-size:clamp(36px,7vw,80px);font-weight:300;letter-spacing:.03em;line-height:1.1;color:var(--warm)}
-#titleBlock h1 em{font-style:italic;color:var(--gold);font-weight:300}
-#titleBlock .tagline{font-family:var(--sans);font-size:clamp(11px,1.5vw,15px);font-weight:200;color:var(--ivory);letter-spacing:.12em;margin-top:16px}
-
-/* Enter button */
-#enterBtn{margin-top:48px;padding:12px 32px;border:1px solid rgba(200,168,85,0.2);border-radius:32px;background:transparent;color:var(--gold);font-family:var(--sans);font-size:11px;font-weight:300;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1)}
-#enterBtn:hover{background:rgba(200,168,85,0.06);border-color:rgba(200,168,85,0.4);transform:scale(1.04)}
-#enterBtn.show{animation:breathe 3s ease-in-out infinite}
-@keyframes breathe{0%,100%{opacity:.4}50%{opacity:1}}
-
-/* ═══════════════════════════════════════════
-   ACT 2: FLOATING UNIVERSE
-   ═══════════════════════════════════════════ */
-#universeCanvas{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 3s}
-#universeCanvas.show{opacity:1;pointer-events:auto}
+/* ── Main View ── */
+#mainCanvas{position:fixed;inset:0;z-index:1;opacity:0;transition:opacity 3s}
+#mainCanvas.on{opacity:1}
+#skyCanvas{position:fixed;inset:0;z-index:0}
 
 /* ── HUD ── */
-#hud{position:fixed;top:0;left:0;right:0;z-index:15;display:flex;justify-content:space-between;align-items:flex-start;padding:24px 32px;opacity:0;transition:opacity 1.5s;pointer-events:none}
-#hud.show{opacity:1;pointer-events:auto}
-.hud-city{text-align:right}
-.hud-city:first-child{text-align:left}
-.hud-city .city-name{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,168,85,0.3);font-weight:300}
-.hud-city .city-time{font-family:var(--serif);font-size:clamp(16px,2vw,24px);font-weight:300;color:var(--warm);letter-spacing:.02em}
-.hud-city .city-time-period{font-size:9px;color:var(--ivory);margin-top:2px;letter-spacing:.08em}
-.hud-center{text-align:center}
-.hud-center .countdown-label{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,168,85,0.25);font-weight:300}
-.hud-center .countdown-val{font-family:var(--serif);font-size:13px;color:rgba(240,230,210,0.35);margin-top:2px}
+#hud{position:fixed;top:0;left:0;right:0;z-index:12;display:flex;justify-content:space-between;align-items:flex-start;padding:20px 28px;opacity:0;transition:opacity 1.5s;pointer-events:none}
+#hud.on{opacity:1;pointer-events:auto}
+.hc{text-align:right}.hc:first-child{text-align:left}
+.hc .cn{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:rgba(200,168,85,.25);font-weight:300}
+.hc .ct2{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(15px,2vw,22px);font-weight:300;color:#f0e6d2;letter-spacing:.02em}
+.hc .cd2{font-size:9px;color:rgba(200,168,85,.2);margin-top:1px;letter-spacing:.08em}
+.hcc{text-align:center}
+.hcc .cl{font-size:7px;letter-spacing:.22em;text-transform:uppercase;color:rgba(200,168,85,.2);font-weight:300}
+.hcc .cv{font-family:'Cormorant Garamond',Georgia,serif;font-size:12px;color:rgba(240,230,210,.3);margin-top:2px}
 
-/* ── Scene Label ── */
-#sceneLabel{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:15;opacity:0;transition:opacity 1.5s;pointer-events:none;text-align:center}
-#sceneLabel.show{opacity:1}
-.sl-name{font-family:var(--serif);font-size:clamp(14px,2vw,18px);font-weight:300;color:var(--gold);letter-spacing:.06em}
-.sl-hint{font-size:9px;color:rgba(240,230,210,0.2);margin-top:4px;letter-spacing:.15em;font-weight:300}
-
-/* ── Constellation Nav ── */
-#constNav{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:15;display:flex;flex-direction:column;gap:0;opacity:0;transition:opacity 1.5s;pointer-events:none}
-#constNav.show{opacity:1;pointer-events:auto}
-.const-star{display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 0;transition:all .4s}
-.const-star .star-dot{width:6px;height:6px;border-radius:50%;border:1px solid rgba(200,168,85,0.25);background:transparent;transition:all .4s;flex-shrink:0}
-.const-star .star-label{font-size:9px;letter-spacing:.12em;color:rgba(200,168,85,0.2);font-weight:300;transition:color .4s;text-transform:uppercase;white-space:nowrap}
-.const-star:hover .star-dot{border-color:var(--gold);background:rgba(200,168,85,0.15);transform:scale(1.4)}
-.const-star:hover .star-label{color:rgba(200,168,85,0.6)}
-.const-star.active .star-dot{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(200,168,85,0.4)}
-.const-star.active .star-label{color:var(--gold)}
-
-/* ── I Miss You Button ── */
-#missBtn{position:fixed;bottom:40px;right:32px;z-index:15;width:48px;height:48px;border-radius:50%;border:1px solid rgba(200,168,85,0.12);background:rgba(255,255,255,0.01);backdrop-filter:blur(20px);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1);pointer-events:none}
-#missBtn.show{opacity:.5;pointer-events:auto}
-#missBtn:hover{opacity:1;border-color:rgba(200,168,85,0.3);transform:scale(1.08)}
-#missBtn .heart{width:16px;height:16px;position:relative}
-#missBtn .heart::before,#missBtn .heart::after{content:'';position:absolute;top:0;width:10px;height:16px;border-radius:10px 10px 0 0;background:var(--gold);transform-origin:bottom center}
-#missBtn .heart::before{left:0;transform:rotate(-45deg);transform-origin:bottom right}
-#missBtn .heart::after{left:6px;transform:rotate(45deg);transform-origin:bottom left}
-#missBtn.pulsing{animation:heartPulse 1.5s cubic-bezier(.34,1.56,.64,1)}
-@keyframes heartPulse{0%{transform:scale(1)}20%{transform:scale(1.25);box-shadow:0 0 40px rgba(200,168,85,0.3)}100%{transform:scale(1)}}
-
-/* ── I Miss You Received Pulse ── */
-#missPulse{position:fixed;inset:0;z-index:12;background:radial-gradient(ellipse at center,rgba(200,168,85,0.08) 0%,transparent 70%);opacity:0;pointer-events:none;transition:opacity 0.6s}
-#missPulse.show{opacity:1}
-#missToast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;text-align:center;opacity:0;pointer-events:none;transition:opacity 0.8s}
-#missToast.show{opacity:1}
-#missToast .miss-name{font-family:var(--serif);font-size:18px;color:var(--gold);font-weight:300;letter-spacing:.04em}
-#missToast .miss-sub{font-size:10px;color:var(--ivory);letter-spacing:.15em;margin-top:4px}
+/* ── Side Stars (Constellation Nav) ── */
+#sideNav{position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:12;display:flex;flex-direction:column;gap:0;opacity:0;transition:opacity 1.5s;pointer-events:none}
+#sideNav.on{opacity:1;pointer-events:auto}
+.sn{display:flex;align-items:center;gap:10px;cursor:pointer;padding:7px 0;transition:all .4s}
+.sn .sd{width:5px;height:5px;border-radius:50%;border:1px solid rgba(200,168,85,.2);background:transparent;transition:all .4s;flex-shrink:0}
+.sn .sl{font-size:8px;letter-spacing:.14em;color:rgba(200,168,85,.15);font-weight:300;transition:color .4s;text-transform:uppercase;white-space:nowrap}
+.sn:hover .sd{border-color:rgba(200,168,85,.5);background:rgba(200,168,85,.1);transform:scale(1.3)}
+.sn:hover .sl{color:rgba(200,168,85,.5)}
+.sn.act .sd{background:#c8a855;border-color:#c8a855;box-shadow:0 0 10px rgba(200,168,85,.3)}
+.sn.act .sl{color:#c8a855}
 
 /* ── Moon ── */
-#moonBtn{position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:15;width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#eee 0%,#ccc 50%,#999 100%);box-shadow:0 0 20px rgba(200,200,180,0.15);cursor:pointer;opacity:0;transition:all .5s;pointer-events:none;border:none}
-#moonBtn.show{opacity:.6;pointer-events:auto}
-#moonBtn:hover{opacity:1;box-shadow:0 0 30px rgba(200,200,180,0.25);transform:translateX(-50%) scale(1.1)}
+#moonEl{position:fixed;z-index:12;cursor:pointer;opacity:0;transition:opacity .5s,brightness .3s;pointer-events:none}
+#moonEl.on{opacity:1;pointer-events:auto}
+#moonEl:hover{filter:brightness(1.2)}
 
-/* ── Moon Message Overlay ── */
-#moonOverlay{position:fixed;inset:0;z-index:25;background:rgba(2,2,8,0.92);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
-#moonOverlay.open{opacity:1;visibility:visible}
-#moonOverlay .moon-big{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0%,#eee 30%,#ccc 60%,#999 100%);box-shadow:0 0 60px rgba(200,200,180,0.15),0 0 120px rgba(200,200,180,0.05);margin-bottom:32px}
-#moonOverlay .moon-date{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
-#moonOverlay .moon-msg{font-family:var(--serif);font-size:clamp(18px,3vw,28px);font-weight:300;color:var(--warm);text-align:center;max-width:500px;line-height:1.6;font-style:italic}
-#moonOverlay .moon-close{margin-top:40px;padding:8px 24px;border:1px solid rgba(200,168,85,0.15);border-radius:20px;background:transparent;color:var(--gold);font-size:10px;letter-spacing:.15em;cursor:pointer;transition:all .3s}
-#moonOverlay .moon-close:hover{border-color:rgba(200,168,85,0.4);background:rgba(200,168,85,0.05)}
+/* ── Moon Overlay ── */
+#moonOv{position:fixed;inset:0;z-index:20;background:rgba(2,4,12,.92);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
+#moonOv.open{opacity:1;visibility:visible}
+#moonOv .mbig{border-radius:50%;box-shadow:0 0 50px rgba(200,200,180,.1);margin-bottom:28px}
+#moonOv .mdt{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#c8a855;margin-bottom:12px}
+#moonOv .mmsg{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(16px,2.5vw,24px);font-weight:300;color:#f0e6d2;text-align:center;max-width:460px;line-height:1.6;font-style:italic}
+#moonOv .mcl{margin-top:36px;padding:7px 20px;border:1px solid rgba(200,168,85,.12);border-radius:18px;background:transparent;color:#c8a855;font-size:9px;letter-spacing:.15em;cursor:pointer;transition:all .3s}
+#moonOv .mcl:hover{border-color:rgba(200,168,85,.35);background:rgba(200,168,85,.04)}
 
-/* ── Letter Writing Overlay ── */
-#letterOverlay{position:fixed;inset:0;z-index:25;background:rgba(2,2,8,0.92);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
-#letterOverlay.open{opacity:1;visibility:visible}
-.letter-envelope{width:min(440px,90vw);background:linear-gradient(145deg,rgba(15,18,30,0.95),rgba(10,12,25,0.98));border:1px solid rgba(200,168,85,0.1);border-radius:20px;padding:36px;transform:translateY(30px) scale(.95);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative}
-#letterOverlay.open .letter-envelope{transform:translateY(0) scale(1)}
-.letter-envelope h3{font-family:var(--serif);font-size:22px;font-weight:300;color:var(--gold);margin-bottom:16px}
-.letter-envelope textarea{width:100%;min-height:140px;border:none;background:transparent;color:var(--warm);font-family:var(--serif);font-size:17px;line-height:1.8;resize:none;outline:none}
-.letter-envelope textarea::placeholder{color:rgba(240,230,210,0.12);font-style:italic}
-.letter-actions{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.03)}
-.letter-count{font-size:9px;color:rgba(240,230,210,0.25);letter-spacing:.08em}
-.letter-send{padding:8px 20px;border:1px solid rgba(200,168,85,0.2);border-radius:24px;background:rgba(200,168,85,0.04);color:var(--gold);font-family:var(--sans);font-size:10px;font-weight:400;cursor:pointer;transition:all .4s;letter-spacing:.06em}
-.letter-send:hover{background:rgba(200,168,85,0.1);border-color:rgba(200,168,85,0.4)}
-.letter-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);color:rgba(240,230,210,0.25);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px}
+/* ── I Miss You ── */
+#missBtn{position:fixed;bottom:36px;right:28px;z-index:12;width:44px;height:44px;border-radius:50%;border:1px solid rgba(200,168,85,.1);background:rgba(0,0,0,.3);backdrop-filter:blur(12px);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1);pointer-events:none}
+#missBtn.on{opacity:.4;pointer-events:auto}
+#missBtn:hover{opacity:.9;border-color:rgba(200,168,85,.3);transform:scale(1.06)}
+#missBtn svg{width:18px;height:18px}
+#missBtn.puls{animation:hp 1.5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes hp{0%{transform:scale(1)}20%{transform:scale(1.2);box-shadow:0 0 30px rgba(200,168,85,.25)}100%{transform:scale(1)}}
 
-/* ── Paper Airplane Animation ── */
-.paper-plane{position:fixed;z-index:30;pointer-events:none;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:12px solid var(--warm);filter:drop-shadow(0 0 6px rgba(200,168,85,0.3))}
+/* ── Miss Pulse ── */
+#missPulse{position:fixed;inset:0;z-index:11;background:radial-gradient(ellipse at center,rgba(200,168,85,.06) 0%,transparent 70%);opacity:0;pointer-events:none;transition:opacity .5s}
+#missPulse.on{opacity:1}
+#missToast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:15;text-align:center;opacity:0;pointer-events:none;transition:opacity .6s}
+#missToast.on{opacity:1}
+#missToast .mn{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#c8a855;font-weight:300;letter-spacing:.04em}
+#missToast .ms{font-size:9px;color:rgba(240,230,210,.35);letter-spacing:.15em;margin-top:3px}
 
-/* ── Firefly Notification ── */
-.firefly{position:fixed;z-index:30;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px rgba(200,168,85,0.5);pointer-events:auto;cursor:pointer;transition:box-shadow .3s}
-.firefly:hover{box-shadow:0 0 24px rgba(200,168,85,0.8)}
-.firefly.opening{animation:fireflyLand .8s cubic-bezier(.16,1,.3,1) forwards}
-@keyframes fireflyLand{0%{transform:scale(1)}50%{transform:scale(1.5);box-shadow:0 0 40px rgba(200,168,85,0.6)}100%{transform:scale(0);opacity:0}}
+/* ── Letter Overlay ── */
+#letOv{position:fixed;inset:0;z-index:20;background:rgba(2,4,12,.92);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
+#letOv.open{opacity:1;visibility:visible}
+.letEnv{width:min(420px,90vw);background:linear-gradient(145deg,rgba(12,14,24,.95),rgba(8,10,20,.98));border:1px solid rgba(200,168,85,.08);border-radius:16px;padding:32px;transform:translateY(24px) scale(.97);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative}
+#letOv.open .letEnv{transform:translateY(0) scale(1)}
+.letEnv h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:300;color:#c8a855;margin-bottom:14px}
+.letEnv textarea{width:100%;min-height:130px;border:none;background:transparent;color:#f0e6d2;font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;line-height:1.8;resize:none;outline:none}
+.letEnv textarea::placeholder{color:rgba(240,230,210,.1);font-style:italic}
+.letAct{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,.02)}
+.letCnt{font-size:9px;color:rgba(240,230,210,.2);letter-spacing:.08em}
+.letSend{padding:7px 18px;border:1px solid rgba(200,168,85,.15);border-radius:20px;background:rgba(200,168,85,.03);color:#c8a855;font-size:9px;cursor:pointer;transition:all .3s;letter-spacing:.06em}
+.letSend:hover{background:rgba(200,168,85,.08);border-color:rgba(200,168,85,.3)}
+.letX{position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.04);background:rgba(255,255,255,.01);color:rgba(240,230,210,.2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px}
+
+/* ── Firefly ── */
+.ff{position:fixed;z-index:15;width:6px;height:6px;border-radius:50%;background:#c8a855;box-shadow:0 0 10px rgba(200,168,85,.4),0 0 20px rgba(200,168,85,.15);pointer-events:auto;cursor:pointer;transition:box-shadow .3s}
+.ff:hover{box-shadow:0 0 20px rgba(200,168,85,.6),0 0 40px rgba(200,168,85,.25)}
+.ff.open{animation:fLand .7s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes fLand{0%{transform:scale(1)}50%{transform:scale(1.8);box-shadow:0 0 30px rgba(200,168,85,.5)}100%{transform:scale(0);opacity:0}}
+
+/* ── Paper Plane ── */
+.pp{position:fixed;z-index:15;pointer-events:none;opacity:0}
 
 /* ── Toast ── */
-#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);z-index:30;background:rgba(5,8,22,0.92);backdrop-filter:blur(24px);border:1px solid rgba(200,168,85,0.12);border-radius:16px;padding:20px 32px;text-align:center;opacity:0;pointer-events:none;transition:all .6s cubic-bezier(.16,1,.3,1)}
-#toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.toast-text{font-family:var(--serif);font-size:15px;color:var(--warm);font-weight:300}
+#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);z-index:20;background:rgba(5,8,18,.9);backdrop-filter:blur(20px);border:1px solid rgba(200,168,85,.08);border-radius:14px;padding:18px 28px;text-align:center;opacity:0;pointer-events:none;transition:all .5s cubic-bezier(.16,1,.3,1)}
+#toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#toast .tt{font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;color:#f0e6d2;font-weight:300}
 
-/* ── Audio Controls ── */
-#audioControls{position:fixed;bottom:40px;left:32px;z-index:15;display:flex;gap:8px;opacity:0;transition:opacity 1.5s;pointer-events:none}
-#audioControls.show{opacity:1;pointer-events:auto}
-.audio-btn{width:28px;height:28px;border-radius:50%;border:1px solid rgba(200,168,85,0.1);background:rgba(255,255,255,0.01);color:var(--silver);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;transition:all .3s}
-.audio-btn:hover{border-color:rgba(200,168,85,0.3);color:var(--gold)}
-.audio-btn.active{background:rgba(200,168,85,0.06);border-color:rgba(200,168,85,0.2);color:var(--gold)}
+/* ── Audio ── */
+#audio{position:fixed;bottom:36px;left:28px;z-index:12;display:flex;gap:6px;opacity:0;transition:opacity 1.5s;pointer-events:none}
+#audio.on{opacity:1;pointer-events:auto}
+.ab{width:26px;height:26px;border-radius:50%;border:1px solid rgba(200,168,85,.08);background:rgba(0,0,0,.2);color:rgba(184,197,214,.4);cursor:pointer;font-size:9px;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.ab:hover{border-color:rgba(200,168,85,.25);color:#c8a855}
+.ab.act{background:rgba(200,168,85,.05);border-color:rgba(200,168,85,.15);color:#c8a855}
 
-/* ── Scroll Indicator ── */
-#scrollIndicator{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:15;text-align:center;opacity:0;transition:opacity 1s;pointer-events:none}
-#scrollIndicator.show{opacity:1}
-#scrollIndicator .scroll-text{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,168,85,0.2);margin-bottom:8px}
-#scrollIndicator .scroll-line{width:1px;height:24px;background:linear-gradient(to bottom,rgba(200,168,85,0.3),transparent);margin:0 auto;animation:scrollPulse 2s ease-in-out infinite}
-@keyframes scrollPulse{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:.8;transform:scaleY(1.3)}}
+/* ── Scene Label ── */
+#sLab{position:fixed;bottom:36px;left:50%;transform:translateX(-50%);z-index:12;opacity:0;transition:opacity 1.5s;pointer-events:none;text-align:center}
+#sLab.on{opacity:1}
+.sn2{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(13px,1.8vw,16px);font-weight:300;color:#c8a855;letter-spacing:.06em}
+.sh2{font-size:8px;color:rgba(240,230,210,.15);margin-top:3px;letter-spacing:.15em;font-weight:300}
 
-/* ── Time of Day Overlay ── */
-#timeOverlay{position:fixed;inset:0;z-index:2;pointer-events:none;transition:background 2s}
+/* ── Scroll Hint ── */
+#scrlH{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:12;text-align:center;opacity:0;transition:opacity 1s;pointer-events:none}
+#scrlH.on{opacity:1}
+#scrlH .st{font-size:7px;letter-spacing:.22em;text-transform:uppercase;color:rgba(200,168,85,.15);margin-bottom:6px}
+#scrlH .sl{width:1px;height:20px;background:linear-gradient(to bottom,rgba(200,168,85,.2),transparent);margin:0 auto;animation:sp 2.5s ease-in-out infinite}
+@keyframes sp{0%,100%{opacity:.2;transform:scaleY(1)}50%{opacity:.6;transform:scaleY(1.2)}}
+
+/* ── Time Overlay ── */
+#timeOv{position:fixed;inset:0;z-index:0;pointer-events:none;transition:background 3s}
+
+/* ── Scroll Progress Bar ── */
+#scrollBar{position:fixed;right:0;top:0;width:2px;height:0;background:linear-gradient(to bottom,rgba(200,168,85,.3),rgba(200,168,85,.1));z-index:12;transition:height .3s;pointer-events:none}
 
 @media(max-width:768px){
-  #hud{padding:16px 20px}
-  .hud-center{display:none}
-  #constNav{right:12px}
-  .const-star .star-label{display:none}
-  #missBtn{bottom:24px;right:20px;width:40px;height:40px}
-  #audioControls{bottom:24px;left:20px}
-  #moonBtn{top:48px;width:28px;height:28px}
+  #hud{padding:14px 16px}
+  .hcc{display:none}
+  #sideNav{right:10px}.sn .sl{display:none}
+  #missBtn{bottom:20px;right:16px;width:38px;height:38px}
+  #audio{bottom:20px;left:16px}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══ ACT 1: CINEMATIC LANDING ═══ -->
+<canvas id="skyCanvas"></canvas>
+<canvas id="mainCanvas"></canvas>
+
+<!-- Landing -->
 <div id="landing">
   <div id="distText"></div>
   <div id="cityDots">
-    <div class="city-dot dublin"><div class="dot"></div><div class="label">Dublin</div></div>
-    <div class="city-dot bangalore"><div class="dot"></div><div class="label">Bangalore</div></div>
-    <div id="heartbeatLine">
-      <svg viewBox="0 0 500 40" preserveAspectRatio="none">
-        <path d="M0,20 Q60,20 80,20 Q95,20 105,5 Q115,35 125,20 Q140,20 180,20 Q200,20 220,20 Q235,20 245,5 Q255,35 265,20 Q280,20 320,20 Q340,20 360,20 Q375,20 385,5 Q395,35 405,20 Q420,20 500,20"/>
-      </svg>
-    </div>
+    <div class="cd dub"><div class="dot"></div><div class="nm">Dublin</div></div>
+    <div class="cd ban"><div class="dot"></div><div class="nm">Bangalore</div></div>
+    <div id="hbLine"><svg viewBox="0 0 520 30" preserveAspectRatio="none"><path d="M0,15 Q65,15 85,15 Q100,15 110,4 Q120,26 130,15 Q145,15 190,15 Q210,15 230,15 Q245,15 255,4 Q265,26 275,15 Q290,15 330,15 Q350,15 370,15 Q385,15 395,4 Q405,26 415,15 Q430,15 520,15"/></svg></div>
   </div>
-  <div id="titleBlock">
-    <h1><em>Parallel</em> Hearts</h1>
-    <div class="tagline">Different skies. Same heartbeat.</div>
-  </div>
+  <div id="titleBlock"><h1><em>Parallel</em> Hearts</h1><div class="tag">Different skies. Same heartbeat.</div></div>
   <button id="enterBtn">Enter Our World</button>
 </div>
 
-<!-- ═══ ACT 2: UNIVERSE ═══ -->
-<div id="timeOverlay"></div>
-<canvas id="universeCanvas"></canvas>
-
+<!-- HUD -->
 <div id="hud">
-  <div class="hud-city">
-    <div class="city-name">Dublin</div>
-    <div class="city-time" id="clockDublin">--:--</div>
-    <div class="city-time-period" id="periodDublin"></div>
-  </div>
-  <div class="hud-center">
-    <div class="countdown-label">Until we meet</div>
-    <div class="countdown-val" id="countdown"></div>
-  </div>
-  <div class="hud-city">
-    <div class="city-name">Bangalore</div>
-    <div class="city-time" id="clockBangalore">--:--</div>
-    <div class="city-time-period" id="periodBangalore"></div>
-  </div>
+  <div class="hc"><div class="cn">Dublin</div><div class="ct2" id="clDub">--:--</div><div class="cd2" id="weDub"></div></div>
+  <div class="hcc"><div class="cl">Until we meet</div><div class="cv" id="cdVal"></div></div>
+  <div class="hc"><div class="cn">Bangalore</div><div class="ct2" id="clBan">--:--</div><div class="cd2" id="weBan"></div></div>
 </div>
 
-<button id="moonBtn"></button>
-
-<div id="constNav">
-  <div class="const-star active" data-scene="universe"><div class="star-dot"></div><div class="star-label">Home</div></div>
-  <div class="const-star" data-scene="memories"><div class="star-dot"></div><div class="star-label">Memories</div></div>
-  <div class="const-star" data-scene="letters"><div class="star-dot"></div><div class="star-label">Letters</div></div>
-  <div class="const-star" data-scene="gallery"><div class="star-dot"></div><div class="star-label">Gallery</div></div>
-  <div class="const-star" data-scene="bucketlist"><div class="star-dot"></div><div class="star-label">Bucket List</div></div>
-  <div class="const-star" data-scene="music"><div class="star-dot"></div><div class="star-label">Our Music</div></div>
-  <div class="const-star" data-scene="future"><div class="star-dot"></div><div class="star-label">Our Future</div></div>
-  <div class="const-star" data-scene="ending"><div class="star-dot" style="opacity:0.3;border-style:dashed"></div><div class="star-label" style="opacity:0.3">...</div></div>
+<!-- Constellation Nav -->
+<div id="sideNav">
+  <div class="sn act" data-s="home"><div class="sd"></div><div class="sl">Home</div></div>
+  <div class="sn" data-s="memories"><div class="sd"></div><div class="sl">Memories</div></div>
+  <div class="sn" data-s="letters"><div class="sd"></div><div class="sl">Letters</div></div>
+  <div class="sn" data-s="gallery"><div class="sd"></div><div class="sl">Gallery</div></div>
+  <div class="sn" data-s="bucket"><div class="sd"></div><div class="sl">Bucket List</div></div>
+  <div class="sn" data-s="music"><div class="sd"></div><div class="sl">Our Music</div></div>
+  <div class="sn" data-s="future"><div class="sd"></div><div class="sl">Our Future</div></div>
+  <div class="sn" data-s="ending"><div class="sd" style="opacity:.2;border-style:dashed"></div><div class="sl" style="opacity:.2">...</div></div>
 </div>
 
-<button id="missBtn" title="I miss you"></button>
+<!-- Moon -->
+<div id="moonEl"></div>
+
+<!-- I Miss You -->
+<button id="missBtn" title="I miss you">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#c8a855" stroke-width="1.2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+</button>
 
 <div id="missPulse"></div>
-<div id="missToast"><div class="miss-name" id="missName"></div><div class="miss-sub">is thinking about you</div></div>
+<div id="missToast"><div class="mn" id="mName"></div><div class="ms">is thinking about you</div></div>
 
-<div id="sceneLabel"><div class="sl-name" id="slName"></div><div class="sl-hint" id="slHint"></div></div>
+<div id="sLab"><div class="sn2" id="slNm"></div><div class="sh2" id="slHt"></div></div>
 
-<div id="scrollIndicator"><div class="scroll-text">Scroll to travel through time</div><div class="scroll-line"></div></div>
+<div id="scrlH"><div class="st">Scroll to travel through time</div><div class="sl"></div></div>
 
-<div id="audioControls">
-  <button class="audio-btn" data-sound="piano" title="Piano">&#9835;</button>
-  <button class="audio-btn" data-sound="rain" title="Rain">&#9729;</button>
-  <button class="audio-btn" data-sound="night" title="Night">&#9789;</button>
+<div id="audio">
+  <button class="ab" data-s="piano" title="Piano">&#9835;</button>
+  <button class="ab" data-s="rain" title="Rain">&#9729;</button>
+  <button class="ab" data-s="night" title="Night">&#9789;</button>
 </div>
 
-<div id="toast"><div class="toast-text" id="toastText"></div></div>
+<div id="toast"><div class="tt" id="tTx"></div></div>
+<div id="scrollBar"></div>
 
-<!-- Moon Message Overlay -->
-<div id="moonOverlay">
-  <div class="moon-big"></div>
-  <div class="moon-date" id="moonDate"></div>
-  <div class="moon-msg" id="moonMsg"></div>
-  <button class="moon-close" onclick="document.getElementById('moonOverlay').classList.remove('open')">Close</button>
+<!-- Moon Overlay -->
+<div id="moonOv">
+  <canvas class="mbig" id="moonBig" width="100" height="100"></canvas>
+  <div class="mdt" id="mDt"></div>
+  <div class="mmsg" id="mMs"></div>
+  <button class="mcl" onclick="document.getElementById('moonOv').classList.remove('open')">Close</button>
 </div>
 
 <!-- Letter Overlay -->
-<div id="letterOverlay">
-  <div class="letter-envelope">
-    <button class="letter-close" onclick="document.getElementById('letterOverlay').classList.remove('open')">&#10005;</button>
+<div id="letOv">
+  <div class="letEnv">
+    <button class="letX" onclick="document.getElementById('letOv').classList.remove('open')">&#10005;</button>
     <h3>Write a Letter</h3>
-    <textarea id="letterText" placeholder="Write something from the heart..."></textarea>
-    <div class="letter-actions">
-      <span class="letter-count" id="letterCount">0 / 250 words</span>
-      <button class="letter-send" id="letterSend">Send with love</button>
+    <textarea id="letTx" placeholder="Write something from the heart..."></textarea>
+    <div class="letAct">
+      <span class="letCnt" id="letCnt">0 / 250 words</span>
+      <button class="letSend" id="letSend">Send with love</button>
     </div>
   </div>
 </div>
 
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}
-</script>
-<script type="module">
-import*as THREE from'three';
-
+<script>
 const $=id=>document.getElementById(id);
 const PI=Math.PI,TAU=PI*2;
-let W=window.innerWidth,H=window.innerHeight;
-let time=0,delta=0;
-let phase='landing';
-let scrollProgress=0;
+let W=innerWidth,H=innerHeight;
+let phase='landing',scrollP=0,time=0;
 
 /* ═══════════════════════════════════════════
-   CUSTOM CURSOR
+   CURSOR
    ═══════════════════════════════════════════ */
-const cursorEl=$('cursor')||createCursor();
-function createCursor(){
-  const c=document.createElement('div');c.id='cursor';
-  c.innerHTML='<div class="cursor-dot"></div><div class="cursor-ring"></div>';
-  document.body.appendChild(c);return c;
+const cur=(()=>{const c=document.createElement('div');c.id='cursor';c.innerHTML='<div class="d"></div><div class="r"></div>';document.body.appendChild(c);return c})();
+const glow=(()=>{const g=document.createElement('div');g.id='cGlow';document.body.appendChild(g);return g})();
+let mx=W/2,my=H/2,cx=W/2,cy=H/2;
+const trails=[];const tD=[];
+for(let i=0;i<8;i++){const e=document.createElement('div');e.className='ct';const s=2.5-i*.25;e.style.width=e.style.height=s+'px';document.body.appendChild(e);trails.push(e);tD.push({x:W/2,y:H/2})}
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;glow.style.left=mx+'px';glow.style.top=my+'px'});
+function tickC(){
+  cx+=(mx-cx)*.1;cy+=(my-cy)*.1;
+  cur.style.transform=`translate(${cx}px,${cy}px)`;
+  for(let i=0;i<8;i++){const p=i===0?{x:cx,y:cy}:tD[i-1];tD[i].x+=(p.x-tD[i].x)*(.14-i*.012);tD[i].y+=(p.y-tD[i].y)*(.14-i*.012);trails[i].style.transform=`translate(${tD[i].x-1}px,${tD[i].y-1}px)`;trails[i].style.opacity=(1-i/8)*.2}
+  let h=false;document.querySelectorAll('button,a,.sn,#enterBtn,.letSend,.letX,.mcl,.ab').forEach(el=>{const r=el.getBoundingClientRect();if(mx>=r.left-6&&mx<=r.right+6&&my>=r.top-6&&my<=r.bottom+6)h=true});
+  cur.classList.toggle('hov',h);
+  requestAnimationFrame(tickC);
 }
-const glowEl=$('cursorGlow')||(()=>{const g=document.createElement('div');g.id='cursorGlow';document.body.appendChild(g);return g})();
-let mouseX=W/2,mouseY=H/2,cursorX=W/2,cursorY=H/2;
-
-const trailEls=[];const trailData=[];
-for(let i=0;i<10;i++){
-  const el=document.createElement('div');el.className='ct';
-  const sz=3-i*.25;el.style.width=sz+'px';el.style.height=sz+'px';
-  document.body.appendChild(el);trailEls.push(el);trailData.push({x:W/2,y:H/2});
-}
-
-document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;glowEl.style.left=mouseX+'px';glowEl.style.top=mouseY+'px'});
-document.addEventListener('mousedown',()=>cursorEl.classList.add('click'));
-document.addEventListener('mouseup',()=>cursorEl.classList.remove('click'));
-
-function tickCursor(){
-  cursorX+=(mouseX-cursorX)*.12;cursorY+=(mouseY-cursorY)*.12;
-  cursorEl.style.transform=`translate(${cursorX}px,${cursorY}px)`;
-  for(let i=0;i<10;i++){
-    const prev=i===0?{x:cursorX,y:cursorY}:trailData[i-1];
-    trailData[i].x+=(prev.x-trailData[i].x)*(.15-i*.01);
-    trailData[i].y+=(prev.y-trailData[i].y)*(.15-i*.01);
-    trailEls[i].style.transform=`translate(${trailData[i].x-1.5}px,${trailData[i].y-1.5}px)`;
-    trailEls[i].style.opacity=(1-i/10)*.25;
-  }
-  /* Hover detection */
-  let hovering=false;
-  document.querySelectorAll('button,a,.const-star,#enterBtn,.letter-send,.letter-close,.moon-close,.audio-btn').forEach(el=>{
-    const r=el.getBoundingClientRect();
-    if(mouseX>=r.left-8&&mouseX<=r.right+8&&mouseY>=r.top-8&&mouseY<=r.bottom+8)hovering=true;
-  });
-  cursorEl.classList.toggle('hover',hovering);
-  requestAnimationFrame(tickCursor);
-}
-tickCursor();
+tickC();
 
 /* ═══════════════════════════════════════════
-   ACT 1: CINEMATIC LANDING
+   REAL-TIME ASTRONOMICAL CALCULATIONS
    ═══════════════════════════════════════════ */
-const REAL_DISTANCE=8580;
-let landingStep=0;
-const landingTimeline=[
-  {delay:800,fn:()=>{
-    /* Show distance counting up */
-    const el=$('distText');
-    el.style.opacity='1';
-    let current=0;
-    const target=REAL_DISTANCE;
-    const duration=2500;
-    const start=performance.now();
-    function tick(now){
-      const p=Math.min(1,(now-start)/duration);
-      const ease=1-Math.pow(1-p,3);
-      current=Math.floor(ease*target);
-      el.innerHTML=`${current.toLocaleString()}<span class="km"> km apart</span>`;
-      if(p<1)requestAnimationFrame(tick);
-      else el.innerHTML=`${target.toLocaleString()}<span class="km"> km apart</span>`;
-    }
-    requestAnimationFrame(tick);
-  }},
-  {delay:3500,fn:()=>{
-    /* Show city dots and heartbeat line */
-    $('cityDots').style.opacity='1';
-    setTimeout(()=>{$('heartbeatLine').style.opacity='1';$('heartbeatLine').classList.add('animate')},600);
-  }},
-  {delay:5500,fn:()=>{
-    /* Fade out distance, show title */
-    $('distText').style.transition='opacity 1.5s';
-    $('distText').style.opacity='0';
-    $('cityDots').style.transition='opacity 1.5s';
-    $('cityDots').style.opacity='0';
-    setTimeout(()=>{
-      $('titleBlock').style.opacity='1';
-      setTimeout(()=>{$('enterBtn').style.opacity='1';$('enterBtn').classList.add('show')},1200);
-    },800);
-  }}
+
+/* Julian Date */
+function toJD(date){const y=date.getUTCFullYear(),m=date.getUTCMonth()+1,d=date.getUTCDate()+date.getUTCHours()/24+date.getUTCMinutes()/1440;let Y=y,M=m;if(M<=2){Y--;M+=12}const A=Math.floor(Y/100),B=2-A+Math.floor(A/4);return Math.floor(365.25*(Y+4716))+Math.floor(30.6001*(M+1))+d+B-1524.5}
+
+/* Sun position (simplified) */
+function sunPos(date,lat,lng){
+  const jd=toJD(date),T=(jd-2451545)/36525;
+  const L0=(280.46646+T*(36000.76983+T*.0003032))%360;
+  const M=(357.52911+T*(35999.05029-.0001537*T))%360;
+  const Mr=M*PI/180;
+  const C=(1.9146-.004817*T-.000014*T*T)*Math.sin(Mr)+(0.019993-.000101*T)*Math.sin(2*Mr)+.00029*Math.sin(3*Mr);
+  const sunLon=(L0+C)*PI/180;
+  const obliquity=(23.439-0.00000036*T)*PI/180;
+  const decl=Math.asin(Math.sin(obliquity)*Math.sin(sunLon));
+  const RA=Math.atan2(Math.cos(obliquity)*Math.sin(sunLon),Math.cos(sunLon));
+  const GMST=(6.697375+.06570982441908*djd(T)+1.00273790935+.000026*(T*T))*15*PI/180;
+  const djd=(jd-2451545);
+  let HA=GMST+lng*PI/180-RA;while(HA>PI)HA-=TAU;while(HA<-PI)HA+=TAU;
+  const latR=lat*PI/180;
+  const alt=Math.asin(Math.sin(latR)*Math.sin(decl)+Math.cos(latR)*Math.cos(decl)*Math.cos(HA));
+  const az=Math.atan2(-Math.sin(HA),Math.tan(decl)*Math.cos(latR)-Math.sin(latR)*Math.cos(HA));
+  return{altitude:alt*180/PI,azimuth:((az*180/PI)+360)%360,declination:decl*180/PI};
+}
+
+/* Moon phase (simplified) */
+function moonPhase(date){
+  const jd=toJD(date);
+  const daysSinceNew=jd-2451549.5;
+  const phase=daysSinceNew%29.53058867;
+  const illumination=(1-Math.cos(phase*TAU/29.53058867))/2;
+  const age=phase;
+  const phaseName=age<1.85?'New Moon':age<7.38?'Waxing Crescent':age<9.23?'First Quarter':age<14.77?'Waxing Gibbous':age<16.62?'Full Moon':age<22.15?'Waning Gibbous':age<24?'Last Quarter':'Waning Crescent';
+  return{illumination,age,phaseName,phaseNorm:age/29.53058867};
+}
+
+/* Sunset/Sunrise approximation */
+function sunriseSunset(date,lat,lng){
+  const jd=toJD(date);
+  const T=(jd-2451545)/36525;
+  const eqtime=229.18*(.000075+.001868*Math.cos(T*TAU)-.032077*Math.sin(T*TAU)-.014615*Math.cos(2*T*TAU)-.04089*Math.sin(2*T*TAU));
+  const decl=23.45*Math.sin(TAU*(284+Math.floor(365.25*(date.getFullYear()+((date.getMonth()+1)-1>1?0:0)))/365)/365)*PI/180;
+  const latR=lat*PI/180;
+  const cosHA=(-Math.sin(latR)*decl<0?1:-1)*Math.sqrt(1-Math.pow(Math.sin(-.83*PI/180)/Math.cos(latR)/Math.cos(decl)-Math.tan(latR)*Math.tan(decl),2));
+  const HA=Math.acos(cosHA)*180/PI;
+  const sunrise=720-4*(lng+HA)-eqtime;
+  const sunset=720-4*(lng-HA)-eqtime;
+  return{
+    rise:new Date(date.getTime()+(sunrise*60000-(date.getTimezoneOffset()*60000))),
+    set:new Date(date.getTime()+(sunset*60000-(date.getTimezoneOffset()*60000)))
+  };
+}
+
+/* Sky color based on sun altitude */
+function skyColor(sunAlt){
+  if(sunAlt>10)return{bg:'#0c1525',fog:'#0c1525',stage:'day'};
+  if(sunAlt>2)return{bg:'#121828',fog:'#121828',stage:'twilight'};
+  if(sunAlt>-2)return{bg:'#18141a',fog:'#18141a',stage:'golden'};
+  if(sunAlt>-6)return{bg:'#0f0c15',fog:'#0f0c15',stage:'dusk'};
+  return{bg:'#050810',fog:'#050810',stage:'night'};
+}
+
+/* Dublin: 53.3498, -6.2603 */
+/* Bangalore: 12.9716, 77.5946 */
+const DUBLIN={lat:53.3498,lng:-6.2603,name:'Dublin'};
+const BANGALORE={lat:12.9716,lng:77.5946,name:'Bangalore'};
+
+/* ═══════════════════════════════════════════
+   REAL SKY CANVAS (2D)
+   ═══════════════════════════════════════════ */
+const skyC=$('skyCanvas');
+const skyX=skyC.getContext('2d');
+function resizeSky(){skyC.width=W;skyC.height=H}
+resizeSky();addEventListener('resize',resizeSky);
+
+/* Real star catalog — bright stars with real RA/Dec (simplified) */
+const starCatalog=[
+  {name:'Sirius',ra:101.29,dec:-16.72,mag:-1.46},
+  {name:'Canopus',ra:95.99,dec:-52.70,mag:-0.74},
+  {name:'Arcturus',ra:213.92,dec:19.18,mag:-0.05},
+  {name:'Vega',ra:279.23,dec:38.78,mag:0.03},
+  {name:'Capella',ra:79.17,dec:46.00,mag:0.08},
+  {name:'Rigel',ra:78.63,dec:-8.20,mag:0.13},
+  {name:'Procyon',ra:114.83,dec:5.23,mag:0.34},
+  {name:'Betelgeuse',ra:88.79,dec:7.41,mag:0.42},
+  {name:'Altair',ra:297.70,dec:8.87,mag:0.77},
+  {name:'Aldebaran',ra:68.98,dec:16.51,mag:0.87},
+  {name:'Spica',ra:201.30,dec:-11.16,mag:0.97},
+  {name:'Antares',ra:247.35,dec:-26.43,mag:1.04},
+  {name:'Pollux',ra:116.33,dec:28.03,mag:1.14},
+  {name:'Fomalhaut',ra:344.41,dec:-29.62,mag:1.16},
+  {name:'Deneb',ra:310.36,dec:45.28,mag:1.25},
+  {name:'Regulus',ra:152.09,dec:11.97,mag:1.35},
+  {name:'Castor',ra:113.65,dec:31.89,mag:1.58},
+  {name:'Bellatrix',ra:81.28,dec:6.35,mag:1.64},
+  {name:'Alnilam',ra:84.05,dec:-1.20,mag:1.69},
+  {name:'Dubhe',ra:165.93,dec:61.75,mag:1.79},
+  {name:'Mirfak',ra:51.08,dec:49.86,mag:1.80},
+  {name:'Wezen',ra:107.10,dec:-26.39,mag:1.84},
+  {name:'Alkaid',ra:206.89,dec:49.31,mag:1.86},
+  {name:'Menkalinan',ra:138.30,dec:44.95,mag:1.90},
+  {name:'Atria',ra:252.17,dec:-69.02,mag:1.92},
+  {name:'Alhena',ra:99.43,dec:16.40,mag:1.93},
+  {name:'Peacock',ra:113.13,dec:-56.68,mag:1.94},
+  {name:'Mirzam',ra:95.67,dec:-17.96,mag:1.98},
+  {name:'Alphard',ra:141.90,dec:-8.66,mag:1.98},
+  {name:'Polis',ra:263.73,dec:-26.30,mag:2.00},
+  {name:'Saiph',ra:86.94,dec:-9.67,mag:2.06},
+  {name:'Elnath',ra:81.57,dec:28.61,mag:2.06},
+  {name:'Alnair',ra:332.06,dec:-46.96,mag:2.07},
+  {name:'Alnitak',ra:85.19,dec:-1.94,mag:2.08},
+  {name:'Alioth',ra:193.51,dec:55.96,mag:2.27},
+  {name:'Fawaris',ra:303.15,dec:45.13,mag:2.27},
+  {name:'Mizar',ra:200.98,dec:54.93,mag:2.27},
+  {name:'Kaus Australis',ra:276.04,dec:-34.38,mag:2.29},
+  {name:'Sargas',ra:264.33,dec:-43.00,mag:2.29},
+  {name:'Avior',ra:125.63,dec:-59.51,mag:2.29},
+  {name:'Alkaid2',ra:206.89,dec:49.31,mag:2.30},
+  {name:'Menkent',ra:211.67,dec:-36.37,mag:2.32},
+  {name:'Alpheratz',ra:2.10,dec:29.09,mag:2.37},
+  {name:'Mirach',ra:17.43,dec:35.62,mag:2.37},
+  {name:'Schedar',ra:10.13,dec:56.54,mag:2.24},
+  {name:'Navi',ra:10.13,dec:59.15,mag:2.47},
+  {name:'Caph',ra:2.29,dec:59.15,mag:2.27}
 ];
 
-function runLanding(){
-  landingTimeline.forEach(step=>setTimeout(step.fn,step.delay));
+/* Random background stars */
+const bgStars=[];
+for(let i=0;i<400;i++){
+  bgStars.push({
+    ra:Math.random()*360,
+    dec:(Math.random()-.5)*160,
+    mag:2.5+Math.random()*2.5,
+    flicker:Math.random()*TAU
+  });
 }
-runLanding();
 
-$('enterBtn').addEventListener('click',enterUniverse);
+function drawSky(ctx,date,lat,lng,offsetX){
+  const now=date;
+  const sun=sunPos(now,lat,lng);
+  const moonData=moonPhase(now);
+  const sky=skyColor(sun.altitude);
 
-function enterUniverse(){
+  /* Sky gradient */
+  const grad=ctx.createLinearGradient(offsetX,0,offsetX,H);
+  if(sun.altitude>5){
+    /* Day */
+    grad.addColorStop(0,'#1a2a4a');
+    grad.addColorStop(.3,'#2a4060');
+    grad.addColorStop(.6,'#4a6888');
+    grad.addColorStop(1,'#6a8aa8');
+  }else if(sun.altitude>-2){
+    /* Golden hour */
+    grad.addColorStop(0,'#0a0c18');
+    grad.addColorStop(.2,'#1a1420');
+    grad.addColorStop(.5,'#3a2018');
+    grad.addColorStop(.8,'#6a3820');
+    grad.addColorStop(1,'#8a5030');
+  }else if(sun.altitude>-8){
+    /* Dusk */
+    grad.addColorStop(0,'#060810');
+    grad.addColorStop(.3,'#100e18');
+    grad.addColorStop(.6,'#201820');
+    grad.addColorStop(1,'#302028');
+  }else{
+    /* Night */
+    grad.addColorStop(0,'#020408');
+    grad.addColorStop(.3,'#050810');
+    grad.addColorStop(.6,'#080c18');
+    grad.addColorStop(1,'#0a1020');
+  }
+  ctx.fillStyle=grad;
+  ctx.fillRect(offsetX,0,W,H);
+
+  /* Stars — visible when sun < 0 */
+  if(sun.altitude<0){
+    const starBright=Math.min(1,Math.abs(sun.altitude)/8);
+
+    /* Background stars */
+    bgStars.forEach(s=>{
+      const sa=s.dec*PI/180;
+      const ha=(s.ra*PI/180-(now.getUTCHours()+now.getUTCMinutes()/60)*15*PI/180+lng*PI/180);
+      const x=offsetX+W/2+(ha%(TAU)-PI)*W/TAU*.5;
+      const y=H/2-sa*H/PI;
+      if(x<offsetX-10||x>offsetX+W+10||y<-10||y>H+10)return;
+      const flicker=.7+.3*Math.sin(time*2+s.flicker);
+      const brightness=starBright*(1-s.mag/5)*flicker;
+      if(brightness<.05)return;
+      ctx.beginPath();
+      ctx.arc(x,y,.5+Math.random()*.3,0,TAU);
+      ctx.fillStyle=`rgba(240,235,220,${brightness})`;
+      ctx.fill();
+    });
+
+    /* Catalog stars */
+    starCatalog.forEach(s=>{
+      const sa=s.dec*PI/180;
+      const ha=(s.ra*PI/180-(now.getUTCHours()+now.getUTCMinutes()/60)*15*PI/180+lng*PI/180);
+      const x=offsetX+W/2+(ha%(TAU)-PI)*W/TAU*.5;
+      const y=H/2-sa*H/PI;
+      if(x<offsetX-20||x>offsetX+W+20||y<-20||y>H+20)return;
+      const brightness=starBright*(1-s.mag/4);
+      if(brightness<.1)return;
+      const sz=2+Math.max(0,(2-s.mag))*1.5;
+      /* Star glow */
+      const grd=ctx.createRadialGradient(x,y,0,x,y,sz*3);
+      grd.addColorStop(0,`rgba(220,225,240,${brightness*.4})`);
+      grd.addColorStop(1,'transparent');
+      ctx.fillStyle=grd;
+      ctx.fillRect(x-sz*3,y-sz*3,sz*6,sz*6);
+      /* Star core */
+      ctx.beginPath();
+      ctx.arc(x,y,sz,0,TAU);
+      ctx.fillStyle=`rgba(240,240,250,${brightness})`;
+      ctx.fill();
+    });
+
+    /* Moon */
+    if(moonData.illumination>.02){
+      const moonX=offsetX+W*.7;
+      const moonY=H*.2;
+      const moonSz=20;
+      /* Moon glow */
+      const mGrd=ctx.createRadialGradient(moonX,moonY,moonSz*.5,moonX,moonY,moonSz*4);
+      mGrd.addColorStop(0,`rgba(200,200,180,${moonData.illumination*.08})`);
+      mGrd.addColorStop(1,'transparent');
+      ctx.fillStyle=mGrd;
+      ctx.fillRect(moonX-moonSz*4,moonY-moonSz*4,moonSz*8,moonSz*8);
+      /* Moon body */
+      ctx.beginPath();
+      ctx.arc(moonX,moonY,moonSz,0,TAU);
+      ctx.fillStyle=`rgba(220,220,200,${.5+moonData.illumination*.4})`;
+      ctx.fill();
+      /* Moon phase shadow */
+      ctx.beginPath();
+      ctx.arc(moonX,moonY,moonSz,0,TAU);
+      ctx.fillStyle=`rgba(5,8,16,${1-moonData.illumination})`;
+      ctx.fill();
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   ACT 1: LANDING
+   ═══════════════════════════════════════════ */
+const REAL_DIST=8580;
+const landingSeq=[
+  {d:600,fn:()=>{
+    $('distText').style.opacity='1';
+    let cur=0;const dur=2500;const st=performance.now();
+    (function tick(now){const p=Math.min(1,(now-st)/dur);const e=1-Math.pow(1-p,3);cur=Math.floor(e*REAL_DIST);$('distText').innerHTML=`${cur.toLocaleString()}<span class="u">km apart</span>`;if(p<1)requestAnimationFrame(tick);else $('distText').innerHTML=`${REAL_DIST.toLocaleString()}<span class="u">km apart</span>`})(performance.now());
+  }},
+  {d:3500,fn:()=>{$('cityDots').style.opacity='1';setTimeout(()=>{$('hbLine').style.opacity='1';$('hbLine').classList.add('on')},600)}},
+  {d:5500,fn:()=>{
+    $('distText').style.opacity='0';$('distText').style.transition='opacity 1.5s';
+    $('cityDots').style.opacity='0';$('cityDots').style.transition='opacity 1.5s';
+    setTimeout(()=>{$('titleBlock').style.opacity='1';setTimeout(()=>{$('enterBtn').style.opacity='1';$('enterBtn').classList.add('show')},1200)},800);
+  }}
+];
+landingSeq.forEach(s=>setTimeout(s.fn,s.d));
+
+$('enterBtn').addEventListener('click',()=>{
   if(phase!=='landing')return;
-  phase='transition';
-  $('landing').classList.add('fade');
+  phase='trans';
+  $('landing').classList.add('out');
   setTimeout(()=>{
     $('landing').style.display='none';
     phase='universe';
-    $('universeCanvas').classList.add('show');
-    $('hud').classList.add('show');
-    $('constNav').classList.add('show');
-    $('missBtn').classList.add('show');
-    $('audioControls').classList.add('show');
-    $('moonBtn').classList.add('show');
-    $('scrollIndicator').classList.add('show');
-    showLabel('Your Universe','Scroll to travel through time');
-    setTimeout(()=>$('scrollIndicator').classList.remove('show'),8000);
-    startUniverse();
-  },2000);
-}
-
-/* ═══════════════════════════════════════════
-   ACT 2: FLOATING UNIVERSE (Three.js)
-   ═══════════════════════════════════════════ */
-const renderer=new THREE.WebGLRenderer({canvas:$('universeCanvas'),antialias:true,alpha:true});
-renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=0.8;
-
-const cam=new THREE.PerspectiveCamera(50,W/H,0.1,500);
-cam.position.set(0,0,8);
-
-const sc=new THREE.Scene();
-sc.background=new THREE.Color(0x020510);
-sc.fog=new THREE.FogExp2(0x020510,0.008);
-
-/* ── Lighting ── */
-sc.add(new THREE.AmbientLight(0x1a1a2a,.15));
-const sunLight=new THREE.DirectionalLight(0xffeedd,.3);
-sunLight.position.set(-5,8,5);sc.add(sunLight);
-
-/* ── Star Field (background) ── */
-const starN=2000;
-const starGeo=new THREE.BufferGeometry();
-const starPos=new Float32Array(starN*3);
-const starSz=new Float32Array(starN);
-const starCol=new Float32Array(starN*3);
-for(let i=0;i<starN;i++){
-  const theta=Math.random()*TAU,phi=Math.acos(2*Math.random()-1);
-  const r=20+Math.random()*80;
-  starPos[i*3]=r*Math.sin(phi)*Math.cos(theta);
-  starPos[i*3+1]=r*Math.sin(phi)*Math.sin(theta);
-  starPos[i*3+2]=r*Math.cos(phi);
-  starSz[i]=Math.random()*2+.5;
-  const temp=Math.random();
-  starCol[i*3]=.9+temp*.1;starCol[i*3+1]=.85+temp*.1;starCol[i*3+2]=.8+temp*.2;
-}
-starGeo.setAttribute('position',new THREE.BufferAttribute(starPos,3));
-starGeo.setAttribute('size',new THREE.BufferAttribute(starSz,1));
-starGeo.setAttribute('color',new THREE.BufferAttribute(starCol,3));
-const starMat=new THREE.ShaderMaterial({
-  uniforms:{time:{value:0}},
-  vertexShader:`attribute float size;attribute vec3 color;varying vec3 vC;varying float vA;uniform float time;void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.);gl_PointSize=size*(200./-mv.z);gl_Position=projectionMatrix*mv;vA=.6+.4*sin(time*.5+position.x*.1+position.y*.1);}`,
-  fragmentShader:`varying vec3 vC;varying float vA;void main(){float d=length(gl_PointCoord-vec2(.5));if(d>.5)discard;float g=1.-smoothstep(0.,.5,d);gl_FragColor=vec4(vC,g*vA);}`,
-  transparent:true,blending:THREE.AdditiveBlending,depthWrite:false
-});
-const stars=new THREE.Points(starGeo,starMat);
-sc.add(stars);
-
-/* ── Shared Moon ── */
-const moonGroup=new THREE.Group();
-const moonMesh=new THREE.Mesh(
-  new THREE.SphereGeometry(1.2,32,32),
-  new THREE.MeshBasicMaterial({color:0xeeeedd})
-);
-moonGroup.add(moonMesh);
-const moonGlow=new THREE.Mesh(
-  new THREE.SphereGeometry(2,32,32),
-  new THREE.ShaderMaterial({
-    vertexShader:`varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-    fragmentShader:`varying vec3 vN;void main(){float i=pow(.6-dot(vN,vec3(0,0,1)),3.);gl_FragColor=vec4(.7,.72,.8,i*.35);}`,
-    transparent:true,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false
-  })
-);
-moonGroup.add(moonGlow);
-moonGroup.position.set(0,4,-15);
-sc.add(moonGroup);
-
-/* ── Constellation Lines (connecting nav stars) ── */
-const constGroup=new THREE.Group();
-const constStars=[];
-const constLabels=['Home','Memories','Letters','Gallery','Bucket List','Our Music','Our Future'];
-const constPositions=[
-  [0,0,0],[3,2,-2],[-2,3,-1],[4,-1,-3],[-3,-2,-2],[1,-3,-1],[-4,1,-2]
-];
-
-constPositions.forEach((p,i)=>{
-  const star=new THREE.Mesh(
-    new THREE.SphereGeometry(i===0?.08:.05,12,12),
-    new THREE.MeshBasicMaterial({
-      color:i===0?0xffcc66:0xc8a855,
-      transparent:true,opacity:i===0?1:.5,
-      blending:THREE.AdditiveBlending,depthWrite:false
-    })
-  );
-  star.position.set(...p);
-  constGroup.add(star);constStars.push(star);
+    $('mainCanvas').classList.add('on');
+    $('hud').classList.add('on');
+    $('sideNav').classList.add('on');
+    $('missBtn').classList.add('on');
+    $('audio').classList.add('on');
+    $('moonEl').classList.add('on');
+    $('scrlH').classList.add('on');
+    lab('Your Universe','Scroll to travel through time');
+    setTimeout(()=>$('scrlH').classList.remove('show'),8000);
+    updateAll();
+  },2500);
 });
 
-/* Lines between adjacent stars */
-for(let i=0;i<constPositions.length-1;i++){
-  const a=new THREE.Vector3(...constPositions[i]);
-  const b=new THREE.Vector3(...constPositions[i+1]);
-  const mid=a.clone().add(b).multiplyScalar(.5).add(new THREE.Vector3(0,.3,0));
-  const curve=new THREE.QuadraticBezierCurve3(a,mid,b);
-  const pts=curve.getPoints(30);
-  const lineGeo=new THREE.BufferGeometry().setFromPoints(pts);
-  const lineMat=new THREE.LineBasicMaterial({color:0xc8a855,transparent:true,opacity:.1,blending:THREE.AdditiveBlending,depthWrite:false});
-  constGroup.add(new THREE.Line(lineGeo,lineMat));
-}
-
-/* Unfinished constellation (the ending) */
-const endingStarPositions=[[-3,3,-4],[-2,4,-5],[-1,3.5,-4.5],[0,4.5,-5.5],[1,3.8,-4.8],[2,4.2,-5.2],[3,3.5,-4.5]];
-const endingLinePositions=[[-3,3,-4],[-2,4,-5],[-1,3.5,-4.5],[0,4.5,-5.5],[1,3.8,-4.8],[2,4.2,-5.2],[3,3.5,-4.5]];
-/* Last star is dim/dashed — the unfinished one */
-const lastStarPos=endingStarPositions[endingStarPositions.length-1];
-const lastStar=new THREE.Mesh(
-  new THREE.SphereGeometry(.02,8,8),
-  new THREE.MeshBasicMaterial({color:0xc8a855,transparent:true,opacity:.15,blending:THREE.AdditiveBlending,depthWrite:false})
-);
-lastStar.position.set(...lastStarPos);
-constGroup.add(lastStar);
-
-/* Lines for ending constellation (except last segment) */
-for(let i=0;i<endingLinePositions.length-2;i++){
-  const a=new THREE.Vector3(...endingLinePositions[i]);
-  const b=new THREE.Vector3(...endingLinePositions[i+1]);
-  const pts=[a,b];
-  const lineGeo=new THREE.BufferGeometry().setFromPoints(pts);
-  const lineMat=new THREE.LineBasicMaterial({color:0xc8a855,transparent:true,opacity:.08,blending:THREE.AdditiveBlending,depthWrite:false});
-  constGroup.add(new THREE.Line(lineGeo,lineMat));
-}
-/* Dashed last segment */
-const dashPts=[new THREE.Vector3(...endingLinePositions[endingLinePositions.length-2]),new THREE.Vector3(...lastStarPos)];
-const dashGeo=new THREE.BufferGeometry().setFromPoints(dashPts);
-const dashMat=new THREE.LineDashedMaterial({color:0xc8a855,transparent:true,opacity:.06,dashSize:.2,gapSize:.15,blending:THREE.AdditiveBlending,depthWrite:false});
-const dashLine=new THREE.Line(dashGeo,dashMat);
-dashLine.computeLineDistances();
-constGroup.add(dashLine);
-
-constGroup.position.set(0,0,-5);
-sc.add(constGroup);
-
-/* ── Drifting Clouds ── */
-const clouds=[];
-for(let i=0;i<8;i++){
-  const cloudGeo=new THREE.PlaneGeometry(4+Math.random()*6,1+Math.random()*2);
-  const cloudMat=new THREE.MeshBasicMaterial({
-    color:0x1a2040,transparent:true,opacity:.03+Math.random()*.03,
-    blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide
-  });
-  const cloud=new THREE.Mesh(cloudGeo,cloudMat);
-  cloud.position.set((Math.random()-.5)*30,(Math.random()-.5)*10,-5-Math.random()*15);
-  cloud.rotation.z=Math.random()*.3;
-  cloud.userData.speed=.002+Math.random()*.005;
-  cloud.userData.driftY=(Math.random()-.5)*.001;
-  sc.add(cloud);clouds.push(cloud);
-}
-
 /* ═══════════════════════════════════════════
-   TIME OF DAY SYSTEM (Scroll-based)
+   ACT 2: REAL-TIME UNIVERSE
    ═══════════════════════════════════════════ */
-/* Dublin hours: 6am(dawn)→12pm(noon)→17pm(golden)→22pm(night) */
-/* Bangalore: +5:30 offset, different sky color */
-const timeColors={
-  dawn:{bg:0x0a1020,ambient:0x4a6090,sky:'linear-gradient(180deg, #0a1020 0%, #1a2a4a 40%, #3a4a6a 70%, #6a7a9a 100%)'},
-  morning:{bg:0x101828,ambient:0x8090a0,sky:'linear-gradient(180deg, #101828 0%, #2a3a5a 40%, #5a7a9a 100%)'},
-  noon:{bg:0x182030,ambient:0xaab0b8,sky:'linear-gradient(180deg, #182030 0%, #3a5070 40%, #7090b0 100%)'},
-  golden:{bg:0x1a1820,ambient:0xc8a855,sky:'linear-gradient(180deg, #1a1820 0%, #3a2a20 40%, #8a5a30 70%, #c8a060 100%)'},
-  dusk:{bg:0x12101a,ambient:0x6a5080,sky:'linear-gradient(180deg, #12101a 0%, #2a1a30 40%, #4a2a40 70%, #6a4a50 100%)'},
-  night:{bg:0x050810,ambient:0x202040,sky:'linear-gradient(180deg, #050810 0%, #0a1020 40%, #101830 100%)'}
-};
+const mainC=$('mainCanvas');
+const mainX=mainC.getContext('2d');
+function resizeMain(){mainC.width=W;mainC.height=H}
+resizeMain();addEventListener('resize',resizeMain);
 
-function getTimeOfDay(hour){
-  if(hour<7)return'dawn';if(hour<11)return'morning';if(hour<15)return'noon';
-  if(hour<18)return'golden';if(hour<20)return'dusk';return'night';
-}
+/* Draw the real sky for both cities side by side */
+function drawUniverse(){
+  mainX.clearRect(0,0,W,H);
 
-function getTimePeriodName(hour){
-  if(hour<7)return'Dawn';if(hour<11)return'Morning';if(hour<15)return'Afternoon';
-  if(hour<18)return'Golden Hour';if(hour<20)return'Dusk';return'Night';
-}
-
-function updateTimeOfDay(){
-  if(phase!=='universe')return;
   const now=new Date();
-  const dublinHour=parseInt(new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'numeric',hour12:false}).format(now));
-  const bangaloreHour=parseInt(new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'numeric',hour12:false}).format(now));
+  /* Add scroll offset to simulate time travel */
+  const fakeDate=new Date(now.getTime()+scrollP*24*3600000);
 
-  /* Use scroll to blend between time periods */
-  const dublinPeriod=getTimeOfDay((dublinHour+Math.floor(scrollProgress*16))%24);
-  const colors=timeColors[dublinPeriod];
+  /* Dublin sky (left half) */
+  drawSky(mainX,fakeDate,DUBLIN.lat,DUBLIN.lng,0);
 
-  sc.background.set(colors.bg);
-  sc.fog.color.set(colors.bg);
-  sunLight.color.set(colors.ambient);
+  /* Bangalore sky (right half) */
+  drawSky(mainX,fakeDate,BANGALORE.lat,BANGALORE.lng,W/2);
 
-  $('timeOverlay').style.background=colors.sky;
-  $('timeOverlay').style.opacity=.15;
+  /* Subtle divider line */
+  mainX.beginPath();
+  mainX.moveTo(W/2,0);mainX.lineTo(W/2,H);
+  mainX.strokeStyle='rgba(200,168,85,.05)';
+  mainX.lineWidth=1;
+  mainX.stroke();
 
-  /* Update period labels */
-  const dp=getTimePeriodName((dublinHour+Math.floor(scrollProgress*16))%24);
-  const bp=getTimePeriodName((bangaloreHour+Math.floor(scrollProgress*16))%24);
-  $('periodDublin').textContent=dp;
-  $('periodBangalore').textContent=bp;
+  /* City labels */
+  mainX.font='300 9px Inter, sans-serif';
+  mainX.fillStyle='rgba(200,168,85,.15)';
+  mainX.textAlign='center';
+  mainX.fillText('DUBLIN',W/4,H-20);
+  mainX.fillText('BANGALORE',W*3/4,H-20);
+
+  /* Distance label */
+  mainX.fillStyle='rgba(200,168,85,.1)';
+  mainX.fillText(`${REAL_DIST.toLocaleString()} km apart`,W/2,H-8);
+}
+
+/* Update everything */
+function updateAll(){
+  if(phase!=='universe')return;
+  drawUniverse();
+  updateClocks();
+  updateMoon();
+  updateWeather();
+  tickFireflies();
+}
+
+/* ═══════════════════════════════════════════
+   MOON POSITION & PHASE
+   ═══════════════════════════════════════════ */
+function updateMoon(){
+  const now=new Date();
+  const moon=moonPhase(now);
+  const sun=sunPos(now,DUBLIN.lat,DUBLIN.lng);
+  const visible=sun.altitude<-6;
+
+  /* Position moon element */
+  const el=$('moonEl');
+  const sz=visible?28:24;
+  el.style.width=sz+'px';el.style.height=sz+'px';
+  el.style.borderRadius='50%';
+  el.style.background=`radial-gradient(circle at ${40-moon.illumination*30}% 35%, #eee ${moon.illumination*60}%, #aaa ${40+moon.illumination*30}%, #666 100%)`;
+  el.style.boxShadow=`0 0 ${visible?20:8}px rgba(200,200,180,${visible?.12:.04})`;
+  el.style.top='48px';
+  el.style.left='50%';
+  el.style.transform='translateX(-50%)';
+
+  /* Click handler */
+  el.onclick=()=>{
+    const canvas=$('moonBig');
+    const ctx=canvas.getContext('2d');
+    canvas.width=100;canvas.height=100;
+    /* Draw big moon */
+    ctx.beginPath();ctx.arc(50,50,40,0,TAU);
+    const grd=ctx.createRadialGradient(50,50,0,50,50,40);
+    grd.addColorStop(0,'#eee');grd.addColorStop(.7,'#ccc');grd.addColorStop(1,'#999');
+    ctx.fillStyle=grd;ctx.fill();
+    /* Phase shadow */
+    ctx.beginPath();ctx.arc(50,50,40,0,TAU);
+    ctx.fillStyle=`rgba(5,8,16,${1-moon.illumination})`;ctx.fill();
+
+    const msgs=[
+      'Tonight, the same moon hangs over Dublin and Bangalore. She looks up. He looks up. Same light. Two cities. One heart.',
+      'The moon doesn\'t care about borders or time zones. It just shines. The way your love does.',
+      'Some nights, the moon is all you have in common with someone far away. And somehow, that\'s enough.',
+      'He can\'t hold your hand tonight. But the moonlight falling on your skin is the same light touching his.',
+      'The moon waxes and wanes. So does the distance. But it always comes back to full.',
+      'Between Dublin and Bangalore, there\'s a line only the moon can draw.'
+    ];
+    $('mDt').textContent=moon.phaseName+' · '+Math.round(moon.illumination*100)+'% illuminated';
+    $('mMs').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+    $('moonOv').classList.add('open');
+  };
 }
 
 /* ═══════════════════════════════════════════
    FIREFLY NOTIFICATIONS
    ═══════════════════════════════════════════ */
-const fireflies=[];
-function spawnFirefly(msg){
-  const el=document.createElement('div');
-  el.className='firefly';
-  el.title='A message from Sharath';
-  const startX=Math.random()*W*.6+W*.2;
-  const startY=H+20;
-  el.style.left=startX+'px';el.style.top=startY+'px';
+const ffs=[];
+function spawnFF(msg){
+  const el=document.createElement('div');el.className='ff';
+  el.title='A thought from Sharath';
+  const sx=Math.random()*W*.6+W*.2,sy=H+10;
+  el.style.left=sx+'px';el.style.top=sy+'px';
   document.body.appendChild(el);
-
-  const flyData={el,x:startX,y:startY,vx:(Math.random()-.5)*2,vy:-1-Math.random()*2,phase:Math.random()*TAU,msg};
-  fireflies.push(flyData);
-
-  el.addEventListener('click',()=>{
-    el.classList.add('opening');
-    setTimeout(()=>{
-      el.remove();
-      fireflies.splice(fireflies.indexOf(flyData),1);
-      showToast(msg);
-    },800);
-  });
+  const d={el,x:sx,y:sy,vx:(Math.random()-.5)*1.5,vy:-.8-Math.random()*1.5,ph:Math.random()*TAU,msg};
+  ffs.push(d);
+  el.addEventListener('click',()=>{el.classList.add('open');setTimeout(()=>{el.remove();ffs.splice(ffs.indexOf(d),1);toast(msg)},700)});
 }
-
-function tickFireflies(){
-  fireflies.forEach(f=>{
-    f.phase+=.02;
-    f.x+=Math.sin(f.phase)*1.5+f.vx;
-    f.y+=Math.cos(f.phase*.7)*.8+f.vy;
-    if(f.y<-20){f.y=H+20;f.x=Math.random()*W*.6+W*.2}
-    f.el.style.left=f.x+'px';f.el.style.top=f.y+'px';
-    f.el.style.opacity=.5+.5*Math.sin(f.phase*3);
-  });
-}
+function tickFireflies(){ffs.forEach(f=>{f.ph+=.015;f.x+=Math.sin(f.ph)*1.2+f.vx;f.y+=Math.cos(f.ph*.6)*.6+f.vy;if(f.y<-10){f.y=H+10;f.x=Math.random()*W*.6+W*.2}f.el.style.left=f.x+'px';f.el.style.top=f.y+'px';f.el.style.opacity=.4+.4*Math.sin(f.ph*2.5)})}
 
 /* ═══════════════════════════════════════════
    PAPER AIRPLANE LETTERS
    ═══════════════════════════════════════════ */
-function sendPaperAirplane(text){
-  const plane=document.createElement('div');
-  plane.className='paper-plane';
-  document.body.appendChild(plane);
-
-  const startX=W*.5;
-  const startY=H*.5;
-  plane.style.left=startX+'px';plane.style.top=startY+'px';
-
-  const endX=W*.15;
-  const endY=H*.15;
-  const duration=3000;
-  const start=performance.now();
-
-  function anim(now){
-    const p=Math.min(1,(now-start)/duration);
-    const ease=1-Math.pow(1-p,3);
-    const x=startX+(endX-startX)*ease;
-    const y=startY+(endY-startY)*ease-Math.sin(p*PI)*150;
-    const rot=-45+p*360;
-    plane.style.left=x+'px';
-    plane.style.top=y+'px';
-    plane.style.transform=`rotate(${rot}deg) scale(${1-p*.5})`;
-    plane.style.opacity=1-p*.7;
-    if(p<1)requestAnimationFrame(anim);
-    else{plane.remove();showToast('✉️ Letter sent across the stars')}
-  }
-  requestAnimationFrame(anim);
-}
-
-$('letterSend').addEventListener('click',()=>{
-  const text=$('letterText').value.trim();
+function sendPlane(){
+  const text=$('letTx').value.trim();
   if(!text)return;
   const words=text.split(/\s+/).filter(Boolean).length;
-  if(words>250){showToast('Keep it under 250 words');return}
-  $('letterOverlay').classList.remove('open');
-  $('letterText').value='';
-  sendPaperAirplane(text);
-});
+  if(words>250){toast('Keep it under 250 words');return}
+  $('letOv').classList.remove('open');
+  $('letTx').value='';
+  const plane=document.createElement('div');plane.className='pp';
+  plane.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8a855" stroke-width="1"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>';
+  document.body.appendChild(plane);
+  const sx=W*.5,sy=H*.5,ex=W*.15,ey=H*.15,st=performance.now();
+  (function anim(now){
+    const p=Math.min(1,(now-st)/3000);
+    const e=1-Math.pow(1-p,3);
+    plane.style.left=(sx+(ex-sx)*e)+'px';
+    plane.style.top=(sy+(ey-sy)*e-Math.sin(p*PI)*120)+'px';
+    plane.style.transform=`rotate(${-45+p*300}deg) scale(${1-p*.4})`;
+    plane.style.opacity=String(1-p*.6);
+    plane.style.display='block';
+    if(p<1)requestAnimationFrame(anim);else{plane.remove();toast('Letter sent across the stars ✦')}
+  })(performance.now());
+}
 
-$('letterText')?.addEventListener('input',function(){
-  const w=this.value.trim().split(/\s+/).filter(Boolean).length;
-  $('letterCount').textContent=`${w} / 250 words`;
-});
-
-/* ═══════════════════════════════════════════
-   SHARED MOON — Today's Message
-   ═══════════════════════════════════════════ */
-const dailyMessages=[
-  {date:'23 May',msg:'The day we said forever in the misty hills of Coorg.'},
-  {date:'3 Feb',msg:'Happy birthday, Sharath. She thinks of you first thing every morning.'},
-  {date:'20 Mar',msg:'Happy birthday, Rashmi. He planned something beautiful. Wait and see.'},
-  {date:'1 Jan',msg:'New year. Same promise. This is the year we close the distance.'},
-  {date:'14 Feb',msg:'Valentine\'s Day. 5,000 miles apart. A voice note at midnight.'},
-  {date:'Default',msg:'The same moon watches over Dublin tonight. And Bangalore. And you.'}
-];
-
-$('moonBtn').addEventListener('click',()=>{
-  const now=new Date();
-  const day=now.getDate();
-  const month=now.toLocaleString('en',{month:'short'});
-  const today=dailyMessages.find(m=>m.date===`${day} ${month}`)||dailyMessages.find(m=>m.date==='Default');
-  $('moonDate').textContent=`${month} ${day}`;
-  $('moonMsg').textContent=today.msg;
-  $('moonOverlay').classList.add('open');
-});
+$('letSend').addEventListener('click',sendPlane);
+$('letTx')?.addEventListener('input',function(){$('letCnt').textContent=`${this.value.trim().split(/\s+/).filter(Boolean).length} / 250 words`});
 
 /* ═══════════════════════════════════════════
    I MISS YOU
    ═══════════════════════════════════════════ */
 $('missBtn').addEventListener('click',()=>{
-  $('missBtn').classList.add('pulsing');
-  setTimeout(()=>$('missBtn').classList.remove('pulsing'),1500);
-  showToast('💌 He knows');
-  /* In a real app this would send via WebSocket/Supabase */
+  $('missBtn').classList.add('puls');setTimeout(()=>$('missBtn').classList.remove('puls'),1500);
+  toast('He knows');
 });
-
-function receiveMissYou(){
-  $('missPulse').classList.add('show');
-  $('missName').textContent='Sharath';
-  $('missToast').classList.add('show');
-  setTimeout(()=>{$('missPulse').classList.remove('show');$('missToast').classList.remove('show')},3000);
-  /* Spawn a firefly as bonus */
-  spawnFirefly('Thinking of you');
+function receiveMiss(){
+  $('missPulse').classList.add('on');$('mName').textContent='Sharath';$('missToast').classList.add('on');
+  setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},3000);
+  spawnFF('Thinking of you');
 }
 
 /* ═══════════════════════════════════════════
    SCROLL — Time Travel
    ═══════════════════════════════════════════ */
-window.addEventListener('wheel',e=>{
-  if(phase!=='universe')return;
-  scrollProgress=Math.max(0,Math.min(1,scrollProgress+e.deltaY*.0005));
-  updateTimeOfDay();
-},{passive:true});
-
-/* Touch scroll */
-let touchStart=0;
-window.addEventListener('touchstart',e=>{touchStart=e.touches[0].clientY});
-window.addEventListener('touchmove',e=>{
-  if(phase!=='universe')return;
-  const dy=touchStart-e.touches[0].clientY;
-  touchStart=e.touches[0].clientY;
-  scrollProgress=Math.max(0,Math.min(1,scrollProgress+dy*.002));
-  updateTimeOfDay();
-},{passive:true});
+addEventListener('wheel',e=>{if(phase!=='universe')return;scrollP=Math.max(0,Math.min(1,scrollP+e.deltaY*.0003));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
+let tSt=0;
+addEventListener('touchstart',e=>{tSt=e.touches[0].clientY});
+addEventListener('touchmove',e=>{if(phase!=='universe')return;const dy=tSt-e.touches[0].clientY;tSt=e.touches[0].clientY;scrollP=Math.max(0,Math.min(1,scrollP+dy*.001));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
 
 /* ═══════════════════════════════════════════
-   HUD CLOCKS
+   HUD CLOCKS & WEATHER
    ═══════════════════════════════════════════ */
+let weatherCache={};
+async function updateWeather(){
+  try{
+    const[d,b]=await Promise.all([
+      fetch('https://wttr.in/Dublin?format=%C+%t').then(r=>r.text()).catch(()=>''),
+      fetch('https://wttr.in/Bangalore?format=%C+%t').then(r=>r.text()).catch(()=>'')
+    ]);
+    if(d)$('weDub').textContent=d.trim();
+    if(b)$('weBan').textContent=b.trim();
+  }catch(e){}
+}
 function updateClocks(){
   const now=new Date();
-  $('clockDublin').textContent=new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
-  $('clockBangalore').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
-  const target=new Date('2026-12-01');
-  const diff=target-now;
-  $('countdown').textContent=diff>0?`${Math.floor(diff/86400000)} days`:'Home';
-  updateTimeOfDay();
+  $('clDub').textContent=new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
+  $('clBan').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
+  const target=new Date('2026-12-01');const diff=target-now;
+  $('cdVal').textContent=diff>0?`${Math.floor(diff/864e5)} days`:'Home';
 }
 updateClocks();setInterval(updateClocks,10000);
+updateWeather();setInterval(updateWeather,600000);
 
 /* ═══════════════════════════════════════════
-   CONSTELLATION NAVIGATION
+   NAV
    ═══════════════════════════════════════════ */
-document.querySelectorAll('.const-star').forEach(star=>{
-  star.addEventListener('click',()=>{
-    const scene=star.dataset.scene;
-    document.querySelectorAll('.const-star').forEach(s=>s.classList.remove('active'));
-    star.classList.add('active');
-    if(scene==='letters'){$('letterOverlay').classList.add('open');return}
-    showLabel(star.querySelector('.star-label').textContent,'');
-  });
-});
+document.querySelectorAll('.sn').forEach(s=>s.addEventListener('click',()=>{
+  const sc=s.dataset.s;document.querySelectorAll('.sn').forEach(x=>x.classList.remove('act'));s.classList.add('act');
+  if(sc==='letters'){$('letOv').classList.add('open');return}
+  lab(s.querySelector('.sl').textContent,'');
+}));
 
 /* ═══════════════════════════════════════════
-   SCENE LABEL
+   LABEL & TOAST
    ═══════════════════════════════════════════ */
-let labelTimer;
-function showLabel(name,hint){
-  $('slName').textContent=name;
-  $('slHint').textContent=hint||'';
-  $('sceneLabel').classList.add('show');
-  clearTimeout(labelTimer);
-  labelTimer=setTimeout(()=>$('sceneLabel').classList.remove('show'),5000);
-}
-
-/* ═══════════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════════ */
-let toastTimer;
-function showToast(text){
-  $('toastText').textContent=text;
-  $('toast').classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3000);
-}
+let labT;function lab(n,h){$('slNm').textContent=n;$('slHt').textContent=h||'';$('sLab').classList.add('on');clearTimeout(labT);labT=setTimeout(()=>$('sLab').classList.remove('on'),5000)}
+let toastT;function toast(t){$('tTx').textContent=t;$('toast').classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>$('toast').classList.remove('on'),3000)}
 
 /* ═══════════════════════════════════════════
    AMBIENT AUDIO
    ═══════════════════════════════════════════ */
-let audioCtx=null;const activeSounds={};
-function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}
-
-function createPiano(){if(activeSounds.piano)return stopSound('piano');initAudio();const o1=audioCtx.createOscillator(),o2=audioCtx.createOscillator(),g=audioCtx.createGain(),f=audioCtx.createBiquadFilter();o1.type='sine';o1.frequency.value=220;o2.type='sine';o2.frequency.value=330;f.type='lowpass';f.frequency.value=400;g.gain.value=0;o1.connect(f);o2.connect(f);f.connect(g);g.connect(audioCtx.destination);o1.start();o2.start();g.gain.linearRampToValueAtTime(.03,audioCtx.currentTime+2);const lfo=audioCtx.createOscillator(),lg=audioCtx.createGain();lfo.frequency.value=.1;lg.gain.value=20;lfo.connect(lg);lg.connect(o1.frequency);lfo.start();activeSounds.piano={osc:[o1,o2],gain:g};document.querySelector('[data-sound="piano"]').classList.add('active')}
-
-function createRain(){if(activeSounds.rain)return stopSound('rain');initAudio();const buf=audioCtx.createBuffer(1,2*audioCtx.sampleRate,audioCtx.sampleRate),d=buf.getChannelData(0);let last=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;d[i]=(last+.02*w)/1.02;last=d[i];d[i]*=3.5}const n=audioCtx.createBufferSource();n.buffer=buf;n.loop=true;const f=audioCtx.createBiquadFilter();f.type='bandpass';f.frequency.value=800;f.Q.value=.5;const g=audioCtx.createGain();g.gain.value=0;n.connect(f);f.connect(g);g.connect(audioCtx.destination);n.start();g.gain.linearRampToValueAtTime(.04,audioCtx.currentTime+2);activeSounds.rain={noise:n,gain:g};document.querySelector('[data-sound="rain"]').classList.add('active')}
-
-function createNight(){if(activeSounds.night)return stopSound('night');initAudio();const o=audioCtx.createOscillator(),o2=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=440;o2.type='triangle';o2.frequency.value=554;g.gain.value=0;o.connect(g);o2.connect(g);g.connect(audioCtx.destination);o.start();o2.start();g.gain.linearRampToValueAtTime(.015,audioCtx.currentTime+3);activeSounds.night={osc:[o,o2],gain:g};document.querySelector('[data-sound="night"]').classList.add('active')}
-
-function stopSound(type){const s=activeSounds[type];if(!s)return;if(s.gain)s.gain.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1);setTimeout(()=>{if(s.osc)(Array.isArray(s.osc)?s.osc:[s.osc]).forEach(o=>{try{o.stop()}catch(e){}});if(s.noise)try{s.noise.stop()}catch(e){}},1100);delete activeSounds[type];document.querySelector(`[data-sound="${type}"]`)?.classList.remove('active')}
-
-document.querySelectorAll('.audio-btn').forEach(btn=>btn.addEventListener('click',()=>{
-  const s=btn.dataset.sound;if(s==='piano')createPiano();if(s==='rain')createRain();if(s==='night')createNight();
-}));
-
-/* ═══════════════════════════════════════════
-   UNIVERSE RENDER LOOP
-   ═══════════════════════════════════════════ */
-const clock=new THREE.Clock();
-function startUniverse(){
-  function animate(){
-    requestAnimationFrame(animate);
-    delta=Math.min(clock.getDelta(),.05);
-    time+=delta;
-
-    /* Stars slow drift */
-    stars.rotation.y=time*.003;
-    stars.rotation.x=Math.sin(time*.01)*.002;
-    starMat.uniforms.time.value=time;
-
-    /* Moon gentle bob */
-    moonGroup.position.y=4+Math.sin(time*.2)*.3;
-    moonGroup.rotation.y=time*.05;
-
-    /* Clouds drift */
-    clouds.forEach(c=>{
-      c.position.x+=c.userData.speed;
-      c.position.y+=c.userData.driftY;
-      if(c.position.x>20)c.position.x=-20;
-    });
-
-    /* Constellation stars pulse */
-    constStars.forEach((s,i)=>{
-      const pulse=.5+.5*Math.sin(time*1.5+i*1.2);
-      s.material.opacity=(i===0?.8:.3)+pulse*.2;
-      s.scale.setScalar(1+pulse*.1);
-    });
-
-    /* Unfinished star faint pulse */
-    lastStar.material.opacity=.05+.1*Math.sin(time*.5);
-    lastStar.scale.setScalar(.8+.2*Math.sin(time*.5));
-
-    /* Fireflies */
-    tickFireflies();
-
-    cam.position.x=Math.sin(time*.05)*.3;
-    cam.position.y=Math.cos(time*.03)*.2;
-    cam.lookAt(0,0,-5);
-
-    composer.render();
-  }
-  animate();
-}
-
-/* Post-processing */
-import{EffectComposer}from'three/addons/postprocessing/EffectComposer.js';
-import{RenderPass}from'three/addons/postprocessing/RenderPass.js';
-import{UnrealBloomPass}from'three/addons/postprocessing/UnrealBloomPass.js';
-import{ShaderPass}from'three/addons/postprocessing/ShaderPass.js';
-
-const composer=new EffectComposer(renderer);
-composer.addPass(new RenderPass(sc,cam));
-composer.addPass(new UnrealBloomPass(new THREE.Vector2(W,H),.6,.4,.85));
-const vigShader={uniforms:{tDiffuse:{value:null}},vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`uniform sampler2D tDiffuse;varying vec2 vUv;void main(){vec4 t=texture2D(tDiffuse,vUv);vec2 u=(vUv-.5)*1.1;float v=1.-dot(u,u);t.rgb*=smoothstep(0.,1.,v/1.3);gl_FragColor=t;}`};
-composer.addPass(new ShaderPass(vigShader));
-
-/* ═══════════════════════════════════════════
-   RESIZE
-   ═══════════════════════════════════════════ */
-window.addEventListener('resize',()=>{
-  W=window.innerWidth;H=window.innerHeight;
-  cam.aspect=W/H;cam.updateProjectionMatrix();
-  renderer.setSize(W,H);composer.setSize(W,H);
-});
+let actx=null;const asnd={};
+function iA(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume()}
+function mkPiano(){if(asnd.piano)return sS('piano');iA();const o1=actx.createOscillator(),o2=actx.createOscillator(),g=actx.createGain(),f=actx.createBiquadFilter();o1.type='sine';o1.frequency.value=220;o2.type='sine';o2.frequency.value=330;f.type='lowpass';f.frequency.value=400;g.gain.value=0;o1.connect(f);o2.connect(f);f.connect(g);g.connect(actx.destination);o1.start();o2.start();g.gain.linearRampToValueAtTime(.025,actx.currentTime+2);asnd.piano={osc:[o1,o2],gain:g};document.querySelector('[data-s="piano"]').classList.add('act')}
+function mkRain(){if(asnd.rain)return sS('rain');iA();const buf=actx.createBuffer(1,2*actx.sampleRate,actx.sampleRate),d=buf.getChannelData(0);let last=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;d[i]=(last+.02*w)/1.02;last=d[i];d[i]*=3.5}const n=actx.createBufferSource();n.buffer=buf;n.loop=true;const f=actx.createBiquadFilter();f.type='bandpass';f.frequency.value=800;f.Q.value=.5;const g=actx.createGain();g.gain.value=0;n.connect(f);f.connect(g);g.connect(actx.destination);n.start();g.gain.linearRampToValueAtTime(.035,actx.currentTime+2);asnd.rain={noise:n,gain:g};document.querySelector('[data-s="rain"]').classList.add('act')}
+function mkNight(){if(asnd.night)return sS('night');iA();const o=actx.createOscillator(),o2=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=440;o2.type='triangle';o2.frequency.value=554;g.gain.value=0;o.connect(g);o2.connect(g);g.connect(actx.destination);o.start();o2.start();g.gain.linearRampToValueAtTime(.012,actx.currentTime+3);asnd.night={osc:[o,o2],gain:g};document.querySelector('[data-s="night"]').classList.add('act')}
+function sS(t){const s=asnd[t];if(!s)return;if(s.gain)s.gain.gain.linearRampToValueAtTime(0,actx.currentTime+1);setTimeout(()=>{if(s.osc)(Array.isArray(s.osc)?s.osc:[s.osc]).forEach(o=>{try{o.stop()}catch(e){}});if(s.noise)try{s.noise.stop()}catch(e){}},1100);delete asnd[t];document.querySelector(`[data-s="${t}"]`)?.classList.remove('act')}
+document.querySelectorAll('.ab').forEach(b=>b.addEventListener('click',()=>{const s=b.dataset.s;if(s==='piano')mkPiano();if(s==='rain')mkRain();if(s==='night')mkNight()}));
 
 /* ═══════════════════════════════════════════
    EASTER EGGS
    ═══════════════════════════════════════════ */
-let easterClicks=0;
+let ec=0;
 document.addEventListener('keydown',e=>{
-  if(e.key==='l'||e.key==='L'){easterClicks++;if(easterClicks>=5){showToast('The tree remembers.');easterClicks=0}}
-  if(e.key==='m'||e.key==='M')showToast('Same moon.');
-  if(e.key==='h'||e.key==='H')receiveMissYou();
+  if(e.key==='l'||e.key==='L'){ec++;if(ec>=5){toast('The tree remembers.');ec=0}}
+  if(e.key==='m'||e.key==='M')toast('Same moon.');
+  if(e.key==='h'||e.key==='H')receiveMiss();
 });
 
 /* ═══════════════════════════════════════════
-   DEMO: Spawn a firefly after 15 seconds
+   ANIMATION LOOP
    ═══════════════════════════════════════════ */
-setTimeout(()=>{if(phase==='universe')spawnFirefly('Missing you from Bangalore')},15000);
+let lastT=0;
+function loop(ts){
+  time=ts/1000;
+  if(phase==='universe'){
+    if(time-lastT>.03){updateAll();lastT=time}
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* Demo: firefly after 12 seconds */
+setTimeout(()=>{if(phase==='universe')spawnFF('Missing you from Bangalore')},12000);
 </script>
 </body>
 </html>
