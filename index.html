@@ -8,10 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180deg,#1a1a40 0%,#222255 30%,#2a2a6a 60%,#323280 100%);color:#f0e6d2;font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d2;font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
 ::selection{background:#d4a0a0;color:#050816}
 
-/* ── Landing ── */
 #landing{position:fixed;inset:0;z-index:50;background:#050816;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 2.5s cubic-bezier(.16,1,.3,1)}
 #landing.out{opacity:0;pointer-events:none}
 #landCanvas{position:absolute;inset:0;width:100%;height:100%}
@@ -24,12 +23,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 #enterBtn.show{animation:btnPulse 3s ease-in-out infinite}
 @keyframes btnPulse{0%,100%{opacity:.5}50%{opacity:1}}
 
-/* ── Main View ── */
-#mainCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;opacity:0;transition:opacity 3s}
-#mainCanvas.on{opacity:1}
-#skyCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+#skyWrap{position:fixed;inset:0;z-index:0;display:none}
+#skyWrap.on{display:flex}
+#skyDublin{flex:1;transition:background 4s ease}
+#skyBangalore{flex:1;position:relative;transition:background 4s ease}
+#skyDivider{position:absolute;top:0;left:50%;width:80px;height:100%;transform:translateX(-50%);background:linear-gradient(to right,rgba(5,8,16,0),rgba(5,8,16,.6),rgba(5,8,16,0));z-index:1;pointer-events:none}
+#starCanvas{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 3s}
+#starCanvas.on{opacity:1}
+#cityLabels{position:fixed;bottom:20px;left:0;right:0;z-index:2;display:flex;pointer-events:none;opacity:0;transition:opacity 1.5s}
+#cityLabels.on{opacity:1}
+#cityLabels>div{flex:1;text-align:center;font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(16px,2.2vw,22px);font-weight:300;color:rgba(212,160,160,.5);letter-spacing:.06em}
 
-/* ── HUD — clean layout, no collisions ── */
 #hud{position:fixed;top:0;left:0;right:0;z-index:12;display:grid;grid-template-columns:1fr auto 1fr;align-items:start;padding:24px 40px;opacity:0;transition:opacity 1.5s;pointer-events:none;background:linear-gradient(to bottom,rgba(5,8,22,.8) 0%,rgba(5,8,22,.3) 60%,transparent 100%)}
 #hud.on{opacity:1;pointer-events:auto}
 .hc-left{text-align:left}.hc-right{text-align:right}
@@ -40,12 +44,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 .hcc .cl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:rgba(212,160,160,.65);font-weight:400}
 .hcc .cv{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(22px,3vw,32px);color:#d4a0a0;margin-top:6px;letter-spacing:.04em}
 
-/* ── Moon — top left, below Dublin clock ── */
 #moonEl{position:fixed;z-index:13;cursor:pointer;opacity:0;transition:opacity .8s;pointer-events:none;top:90px;left:40px}
 #moonEl.on{opacity:1;pointer-events:auto}
 #moonEl:hover{filter:brightness(1.3)}
 
-/* ── Side Nav ── */
 #sideNav{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:12;display:flex;flex-direction:column;gap:0;opacity:0;transition:opacity 1.5s;pointer-events:none}
 #sideNav.on{opacity:1;pointer-events:auto}
 .sn{display:flex;align-items:center;gap:12px;cursor:pointer;padding:10px 0;transition:all .4s}
@@ -56,7 +58,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 .sn.act .sd{background:#d4a0a0;border-color:#d4a0a0;box-shadow:0 0 14px rgba(212,160,160,.5)}
 .sn.act .sl{color:#d4a0a0}
 
-/* ── I Miss You ── */
 #missBtn{position:fixed;bottom:40px;right:32px;z-index:12;width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(212,160,160,.25);background:rgba(5,8,16,.5);backdrop-filter:blur(12px);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1);pointer-events:none}
 #missBtn.on{opacity:.75;pointer-events:auto}
 #missBtn:hover{opacity:1;border-color:rgba(212,160,160,.5);transform:scale(1.08);box-shadow:0 0 24px rgba(212,160,160,.15)}
@@ -71,35 +72,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 #missToast .mn{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:#d4a0a0;font-weight:300;letter-spacing:.04em}
 #missToast .ms{font-size:10px;color:rgba(240,230,210,.45);letter-spacing:.12em;margin-top:4px}
 
-/* ── Scene Label ── */
 #sLab{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:12;opacity:0;transition:opacity 1.5s;pointer-events:none;text-align:center}
 #sLab.on{opacity:1}
 .sn2{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(16px,2.2vw,22px);font-weight:300;color:#d4a0a0;letter-spacing:.06em}
 .sh2{font-size:10px;color:rgba(240,230,210,.35);margin-top:4px;letter-spacing:.12em;font-weight:300}
 
-/* ── Audio ── */
 #audio{position:fixed;bottom:40px;left:32px;z-index:12;display:flex;gap:8px;opacity:0;transition:opacity 1.5s;pointer-events:none}
 #audio.on{opacity:1;pointer-events:auto}
 .ab{width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(212,160,160,.2);background:rgba(5,8,16,.4);color:rgba(212,160,160,.6);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .3s;backdrop-filter:blur(8px)}
 .ab:hover{border-color:rgba(212,160,160,.5);color:#d4a0a0;transform:scale(1.1)}
 .ab.act{background:rgba(212,160,160,.08);border-color:rgba(212,160,160,.3);color:#d4a0a0}
 
-/* ── Scroll Hint ── */
 #scrlH{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:12;text-align:center;opacity:0;transition:opacity 1s;pointer-events:none}
 #scrlH.on{opacity:1}
 #scrlH .st{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(212,160,160,.4);margin-bottom:8px}
 #scrlH .sl{width:1px;height:24px;background:linear-gradient(to bottom,rgba(212,160,160,.3),transparent);margin:0 auto;animation:sp 2.5s ease-in-out infinite}
 @keyframes sp{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:.7;transform:scaleY(1.2)}}
 
-/* ── Toast ── */
 #toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);z-index:20;background:rgba(5,8,18,.92);backdrop-filter:blur(20px);border:1px solid rgba(212,160,160,.12);border-radius:14px;padding:20px 32px;text-align:center;opacity:0;pointer-events:none;transition:all .5s cubic-bezier(.16,1,.3,1)}
 #toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
 #toast .tt{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#f0e6d2;font-weight:300}
 
-/* ── Scroll Bar ── */
 #scrollBar{position:fixed;right:0;top:0;width:2px;height:0;background:linear-gradient(to bottom,rgba(212,160,160,.4),rgba(212,160,160,.15));z-index:12;transition:height .3s;pointer-events:none}
 
-/* ── Gallery ── */
 #gallery{position:fixed;inset:0;z-index:22;background:rgba(5,8,16,.97);opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(212,160,160,.15) transparent}
 #gallery.open{opacity:1;visibility:visible}
 .gal-header{position:sticky;top:0;z-index:2;text-align:center;padding:32px 20px 20px;background:linear-gradient(to bottom,rgba(5,8,16,.98),transparent)}
@@ -116,8 +111,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 .gal-card .gc-date{font-size:8px;color:#d4a0a0;letter-spacing:.15em;text-transform:uppercase}
 .gal-card .gc-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;color:#f0e6d2;margin-top:3px;font-weight:300}
 .gal-card .gc-desc{font-size:9px;color:rgba(240,230,210,.35);margin-top:2px;font-style:italic}
+.gal-upload{display:flex;align-items:center;justify-content:center;padding:20px;margin-bottom:16px}
+.gal-upload-btn{padding:12px 28px;border:1.5px dashed rgba(212,160,160,.25);border-radius:12px;background:rgba(212,160,160,.03);color:rgba(212,160,160,.6);font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;cursor:pointer;transition:all .3s;letter-spacing:.06em}
+.gal-upload-btn:hover{border-color:rgba(212,160,160,.45);color:#d4a0a0;background:rgba(212,160,160,.06)}
+.gal-upload-btn input{display:none}
 
-/* ── Photo Viewer ── */
 #photoViewer{position:fixed;inset:0;z-index:25;background:rgba(2,4,12,.96);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .6s cubic-bezier(.16,1,.3,1)}
 #photoViewer.open{opacity:1;visibility:visible}
 #photoViewer img{max-width:88vw;max-height:72vh;object-fit:contain;border-radius:6px;box-shadow:0 12px 50px rgba(0,0,0,.6)}
@@ -131,7 +129,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 #photoViewer .pv-next{right:24px}
 #photoViewer .pv-count{position:absolute;bottom:24px;font-size:9px;color:rgba(212,160,160,.3);letter-spacing:.12em}
 
-/* ── Moon Overlay ── */
 #moonOv{position:fixed;inset:0;z-index:20;background:rgba(5,8,16,.94);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
 #moonOv.open{opacity:1;visibility:visible}
 #moonOv .mbig{border-radius:50%;box-shadow:0 0 60px rgba(200,200,180,.12);margin-bottom:28px}
@@ -140,7 +137,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 #moonOv .mcl{margin-top:36px;padding:8px 22px;border:1.5px solid rgba(212,160,160,.2);border-radius:18px;background:transparent;color:#d4a0a0;font-size:10px;letter-spacing:.12em;cursor:pointer;transition:all .3s}
 #moonOv .mcl:hover{border-color:rgba(212,160,160,.4);background:rgba(212,160,160,.05)}
 
-/* ── Letter System ── */
 #letOv{position:fixed;inset:0;z-index:20;background:rgba(5,8,16,.94);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
 #letOv.open{opacity:1;visibility:visible}
 .letEnv{width:min(600px,92vw);max-height:80vh;background:linear-gradient(145deg,rgba(16,18,30,.96),rgba(10,12,24,.98));border:1px solid rgba(212,160,160,.1);border-radius:16px;transform:translateY(24px) scale(.97);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;display:flex;flex-direction:column}
@@ -185,7 +181,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 .letWhoBtn.active{border-color:rgba(212,160,160,.4);background:rgba(212,160,160,.06);color:#d4a0a0}
 .letWhoBtn:hover{border-color:rgba(212,160,160,.3);color:rgba(212,160,160,.6)}
 
-/* ── Quick Messages ── */
 .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0}
 .qk{padding:16px 14px;border:1px solid rgba(212,160,160,.08);border-radius:12px;cursor:pointer;transition:all .3s;text-align:center;background:rgba(212,160,160,.02)}
 .qk:hover{border-color:rgba(212,160,160,.25);background:rgba(212,160,160,.06);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
@@ -196,7 +191,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 .qk.sent{border-color:rgba(212,160,160,.2);background:rgba(212,160,160,.04)}
 .qk.sent .qk-text{color:#d4a0a0}
 
-/* ── Date Tonight Overlay ── */
 #dateOv{position:fixed;inset:0;z-index:25;background:rgba(4,6,12,.96);backdrop-filter:blur(30px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
 #dateOv.open{opacity:1;visibility:visible}
 .date-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(28px,5vw,48px);font-weight:300;color:#f0e6d2;letter-spacing:.04em;margin-bottom:8px;text-align:center}
@@ -217,16 +211,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 .date-active .da-msg{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(16px,2.5vw,22px);color:#d4a0a0;font-weight:300;font-style:italic;letter-spacing:.04em}
 .date-active .da-who{font-size:9px;color:rgba(212,160,160,.4);margin-top:6px;letter-spacing:.1em}
 
-/* ── YouTube Player ── */
-#ytPlayer{position:fixed;bottom:80px;left:32px;z-index:14;opacity:0;transition:all .6s cubic-bezier(.16,1,.3,1);pointer-events:none;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4);border:1px solid rgba(212,160,160,.1)}
-#ytPlayer.on{opacity:1;pointer-events:auto}
-#ytPlayer iframe{display:block;width:280px;height:158px;border:none}
-#ytToggle{position:fixed;bottom:80px;left:32px;z-index:15;width:36px;height:36px;border-radius:50%;border:1px solid rgba(212,160,160,.15);background:rgba(5,8,16,.5);backdrop-filter:blur(8px);color:rgba(212,160,160,.5);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .3s;opacity:0;pointer-events:none}
-#ytToggle.on{opacity:.8;pointer-events:auto}
-#ytToggle:hover{opacity:1;border-color:rgba(212,160,160,.35);color:#d4a0a0}
-#ytToggle.act{background:rgba(212,160,160,.08);border-color:rgba(212,160,160,.25);color:#d4a0a0}
-
-/* ── Virtual Flowers ── */
 #flowerOv{position:fixed;inset:0;z-index:25;background:rgba(4,6,12,.96);backdrop-filter:blur(30px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
 #flowerOv.open{opacity:1;visibility:visible}
 .fl-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(28px,5vw,48px);font-weight:300;color:#f0e6d2;letter-spacing:.04em;margin-bottom:8px;text-align:center}
@@ -242,25 +226,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 .fly{position:absolute;font-size:24px;animation:flowerFall linear forwards;pointer-events:none}
 @keyframes flowerFall{0%{transform:translateY(-40px) rotate(0deg) scale(1);opacity:1}80%{opacity:1}100%{transform:translateY(100vh) rotate(360deg) scale(.6);opacity:0}}
 
-/* ── Gallery Upload ── */
-.gal-upload{display:flex;align-items:center;justify-content:center;padding:20px;margin-bottom:16px}
-.gal-upload-btn{padding:12px 28px;border:1.5px dashed rgba(212,160,160,.25);border-radius:12px;background:rgba(212,160,160,.03);color:rgba(212,160,160,.6);font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;cursor:pointer;transition:all .3s;letter-spacing:.06em}
-.gal-upload-btn:hover{border-color:rgba(212,160,160,.45);color:#d4a0a0;background:rgba(212,160,160,.06)}
-.gal-upload-btn input{display:none}
+#ytPlayer{position:fixed;bottom:80px;left:32px;z-index:14;opacity:0;transition:all .6s cubic-bezier(.16,1,.3,1);pointer-events:none;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4);border:1px solid rgba(212,160,160,.1)}
+#ytPlayer.on{opacity:1;pointer-events:auto}
+#ytPlayer iframe{display:block;width:280px;height:158px;border:none}
+#ytToggle{position:fixed;bottom:80px;left:32px;z-index:15;width:36px;height:36px;border-radius:50%;border:1px solid rgba(212,160,160,.15);background:rgba(5,8,16,.5);backdrop-filter:blur(8px);color:rgba(212,160,160,.5);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .3s;opacity:0;pointer-events:none}
+#ytToggle.on{opacity:.8;pointer-events:auto}
+#ytToggle:hover{opacity:1;border-color:rgba(212,160,160,.35);color:#d4a0a0}
+#ytToggle.act{background:rgba(212,160,160,.08);border-color:rgba(212,160,160,.25);color:#d4a0a0}
 
-/* ── Paper Airplane ── */
 .pp{position:fixed;z-index:18;pointer-events:none;opacity:0;transition:none}
 .pp svg{filter:drop-shadow(0 0 8px rgba(212,160,160,.4))}
 .pp.incoming svg{stroke:#88b4d8;filter:drop-shadow(0 0 8px rgba(136,180,216,.4))}
 
-/* ── Firefly ── */
 .ff{position:fixed;z-index:15;width:7px;height:7px;border-radius:50%;background:#d4a0a0;box-shadow:0 0 12px rgba(212,160,160,.5),0 0 24px rgba(212,160,160,.2);pointer-events:auto;cursor:pointer;transition:box-shadow .3s}
 .ff:hover{box-shadow:0 0 24px rgba(212,160,160,.7),0 0 48px rgba(212,160,160,.3)}
 .ff.open{animation:fLand .7s cubic-bezier(.16,1,.3,1) forwards}
 @keyframes fLand{0%{transform:scale(1)}50%{transform:scale(1.8);box-shadow:0 0 40px rgba(212,160,160,.6)}100%{transform:scale(0);opacity:0}}
-
-/* ── Time Overlay ── */
-#timeOv{position:fixed;inset:0;z-index:0;pointer-events:none;transition:background 3s}
 
 @media(max-width:768px){
   #hud{padding:16px 18px;grid-template-columns:1fr 1fr}
@@ -270,29 +251,33 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
   #audio{bottom:20px;left:16px}
   .gal-grid{padding:16px 18px 40px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
   #moonEl{left:18px;top:80px}
+  #skyWrap{flex-direction:column}
 }
 </style>
 </head>
 <body>
 
-<canvas id="skyCanvas"></canvas>
-<canvas id="mainCanvas"></canvas>
+<div id="skyWrap">
+  <div id="skyDublin"></div>
+  <div id="skyDivider"></div>
+  <div id="skyBangalore"></div>
+</div>
+<canvas id="starCanvas"></canvas>
 
-<!-- Landing -->
 <div id="landing">
   <canvas id="landCanvas"></canvas>
   <div id="titleBlock"><h1><em>Parallel</em> Hearts</h1><div class="tagline">Different skies. Same heartbeat.</div></div>
   <button id="enterBtn">Enter Our World</button>
 </div>
 
-<!-- HUD -->
 <div id="hud">
   <div class="hc hc-left"><div class="cn">Dublin</div><div class="ct2" id="clDub">--:--</div><div class="cd2" id="weDub"></div></div>
   <div class="hcc"><div class="cl">Until we meet</div><div class="cv" id="cdVal"></div></div>
   <div class="hc hc-right"><div class="cn">Bangalore</div><div class="ct2" id="clBan">--:--</div><div class="cd2" id="weBan"></div></div>
 </div>
 
-<!-- Constellation Nav -->
+<div id="cityLabels"><div>Dublin</div><div>Bangalore</div></div>
+
 <div id="sideNav">
   <div class="sn act" data-s="home"><div class="sd"></div><div class="sl">Home</div></div>
   <div class="sn" data-s="gallery"><div class="sd"></div><div class="sl">Gallery</div></div>
@@ -303,10 +288,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
   <div class="sn" data-s="miss"><div class="sd"></div><div class="sl">I Miss You</div></div>
 </div>
 
-<!-- Moon -->
 <div id="moonEl"></div>
 
-<!-- I Miss You -->
 <button id="missBtn" title="I miss you">
   <svg viewBox="0 0 24 24" fill="none" stroke="#d4a0a0" stroke-width="1.2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
 </button>
@@ -329,7 +312,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 
 <div id="dateActive"><div class="da-msg" id="dateMsg"></div><div class="da-who" id="dateWho"></div></div>
 
-<!-- Date Tonight -->
 <div id="dateOv">
   <div class="date-title">Date Tonight</div>
   <div class="date-sub">Pick something. We're in this together.</div>
@@ -337,7 +319,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
   <button class="date-close" onclick="document.getElementById('dateOv').classList.remove('open')">Maybe later</button>
 </div>
 
-<!-- Virtual Flowers -->
 <div id="flowerOv">
   <div class="fl-title">Send Flowers</div>
   <div class="fl-sub">A little something, just because.</div>
@@ -349,9 +330,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
 
 <div id="toast"><div class="tt" id="tTx"></div></div>
 <div id="scrollBar"></div>
-<div id="timeOv"></div>
 
-<!-- Gallery -->
 <div id="gallery">
   <div class="gal-header">
     <div class="gal-title">Our Memories</div>
@@ -362,7 +341,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
   <div class="gal-grid" id="galGrid"></div>
 </div>
 
-<!-- Photo Viewer -->
 <div id="photoViewer">
   <button class="pv-close" onclick="closePhoto()">&#10005;</button>
   <button class="pv-nav pv-prev" onclick="navPhoto(-1)">&#8249;</button>
@@ -373,7 +351,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
   <div class="pv-count"></div>
 </div>
 
-<!-- Moon Overlay -->
 <div id="moonOv">
   <canvas class="mbig" id="moonBig" width="120" height="120"></canvas>
   <div class="mdt" id="mDt"></div>
@@ -381,7 +358,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:linear-gradient(180d
   <button class="mcl" onclick="document.getElementById('moonOv').classList.remove('open')">Close</button>
 </div>
 
-<!-- Letter System -->
 <div id="letOv">
   <div class="letEnv">
     <button class="letX" onclick="closeLetters()">&#10005;</button>
@@ -428,9 +404,6 @@ let W=innerWidth,H=innerHeight;
 let phase='landing',scrollP=new Date().getHours()/24+new Date().getMinutes()/1440,time=0;
 addEventListener('resize',()=>{W=innerWidth;H=innerHeight});
 
-/* ═══════════════════════════════════════════
-   LANDING — Stars Being Born
-   ═══════════════════════════════════════════ */
 const lCanvas=$('landCanvas'),lCtx=lCanvas.getContext('2d');
 function resizeLanding(){lCanvas.width=W;lCanvas.height=H}
 resizeLanding();addEventListener('resize',resizeLanding);
@@ -464,193 +437,127 @@ function drawLanding(ts){
   lCtx.fillStyle='#050816';lCtx.fillRect(0,0,W,H);
   lCtx.save();zoom+=(zoomTarget-zoom)*.008;lCtx.translate(W/2,H/2);lCtx.scale(zoom,zoom);lCtx.translate(-W/2,-H/2);
   const bgC=Math.min(bgStars.length,Math.floor(el/50));
-  bgStars.slice(0,bgC).forEach(s=>{const f=.7+Math.sin(ts*.002+s.flicker)*.3;lCtx.fillStyle=`rgba(240,230,210,${s.bright*f})`;lCtx.beginPath();lCtx.arc(s.x*W,s.y*H,s.r,0,TAU);lCtx.fill()});
-  if(landPhase>=1){const cC=Math.min(constStars.length,Math.floor((el-pTime[1])/70));constStars.slice(0,cC).forEach(s=>{const f=.7+Math.sin(ts*.002+s.bright*10)*.3;lCtx.fillStyle=`rgba(240,230,210,${s.bright*f})`;lCtx.beginPath();lCtx.arc(s.x*W,s.y*H,s.r,0,TAU);lCtx.fill()})}
-  if(landPhase>=2){const lP=Math.min(1,(el-pTime[2])/2000);lCtx.strokeStyle=`rgba(212,160,160,${.12*lP})`;lCtx.lineWidth=.6;constLines.forEach((line,i)=>{if(i/constLines.length>lP)return;const a=constStars[line[0]],b=constStars[line[1]];if(!a||!b)return;lCtx.beginPath();lCtx.moveTo(a.x*W,a.y*H);lCtx.lineTo(b.x*W,b.y*H);lCtx.stroke()})}
-  heartStars.forEach(h=>{h.bright+=(h.target-h.bright)*.018;if(h.bright<.01)return;const p=.8+Math.sin(ts*.0015)*.2;const g=lCtx.createRadialGradient(h.x*W,h.y*H,0,h.x*W,h.y*H,h.r*10);g.addColorStop(0,`rgba(212,160,160,${h.bright*.3*p})`);g.addColorStop(1,'rgba(212,160,160,0)');lCtx.fillStyle=g;lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r*10,0,TAU);lCtx.fill();lCtx.fillStyle=`rgba(255,200,200,${h.bright*p})`;lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r,0,TAU);lCtx.fill();lCtx.fillStyle=`rgba(255,255,240,${h.bright*p*.8})`;lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r*.35,0,TAU);lCtx.fill()});
+  bgStars.slice(0,bgC).forEach(s=>{const f=.7+Math.sin(ts*.002+s.flicker)*.3;lCtx.fillStyle='rgba(240,230,210,'+(s.bright*f)+')';lCtx.beginPath();lCtx.arc(s.x*W,s.y*H,s.r,0,TAU);lCtx.fill()});
+  if(landPhase>=1){const cC=Math.min(constStars.length,Math.floor((el-pTime[1])/70));constStars.slice(0,cC).forEach(s=>{const f=.7+Math.sin(ts*.002+s.bright*10)*.3;lCtx.fillStyle='rgba(240,230,210,'+(s.bright*f)+')';lCtx.beginPath();lCtx.arc(s.x*W,s.y*H,s.r,0,TAU);lCtx.fill()})}
+  if(landPhase>=2){const lP=Math.min(1,(el-pTime[2])/2000);lCtx.strokeStyle='rgba(212,160,160,'+(.12*lP)+')';lCtx.lineWidth=.6;constLines.forEach((line,i)=>{if(i/constLines.length>lP)return;const a=constStars[line[0]],b=constStars[line[1]];if(!a||!b)return;lCtx.beginPath();lCtx.moveTo(a.x*W,a.y*H);lCtx.lineTo(b.x*W,b.y*H);lCtx.stroke()})}
+  heartStars.forEach(h=>{h.bright+=(h.target-h.bright)*.018;if(h.bright<.01)return;const p=.8+Math.sin(ts*.0015)*.2;const g=lCtx.createRadialGradient(h.x*W,h.y*H,0,h.x*W,h.y*H,h.r*10);g.addColorStop(0,'rgba(212,160,160,'+(h.bright*.3*p)+')');g.addColorStop(1,'rgba(212,160,160,0)');lCtx.fillStyle=g;lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r*10,0,TAU);lCtx.fill();lCtx.fillStyle='rgba(255,200,200,'+(h.bright*p)+')';lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r,0,TAU);lCtx.fill();lCtx.fillStyle='rgba(255,255,240,'+(h.bright*p*.8)+')';lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r*.35,0,TAU);lCtx.fill()});
   threadProg+=(threadTarget-threadProg)*.015;
-  if(threadProg>.01){const sx=heartStars[0].x*W,sy=heartStars[0].y*H,ex=heartStars[1].x*W,ey=heartStars[1].y*H,mx=(sx+ex)/2,my=Math.min(sy,ey)-70;lCtx.strokeStyle=`rgba(212,160,160,${threadProg*.4})`;lCtx.lineWidth=1.5;lCtx.shadowBlur=10;lCtx.shadowColor='rgba(212,160,160,.3)';lCtx.beginPath();lCtx.moveTo(sx,sy);lCtx.quadraticCurveTo(mx,my,sx+(ex-sx)*threadProg,sy+(ey-sy)*threadProg);lCtx.stroke();lCtx.shadowBlur=0;if(threadProg>.1){const tp=(ts*.0003)%1,px=sx+(ex-sx)*tp,py=sy+(ey-sy)*tp-(1-tp)*tp*140;lCtx.fillStyle=`rgba(212,160,160,${threadProg*.6})`;lCtx.beginPath();lCtx.arc(px,py,2.5,0,TAU);lCtx.fill()}}
-  if(landPhase>=3){const la=Math.min(1,(el-pTime[3])/1500);lCtx.font='400 22px "Cormorant Garamond"';lCtx.textAlign='center';lCtx.fillStyle=`rgba(212,160,160,${la*.85})`;lCtx.fillText('Rashmi \u2726',heartStars[0].x*W,heartStars[0].y*H+36);lCtx.fillText('Sharath \u2726',heartStars[1].x*W,heartStars[1].y*H+36)}
+  if(threadProg>.01){const sx=heartStars[0].x*W,sy=heartStars[0].y*H,ex=heartStars[1].x*W,ey=heartStars[1].y*H,mx=(sx+ex)/2,my=Math.min(sy,ey)-70;lCtx.strokeStyle='rgba(212,160,160,'+(threadProg*.4)+')';lCtx.lineWidth=1.5;lCtx.shadowBlur=10;lCtx.shadowColor='rgba(212,160,160,.3)';lCtx.beginPath();lCtx.moveTo(sx,sy);lCtx.quadraticCurveTo(mx,my,sx+(ex-sx)*threadProg,sy+(ey-sy)*threadProg);lCtx.stroke();lCtx.shadowBlur=0;if(threadProg>.1){const tp=(ts*.0003)%1,px=sx+(ex-sx)*tp,py=sy+(ey-sy)*tp-(1-tp)*tp*140;lCtx.fillStyle='rgba(212,160,160,'+(threadProg*.6)+')';lCtx.beginPath();lCtx.arc(px,py,2.5,0,TAU);lCtx.fill()}}
+  if(landPhase>=3){const la=Math.min(1,(el-pTime[3])/1500);lCtx.font='400 22px "Cormorant Garamond"';lCtx.textAlign='center';lCtx.fillStyle='rgba(212,160,160,'+(la*.85)+')';lCtx.fillText('Rashmi \u2726',heartStars[0].x*W,heartStars[0].y*H+36);lCtx.fillText('Sharath \u2726',heartStars[1].x*W,heartStars[1].y*H+36)}
   lCtx.restore();requestAnimationFrame(drawLanding);
 }
 requestAnimationFrame(drawLanding);
 
-/* ═══════════════════════════════════════════
-   ENTER
-   ═══════════════════════════════════════════ */
 $('enterBtn').addEventListener('click',()=>{
   if(phase!=='landing')return;phase='trans';$('landing').classList.add('out');iA();
-  setTimeout(()=>{$('landing').style.display='none';phase='universe';$('mainCanvas').classList.add('on');$('hud').classList.add('on');$('sideNav').classList.add('on');$('missBtn').classList.add('on');$('audio').classList.add('on');$('moonEl').classList.add('on');$('scrlH').classList.add('on');$('ytToggle').classList.add('on');$('scrollBar').style.height=(scrollP*100)+'vh';lab('Your Universe','Scroll to travel through time');setTimeout(()=>$('scrlH').classList.remove('on'),8000);updateAll();try{mkPiano()}catch(e){}},2500);
+  setTimeout(()=>{$('landing').style.display='none';phase='universe';$('skyWrap').classList.add('on');$('starCanvas').classList.add('on');$('hud').classList.add('on');$('sideNav').classList.add('on');$('missBtn').classList.add('on');$('audio').classList.add('on');$('moonEl').classList.add('on');$('scrlH').classList.add('on');$('ytToggle').classList.add('on');$('cityLabels').classList.add('on');$('scrollBar').style.height=(scrollP*100)+'vh';lab('Your Universe','Scroll to travel through time');setTimeout(()=>$('scrlH').classList.remove('on'),8000);updateAll();try{mkPiano()}catch(e){}},2500);
 });
 
-/* ═══════════════════════════════════════════
-   ASTRONOMICAL
-   ═══════════════════════════════════════════ */
 function toJD(date){const y=date.getUTCFullYear(),m=date.getUTCMonth()+1,d=date.getUTCDate()+date.getUTCHours()/24+date.getUTCMinutes()/1440;let Y=y,M=m;if(M<=2){Y--;M+=12}const A=Math.floor(Y/100),B=2-A+Math.floor(A/4);return Math.floor(365.25*(Y+4716))+Math.floor(30.6001*(M+1))+d+B-1524.5}
-function sunPos(date,lat,lng){const jd=toJD(date),T=(jd-2451545)/36525;const L0=(280.46646+T*(36000.76983+T*.0003032))%360;const M=(357.52911+T*(35999.05029-.0001537*T))%360;const Mr=M*PI/180;const C=(1.9146-.004817*T-.000014*T*T)*Math.sin(Mr)+(0.019993-.000101*T)*Math.sin(2*Mr)+.00029*Math.sin(3*Mr);const sunLon=(L0+C)*PI/180;const obliquity=(23.439-0.00000036*T)*PI/180;const decl=Math.asin(Math.sin(obliquity)*Math.sin(sunLon));const RA=Math.atan2(Math.cos(obliquity)*Math.sin(sunLon),Math.cos(sunLon));const djd=(jd-2451545);const GMST=(6.697375+.06570982441908*djd+1.00273790935+.000026*(T*T))*15*PI/180;let HA=GMST+lng*PI/180-RA;while(HA>PI)HA-=TAU;while(HA<-PI)HA+=TAU;const latR=lat*PI/180;const alt=Math.asin(Math.sin(latR)*Math.sin(decl)+Math.cos(latR)*Math.cos(decl)*Math.cos(HA));const az=Math.atan2(-Math.sin(HA),Math.tan(decl)*Math.cos(latR)-Math.sin(latR)*Math.cos(HA));return{altitude:alt*180/PI,azimuth:((az*180/PI)+360)%360,declination:decl*180/PI}}
+function sunAlt(date,lat,lng){const jd=toJD(date),T=(jd-2451545)/36525;const L0=(280.46646+T*(36000.76983+T*.0003032))%360;const M=(357.52911+T*(35999.05029-.0001537*T))%360;const Mr=M*PI/180;const C=(1.9146-.004817*T-.000014*T*T)*Math.sin(Mr)+(0.019993-.000101*T)*Math.sin(2*Mr)+.00029*Math.sin(3*Mr);const sunLon=(L0+C)*PI/180;const obliquity=(23.439-0.00000036*T)*PI/180;const decl=Math.asin(Math.sin(obliquity)*Math.sin(sunLon));const RA=Math.atan2(Math.cos(obliquity)*Math.sin(sunLon),Math.cos(sunLon));const djd=(jd-2451545);const GMST=(6.697375+.06570982441908*djd+1.00273790935+.000026*(T*T))*15*PI/180;let HA=GMST+lng*PI/180-RA;while(HA>PI)HA-=TAU;while(HA<-PI)HA+=TAU;const latR=lat*PI/180;const alt=Math.asin(Math.sin(latR)*Math.sin(decl)+Math.cos(latR)*Math.cos(decl)*Math.cos(HA));return alt*180/PI}
 function moonPhase(date){const jd=toJD(date),T=(jd-2451545)/36525;const L0=218.3165+T*481267.8813;const M=134.9634+T*477198.8676;const Mp=350.7374+T*445267.1115;const F=93.2720+T*483202.0175;const l=(L0+6.289*Math.sin(M*PI/180)+1.274*Math.sin((2*Mp-M)*PI/180)+.658*Math.sin(2*Mp*PI/180))%360;const age=(l-M)%360;const illum=(1+Math.cos(age*PI/180))/2;const phaseName=illum>.97?'Full Moon':illum>.5?'Waxing':illum>.03?'Waxing Crescent':'New Moon';return{illumination:Math.max(0,Math.min(1,illum)),age:((age%360)+360)%360/360*29.53,name:phaseName}}
 
-const stars=[{name:'Sirius',ra:101.29,dec:-16.72,mag:-1.46,flicker:0},{name:'Canopus',ra:95.99,dec:-52.70,mag:-0.74,flicker:.5},{name:'Arcturus',ra:213.92,dec:19.18,mag:-0.05,flicker:1},{name:'Vega',ra:279.23,dec:38.78,mag:0.03,flicker:1.5},{name:'Capella',ra:79.17,dec:46.00,mag:0.08,flicker:2},{name:'Rigel',ra:78.63,dec:-8.20,mag:0.13,flicker:2.5},{name:'Procyon',ra:114.83,dec:5.23,mag:0.34,flicker:3},{name:'Betelgeuse',ra:88.79,dec:7.41,mag:0.42,flicker:3.5},{name:'Altair',ra:297.70,dec:8.87,mag:0.76,flicker:4},{name:'Aldebaran',ra:68.98,dec:16.51,mag:0.87,flicker:4.5},{name:'Antares',ra:247.35,dec:-26.43,mag:1.09,flicker:5},{name:'Spica',ra:201.30,dec:-11.16,mag:1.04,flicker:5.5},{name:'Pollux',ra:116.33,dec:28.03,mag:1.14,flicker:6},{name:'Deneb',ra:310.36,dec:45.28,mag:1.25,flicker:6.5},{name:'Regulus',ra:152.09,dec:11.97,mag:1.40,flicker:7},{name:'Castor',ra:113.65,dec:31.89,mag:1.58,flicker:7.5},{name:'Shaula',ra:263.40,dec:-37.10,mag:1.63,flicker:8},{name:'Bellatrix',ra:81.28,dec:6.35,mag:1.64,flicker:8.5},{name:'Elnath',ra:81.57,dec:28.61,mag:1.65,flicker:9},{name:'Alioth',ra:193.51,dec:55.96,mag:1.77,flicker:9.5},{name:'Dubhe',ra:165.93,dec:61.75,mag:1.79,flicker:10},{name:'Mirfak',ra:51.08,dec:49.86,mag:1.80,flicker:10.5},{name:'Alkaid',ra:206.89,dec:49.31,mag:1.86,flicker:11},{name:'Mizar',ra:200.98,dec:54.93,mag:2.27,flicker:11.5},{name:'Saiph',ra:86.94,dec:-9.67,mag:2.06,flicker:12}];
-const bgStars2=[];for(let i=0;i<500;i++){bgStars2.push({ra:Math.random()*360,dec:(Math.random()-.5)*160,mag:2.5+Math.random()*2.5,flicker:Math.random()*TAU})}
+const DUBLIN={lat:53.3498,lng:-6.2603},BANGALORE={lat:12.9716,lng:77.5946};
 
-function drawSky(ctx,date,lat,lng,offsetX,halfW){
-  const sun=sunPos(date,lat,lng);
-  ctx.save();
-  try{
-  ctx.beginPath();ctx.rect(offsetX-1,0,halfW+2,H);ctx.clip();
-  const cx=offsetX+halfW/2;
-  /* ── Sky gradient based on sun altitude ── */
-  const grad=ctx.createLinearGradient(offsetX,0,offsetX,H);
-  if(sun.altitude>15){
-    grad.addColorStop(0,'#1e3a5f');grad.addColorStop(.3,'#3a6080');grad.addColorStop(.6,'#5a8ab0');grad.addColorStop(.85,'#8ab0cc');grad.addColorStop(1,'#c0d8e8');
-  }else if(sun.altitude>5){
-    grad.addColorStop(0,'#1a2a4a');grad.addColorStop(.3,'#2a4565');grad.addColorStop(.6,'#5a7a98');grad.addColorStop(.85,'#8aa0b8');grad.addColorStop(1,'#a0b8cc');
-  }else if(sun.altitude>-2){
-    grad.addColorStop(0,'#1a1020');grad.addColorStop(.1,'#2a1828');grad.addColorStop(.3,'#4a2530');grad.addColorStop(.5,'#7a3828');grad.addColorStop(.7,'#b06030');grad.addColorStop(.85,'#d09048');grad.addColorStop(1,'#e0b060');
-  }else if(sun.altitude>-8){
-    grad.addColorStop(0,'#141438');grad.addColorStop(.15,'#1e1e50');grad.addColorStop(.35,'#2a2a68');grad.addColorStop(.6,'#353580');grad.addColorStop(.85,'#404098');grad.addColorStop(1,'#4c4cb0');
-  }else{
-    grad.addColorStop(0,'#1a1a40');grad.addColorStop(.15,'#222255');grad.addColorStop(.35,'#2a2a6a');grad.addColorStop(.6,'#323280');grad.addColorStop(.85,'#3a3a95');grad.addColorStop(1,'#4242aa');
-  }
-  ctx.fillStyle=grad;ctx.fillRect(offsetX,0,halfW,H);
-  /* ── Horizon glow ── */
-  const hY=H*.92;
-  if(sun.altitude>-3&&sun.altitude<10){
-    const ga=Math.min(.35,Math.max(0,(10-sun.altitude)/12));
-    const hg=ctx.createRadialGradient(cx,hY,0,cx,hY,H*.55);
-    hg.addColorStop(0,`rgba(220,140,80,${ga})`);hg.addColorStop(.3,`rgba(180,100,60,${ga*.6})`);hg.addColorStop(.7,`rgba(100,50,40,${ga*.2})`);hg.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=hg;ctx.fillRect(offsetX,0,halfW,H);
-  }else if(sun.altitude>=-8&&sun.altitude<=-2){
-    const ga=Math.min(.2,(8+sun.altitude)/30);
-    const hg=ctx.createRadialGradient(cx,hY,0,cx,hY,H*.45);
-    hg.addColorStop(0,`rgba(80,60,120,${ga})`);hg.addColorStop(.5,`rgba(50,35,80,${ga*.4})`);hg.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=hg;ctx.fillRect(offsetX,0,halfW,H);
-  }else if(sun.altitude<-8){
-    const ga=Math.min(.06,(-8-sun.altitude)/-80+.03);
-    const hg=ctx.createRadialGradient(cx,hY,0,cx,hY,H*.35);
-    hg.addColorStop(0,`rgba(80,60,140,${ga})`);hg.addColorStop(.5,`rgba(40,30,80,${ga*.3})`);hg.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=hg;ctx.fillRect(offsetX,0,halfW,H);
-  }
-  /* ── Stars ── */
-  if(sun.altitude<4){
-    const sb=Math.min(1,(4-sun.altitude)/10);
-    bgStars2.forEach(s=>{
-      const sa=s.dec*PI/180;
-      const ha=(s.ra*PI/180-(date.getUTCHours()+date.getUTCMinutes()/60)*15*PI/180+lng*PI/180);
-      const x=cx+(ha%(TAU)-PI)*halfW/TAU*.6;
-      const y=H*.4-sa*H*.35;
-      if(x<offsetX-5||x>offsetX+halfW+5)return;
-      const fl=.5+.5*Math.sin(time*1.8+s.flicker);
-      const a=sb*(1-s.mag/5)*fl;if(a<.03)return;
-      ctx.fillStyle=`rgba(235,235,255,${a})`;ctx.beginPath();ctx.arc(x,y,2.5+s.mag*.5,0,TAU);ctx.fill();
-    });
-    stars.forEach(s=>{
-      const sa=s.dec*PI/180;
-      const ha=(s.ra*PI/180-(date.getUTCHours()+date.getUTCMinutes()/60)*15*PI/180+lng*PI/180);
-      const x=cx+(ha%(TAU)-PI)*halfW/TAU*.6;
-      const y=H*.4-sa*H*.35;
-      if(x<offsetX-5||x>offsetX+halfW+5)return;
-      const fl=.6+.4*Math.sin(time*1.3+s.flicker);
-      const a=sb*Math.max(0,1-s.mag/4)*fl;if(a<.03)return;
-      const sg=ctx.createRadialGradient(x,y,0,x,y,22);
-      sg.addColorStop(0,`rgba(212,160,160,${a*.5})`);sg.addColorStop(.3,`rgba(212,160,160,${a*.2})`);sg.addColorStop(.7,`rgba(212,160,160,${a*.05})`);sg.addColorStop(1,'rgba(212,160,160,0)');
-      ctx.fillStyle=sg;ctx.beginPath();ctx.arc(x,y,22,0,TAU);ctx.fill();
-      ctx.fillStyle=`rgba(255,248,248,${a})`;ctx.beginPath();ctx.arc(x,y,2.8,0,TAU);ctx.fill();
-      ctx.fillStyle=`rgba(255,255,255,${a*.9})`;ctx.beginPath();ctx.arc(x,y,1.2,0,TAU);ctx.fill();
-      if(a>.3&&s.mag<1.5){
-        ctx.fillStyle=`rgba(212,160,160,${a*.45})`;ctx.font='400 9px "Cormorant Garamond",Georgia,serif';ctx.textAlign='center';ctx.fillText(s.name,x,y-12);
-      }
-    });
-  }
-  /* ── Soft clouds ── */
-  ctx.globalAlpha=.04+.02*Math.sin(time*.0001);
-  for(let i=0;i<5;i++){
-    const cxx=cx+(.3*Math.sin(i*2.1+time*.00005)-.15)*halfW;
-    const cyy=H*(.12+i*.16);
-    const cg=ctx.createRadialGradient(cxx,cyy,0,cxx,cyy,120+i*20);
-    cg.addColorStop(0,'rgba(200,200,220,1)');cg.addColorStop(.5,'rgba(200,200,220,.4)');cg.addColorStop(1,'rgba(200,200,220,0)');
-    ctx.fillStyle=cg;ctx.beginPath();ctx.arc(cxx,cyy,120+i*20,0,TAU);ctx.fill();
-  }
-  ctx.globalAlpha=1;
-  /* ── Ground silhouette — city skyline ── */
-  const gnd=ctx.createLinearGradient(offsetX,H-60,offsetX,H);
-  gnd.addColorStop(0,'rgba(3,4,8,0)');gnd.addColorStop(.3,'rgba(3,4,8,.3)');gnd.addColorStop(1,'rgba(3,4,8,.7)');
-  ctx.fillStyle=gnd;ctx.beginPath();ctx.moveTo(offsetX,H);
-  const seed=lat*1000|0;
-  for(let i=0;i<=20;i++){
-    const gx=offsetX+(i/20)*halfW;
-    let gh=20+Math.abs(Math.sin(seed+i*1.7))*15+Math.abs(Math.cos(seed+i*2.3))*10;
-    if(i%4===0)gh*=1.3;
-    ctx.lineTo(gx,H-gh);
-  }
-  ctx.lineTo(offsetX+halfW,H);ctx.closePath();ctx.fill();
-  /* ── Tiny windows in buildings ── */
-  if(sun.altitude<0){
-    for(let i=0;i<8;i++){
-      const wx=offsetX+halfW*(.1+i*.1)+Math.sin(seed+i)*10;
-      const wy=H-25-Math.abs(Math.sin(seed+i*1.7))*12;
-      if(Math.sin(seed+i*3)>.2){ctx.fillStyle=`rgba(255,220,140,${.15+Math.sin(time*.5+i)*.1})`;ctx.fillRect(wx,wy,2,2)}
-    }
-  }
-  }finally{ctx.restore()}
+function skyGradient(alt){
+  if(alt>10)return'linear-gradient(180deg,#1e3a5f 0%,#3a6080 25%,#5a8ab0 50%,#8ab0cc 75%,#c0d8e8 100%)';
+  if(alt>-2)return'linear-gradient(180deg,#1a1020 0%,#2a1828 10%,#4a2530 25%,#7a3828 45%,#b06030 65%,#d09048 82%,#e0b060 100%)';
+  if(alt>-8)return'linear-gradient(180deg,#141438 0%,#1e1e50 15%,#2a2a68 35%,#353580 60%,#404098 85%,#4c4cb0 100%)';
+  return'linear-gradient(180deg,#0a0a2a 0%,#121240 20%,#1a1a55 40%,#222270 65%,#2a2a88 85%,#3232a0 100%)';
+}
+function horizonGlow(alt){
+  if(alt>-3&&alt<10){const a=Math.min(.4,Math.max(0,(10-alt)/12));return'radial-gradient(ellipse 120% 50% at 50% 95%,rgba(220,140,80,'+a+') 0%,rgba(180,100,60,'+(a*.5)+') 35%,transparent 70%)'}
+  if(alt>-8){const a=Math.min(.2,(8+alt)/30);return'radial-gradient(ellipse 100% 40% at 50% 95%,rgba(80,60,120,'+a+') 0%,rgba(50,35,80,'+(a*.4)+') 40%,transparent 80%)'}
+  if(alt<-8){const a=Math.min(.06,(-8-alt)/-80+.03);return'radial-gradient(ellipse 80% 30% at 50% 95%,rgba(80,60,140,'+a+') 0%,transparent 70%)'}
+  return'radial-gradient(ellipse 1px 1px at 50% 50%,transparent 0%,transparent 100%)';
 }
 
-const DUBLIN={lat:53.3498,lng:-6.2603},BANGALORE={lat:12.9716,lng:77.5946};
-const mainCanvas=$('mainCanvas'),mainCtx=mainCanvas.getContext('2d');
-const skyCanvas=$('skyCanvas'),skyCtx=skyCanvas.getContext('2d');
-function resize(){mainCanvas.width=W;mainCanvas.height=H;skyCanvas.width=W;skyCanvas.height=H}
-resize();addEventListener('resize',resize);
+const skyDub=$('skyDublin'),skyBan=$('skyBangalore');
+function updateSkies(date){
+  const altDub=sunAlt(date,DUBLIN.lat,DUBLIN.lng);
+  const altBan=sunAlt(date,BANGALORE.lat,BANGALORE.lng);
+  skyDub.style.background=skyGradient(altDub)+','+horizonGlow(altDub);
+  skyBan.style.background=skyGradient(altBan)+','+horizonGlow(altBan);
+  const hY=altDub>-3&&altDub<10?'rgba(220,140,80,.08)':altDub<-8?'rgba(80,60,140,.03)':'transparent';
+  skyDub.style.boxShadow='inset 0 -60px 120px -40px '+hY;
+  const hY2=altBan>-3&&altBan<10?'rgba(220,140,80,.08)':altBan<-8?'rgba(80,60,140,.03)':'transparent';
+  skyBan.style.boxShadow='inset 0 -60px 120px -40px '+hY2;
+}
+
+const starCanvas=$('starCanvas'),starCtx=starCanvas.getContext('2d');
+function resizeStar(){starCanvas.width=W;starCanvas.height=H}
+resizeStar();addEventListener('resize',resizeStar);
+
+const namedStars=[{name:'Sirius',ra:101.29,dec:-16.72,mag:-1.46},{name:'Canopus',ra:95.99,dec:-52.70,mag:-0.74},{name:'Arcturus',ra:213.92,dec:19.18,mag:-0.05},{name:'Vega',ra:279.23,dec:38.78,mag:0.03},{name:'Capella',ra:79.17,dec:46.00,mag:0.08},{name:'Rigel',ra:78.63,dec:-8.20,mag:0.13},{name:'Procyon',ra:114.83,dec:5.23,mag:0.34},{name:'Betelgeuse',ra:88.79,dec:7.41,mag:0.42},{name:'Altair',ra:297.70,dec:8.87,mag:0.76},{name:'Aldebaran',ra:68.98,dec:16.51,mag:0.87},{name:'Antares',ra:247.35,dec:-26.43,mag:1.09},{name:'Spica',ra:201.30,dec:-11.16,mag:1.04},{name:'Pollux',ra:116.33,dec:28.03,mag:1.14},{name:'Deneb',ra:310.36,dec:45.28,mag:1.25},{name:'Regulus',ra:152.09,dec:11.97,mag:1.40},{name:'Castor',ra:113.65,dec:31.89,mag:1.58},{name:'Shaula',ra:263.40,dec:-37.10,mag:1.63},{name:'Bellatrix',ra:81.28,dec:6.35,mag:1.64},{name:'Elnath',ra:81.57,dec:28.61,mag:1.65},{name:'Alioth',ra:193.51,dec:55.96,mag:1.77},{name:'Dubhe',ra:165.93,dec:61.75,mag:1.79},{name:'Mirfak',ra:51.08,dec:49.86,mag:1.80},{name:'Alkaid',ra:206.89,dec:49.31,mag:1.86},{name:'Mizar',ra:200.98,dec:54.93,mag:2.27},{name:'Saiph',ra:86.94,dec:-9.67,mag:2.06}];
+const bgStars2=[];for(let i=0;i<400;i++){bgStars2.push({ra:Math.random()*360,dec:(Math.random()-.5)*160,mag:2.5+Math.random()*2.5,flicker:Math.random()*TAU})}
+
+function drawStars(date){
+  starCtx.clearRect(0,0,W,H);
+  const altDub=sunAlt(date,DUBLIN.lat,DUBLIN.lng);
+  const altBan=sunAlt(date,BANGALORE.lat,BANGALORE.lng);
+  const avgAlt=(altDub+altBan)/2;
+  if(avgAlt>6)return;
+  const sb=Math.min(1,(6-avgAlt)/12);
+  const hour=date.getUTCHours()+date.getUTCMinutes()/60;
+  bgStars2.forEach(s=>{
+    const ha=s.ra*PI/180-hour*15*PI/180;
+    let hNorm=((ha%TAU)+TAU)%TAU;
+    if(hNorm>PI)hNorm-=TAU;
+    const x=W/2+(hNorm/PI)*W*.45;
+    const y=H*.45-s.dec*H*.004;
+    if(x<-5||x>W+5)return;
+    const fl=.5+.5*Math.sin(time*1.8+s.flicker);
+    const a=sb*(1-s.mag/5)*fl;if(a<.03)return;
+    starCtx.fillStyle='rgba(235,235,255,'+a+')';starCtx.beginPath();starCtx.arc(x,y,1.5+s.mag*.3,0,TAU);starCtx.fill();
+  });
+  namedStars.forEach(s=>{
+    const ha=s.ra*PI/180-hour*15*PI/180;
+    let hNorm=((ha%TAU)+TAU)%TAU;
+    if(hNorm>PI)hNorm-=TAU;
+    const x=W/2+(hNorm/PI)*W*.45;
+    const y=H*.45-s.dec*H*.004;
+    if(x<-5||x>W+5)return;
+    const fl=.6+.4*Math.sin(time*1.3+s.flicker*5);
+    const a=sb*Math.max(0,1-s.mag/4)*fl;if(a<.03)return;
+    const sg=starCtx.createRadialGradient(x,y,0,x,y,18);
+    sg.addColorStop(0,'rgba(212,160,160,'+(a*.4)+')');sg.addColorStop(.4,'rgba(212,160,160,'+(a*.15)+')');sg.addColorStop(1,'rgba(212,160,160,0)');
+    starCtx.fillStyle=sg;starCtx.beginPath();starCtx.arc(x,y,18,0,TAU);starCtx.fill();
+    starCtx.fillStyle='rgba(255,248,248,'+a+')';starCtx.beginPath();starCtx.arc(x,y,2.2,0,TAU);starCtx.fill();
+    starCtx.fillStyle='rgba(255,255,255,'+(a*.9)+')';starCtx.beginPath();starCtx.arc(x,y,1,0,TAU);starCtx.fill();
+    if(a>.3&&s.mag<1.5){
+      starCtx.fillStyle='rgba(212,160,160,'+(a*.4)+')';starCtx.font='400 9px "Cormorant Garamond",Georgia,serif';starCtx.textAlign='center';starCtx.fillText(s.name,x,y-12);
+    }
+  });
+}
 
 function updateAll(){
   if(phase!=='universe')return;
   const now=new Date();
   const baseHour=scrollP*24;
-  const hour=new Date(now.getFullYear(),now.getMonth(),now.getDate(),Math.floor(baseHour),Math.floor((baseHour%1)*60));
-  skyCtx.clearRect(0,0,W,H);try{drawSky(skyCtx,hour,DUBLIN.lat,DUBLIN.lng,0,W/2)}catch(e){console.warn('Dublin sky error',e)}
-  mainCtx.clearRect(0,0,W,H);try{drawSky(mainCtx,hour,BANGALORE.lat,BANGALORE.lng,W/2,W/2)}catch(e){console.warn('Bangalore sky error',e)}
-  /* Soft center divider — gradient fade */
-  const dg=mainCtx.createLinearGradient(W/2-40,0,W/2+40,0);
-  dg.addColorStop(0,'rgba(5,8,22,0)');dg.addColorStop(.35,'rgba(5,8,22,.5)');dg.addColorStop(.5,'rgba(5,8,22,.8)');dg.addColorStop(.65,'rgba(5,8,22,.5)');dg.addColorStop(1,'rgba(5,8,22,0)');
-  mainCtx.fillStyle=dg;mainCtx.fillRect(W/2-40,0,80,H);
-  /* City names — serif, centered in each half */
-  mainCtx.font='300 18px "Cormorant Garamond",Georgia,serif';
-  mainCtx.fillStyle='rgba(212,160,160,.6)';
-  mainCtx.textAlign='center';
-  mainCtx.fillText('Dublin',W/4,H-22);
-  mainCtx.fillText('Bangalore',W*3/4,H-22);
-  /* Subtle connecting thread between cities */
-  const now2=Date.now();
-  const tp=(now2*.00003)%1;
-  mainCtx.strokeStyle='rgba(212,160,160,.12)';mainCtx.lineWidth=1;
-  mainCtx.setLineDash([4,8]);mainCtx.lineDashOffset=-now2*.02;
-  mainCtx.beginPath();mainCtx.moveTo(W/4,H*.5);mainCtx.quadraticCurveTo(W/2,H*.25,W*3/4,H*.5);mainCtx.stroke();
-  mainCtx.setLineDash([]);
+  const hr=Math.floor(baseHour),mn=Math.floor((baseHour%1)*60);
+  const simDate=new Date(now.getFullYear(),now.getMonth(),now.getDate(),hr,mn);
+  updateSkies(simDate);
+  drawStars(simDate);
   updateClocks();updateMoon();updateWeather();tickFireflies();
 }
 
-/* ═══════════════════════════════════════════
-   MOON
-   ═══════════════════════════════════════════ */
 function updateMoon(){
-  const now=new Date(),moon=moonPhase(now),sun=sunPos(now,DUBLIN.lat,DUBLIN.lng),visible=sun.altitude<-6;
+  const now=new Date(),moon=moonPhase(now),alt=sunAlt(now,DUBLIN.lat,DUBLIN.lng),visible=alt<-6;
   const el=$('moonEl'),sz=visible?32:26;
   el.style.width=sz+'px';el.style.height=sz+'px';el.style.borderRadius='50%';
-  el.style.background=`radial-gradient(circle at ${40-moon.illumination*30}% 35%, #eee ${moon.illumination*60}%, #aaa ${40+moon.illumination*30}%, #666 100%)`;
-  el.style.boxShadow=`0 0 ${visible?24:10}px rgba(200,200,180,${visible?.15:.05})`;
+  el.style.background='radial-gradient(circle at '+(40-moon.illumination*30)+'% 35%, #eee '+(moon.illumination*60)+'%, #aaa '+(40+moon.illumination*30)+'%, #666 100%)';
+  el.style.boxShadow='0 0 '+(visible?24:10)+'px rgba(200,200,180,'+(visible?.15:.05)+')';
   el.onclick=()=>{
     const canvas=$('moonBig'),ctx=canvas.getContext('2d');canvas.width=120;canvas.height=120;
     ctx.beginPath();ctx.arc(60,60,50,0,TAU);const grd=ctx.createRadialGradient(60,60,0,60,60,50);grd.addColorStop(0,'#eee');grd.addColorStop(.7,'#ccc');grd.addColorStop(1,'#999');ctx.fillStyle=grd;ctx.fill();
-    ctx.beginPath();ctx.arc(60,60,50,0,TAU);ctx.fillStyle=`rgba(5,8,16,${1-moon.illumination})`;ctx.fill();
+    ctx.beginPath();ctx.arc(60,60,50,0,TAU);ctx.fillStyle='rgba(5,8,16,'+(1-moon.illumination)+')';ctx.fill();
     const msgs=['Tonight, the same moon hangs over Dublin and Bangalore. She looks up. He looks up. Same light. Two cities. One heart.','The moon doesn\'t care about borders or time zones. It just shines. The way your love does.','Some nights, the moon is all you have in common with someone far away. And somehow, that\'s enough.','He can\'t hold your hand tonight. But the moonlight falling on your skin is the same light touching his.'];
-    $('mDt').textContent=`${moon.name} \u2014 ${Math.round(moon.illumination*100)}% illuminated`;
+    $('mDt').textContent=moon.name+' \u2014 '+Math.round(moon.illumination*100)+'% illuminated';
     $('mMs').textContent=msgs[Math.floor(Math.random()*msgs.length)];
     $('moonOv').classList.add('open');
   };
 }
 
-/* ═══════════════════════════════════════════
-   PAPER AIRPLANE LETTERS
-   ═══════════════════════════════════════════ */
 function flyPlane(direction,color,delay){
   return new Promise(resolve=>{
     setTimeout(()=>{
@@ -672,7 +579,6 @@ function flyPlane(direction,color,delay){
         plane.style.transform='rotate('+angle+'deg) scale('+(1-p*.5)+')';
         plane.style.opacity=String(1-p*.7);
         plane.style.display='block';
-        /* Trail particles */
         if(p<.9&&Math.random()>.6){
           const trail=document.createElement('div');
           trail.style.cssText='position:fixed;width:3px;height:3px;border-radius:50%;background:'+color+';opacity:.4;z-index:17;pointer-events:none;left:'+(curX+14)+'px;top:'+(curY+14)+'px;transition:all .8s ease-out';
@@ -686,9 +592,6 @@ function flyPlane(direction,color,delay){
   });
 }
 
-/* ═══════════════════════════════════════════
-   FIREFLIES
-   ═══════════════════════════════════════════ */
 const ffs=[];
 function spawnFF(msg){
   const el=document.createElement('div');el.className='ff';el.title='A thought from Sharath';
@@ -700,9 +603,6 @@ function spawnFF(msg){
 }
 function tickFireflies(){ffs.forEach(f=>{f.ph+=.015;f.x+=Math.sin(f.ph)*1.2+f.vx;f.y+=Math.cos(f.ph*.6)*.6+f.vy;if(f.y<-10){f.y=H+10;f.x=Math.random()*W*.6+W*.2}f.el.style.left=f.x+'px';f.el.style.top=f.y+'px';f.el.style.opacity=.5+.4*Math.sin(f.ph*2.5)})}
 
-/* ═══════════════════════════════════════════
-   GALLERY
-   ═══════════════════════════════════════════ */
 const realPhotos=[
   {src:'web-photos/IMG_6095.JPG',date:'22 May 2025',title:'The day before',desc:'The eve of everything'},
   {src:'web-photos/IMG_6199.JPG',date:'23 May 2025',title:'Our wedding day',desc:'Coorg, Karnataka'},
@@ -738,9 +638,6 @@ function closePhoto(){$('photoViewer').classList.remove('open')}
 function navPhoto(d){const all=[...realPhotos,...userPhotos];pvIdx=(pvIdx+d+all.length)%all.length;openPhoto(pvIdx)}
 document.addEventListener('keydown',e=>{if(!$('photoViewer').classList.contains('open'))return;if(e.key==='Escape')closePhoto();if(e.key==='ArrowLeft')navPhoto(-1);if(e.key==='ArrowRight')navPhoto(1)});
 
-/* ═══════════════════════════════════════════
-   LETTERS — Our shared space
-   ═══════════════════════════════════════════ */
 const LETTERS_KEY='parallel_hearts_letters';
 const quickMsgs=[
   {icon:' miss',text:'I miss you',sub:'They\'ll know',msg:'I miss you so much. Every single day.'},
@@ -812,41 +709,23 @@ $('letSend').addEventListener('click',sendPlane);
 $('letTx')?.addEventListener('input',function(){$('letCnt').textContent=this.value.trim().split(/\s+/).filter(Boolean).length+' words'});
 renderInbox();renderSent();renderQuick();updateBadge();
 
-/* ═══════════════════════════════════════════
-   I MISS YOU
-   ═══════════════════════════════════════════ */
-  $('missBtn').addEventListener('click',()=>{
+$('missBtn').addEventListener('click',()=>{
   $('missBtn').classList.add('puls');setTimeout(()=>$('missBtn').classList.remove('puls'),1500);toast('They know');
 });
 function receiveMiss(){$('missPulse').classList.add('on');$('mName').textContent=sender==='Rashmi'?'Sharath':'Rashmi';$('missToast').classList.add('on');setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},3000);spawnFF('Thinking of you')}
 
-/* ═══════════════════════════════════════════
-   SCROLL
-   ═══════════════════════════════════════════ */
 addEventListener('wheel',e=>{if(phase!=='universe')return;scrollP=Math.max(0,Math.min(1,scrollP+e.deltaY*.0001));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
 let tSt=0;addEventListener('touchstart',e=>{tSt=e.touches[0].clientY});addEventListener('touchmove',e=>{if(phase!=='universe')return;const dy=tSt-e.touches[0].clientY;tSt=e.touches[0].clientY;scrollP=Math.max(0,Math.min(1,scrollP+dy*.0004));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
 
-/* ═══════════════════════════════════════════
-   HUD
-   ═══════════════════════════════════════════ */
 async function updateWeather(){try{const[d,b]=await Promise.all([fetch('https://wttr.in/Dublin?format=%C+%t').then(r=>r.text()).catch(()=>''),fetch('https://wttr.in/Bangalore?format=%C+%t').then(r=>r.text()).catch(()=>'')]);if(d)$('weDub').textContent=d.trim();if(b)$('weBan').textContent=b.trim()}catch(e){}}
 function updateClocks(){const now=new Date();$('clDub').textContent=new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);$('clBan').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);const target=new Date('2026-12-01'),diff=target-now;$('cdVal').textContent=diff>0?Math.floor(diff/864e5)+' days':'Home'}
 updateClocks();setInterval(updateClocks,10000);updateWeather();setInterval(updateWeather,600000);
 
-/* ═══════════════════════════════════════════
-   NAV
-   ═══════════════════════════════════════════ */
 document.querySelectorAll('.sn').forEach(s=>s.addEventListener('click',()=>{const sc=s.dataset.s;document.querySelectorAll('.sn').forEach(x=>x.classList.remove('act'));s.classList.add('act');if(sc==='letters'){$('letOv').classList.add('open');return}if(sc==='gallery'){$('gallery').classList.add('open');return}if(sc==='date'){$('dateOv').classList.add('open');return}if(sc==='flowers'){$('flowerOv').classList.add('open');return}if(sc==='moon'){$('moonEl').click();return}if(sc==='miss'){receiveMiss();return}lab(s.querySelector('.sl').textContent,'')}));
 
-/* ═══════════════════════════════════════════
-   LABEL & TOAST
-   ═══════════════════════════════════════════ */
 let labT;function lab(n,h){$('slNm').textContent=n;$('slHt').textContent=h||'';$('sLab').classList.add('on');clearTimeout(labT);labT=setTimeout(()=>$('sLab').classList.remove('on'),5000)}
 let toastT;function toast(t){$('tTx').textContent=t;$('toast').classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>$('toast').classList.remove('on'),3000)}
 
-/* ═══════════════════════════════════════════
-   AUDIO
-   ═══════════════════════════════════════════ */
 let actx=null;const asnd={};
 function iA(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume()}
 function mkPiano(){if(asnd.piano)return sS('piano');iA();
@@ -872,9 +751,6 @@ function mkNight(){if(asnd.night)return sS('night');iA();const o=actx.createOsci
 function sS(t){const s=asnd[t];if(!s)return;if(s.timer)clearTimeout(s.timer);if(s.masterGain)s.masterGain.gain.linearRampToValueAtTime(0,actx.currentTime+1);if(s.gain)s.gain.gain.linearRampToValueAtTime(0,actx.currentTime+1);setTimeout(()=>{if(s.osc)(Array.isArray(s.osc)?s.osc:[s.osc]).forEach(o=>{try{o.stop()}catch(e){}});if(s.noise)try{s.noise.stop()}catch(e){}},1100);delete asnd[t];document.querySelector('[data-s="'+t+'"]')?.classList.remove('act')}
 document.querySelectorAll('.ab').forEach(b=>b.addEventListener('click',()=>{const s=b.dataset.s;if(s==='piano')mkPiano();if(s==='rain')mkRain();if(s==='night')mkNight()}));
 
-/* ═══════════════════════════════════════════
-   DATE TONIGHT
-   ═══════════════════════════════════════════ */
 const dateActivities=[
   {icon:'\u2615',text:'Coffee',sub:'Virtual coffee date',msg:'Coffee together \u2014 you, me, same time, different cities. Tell me about your day.'},
   {icon:'\uD83C\uDFAC',text:'Movie Night',sub:'Pick something, press play',msg:'Movie night! Pick something we can both watch right now. Text me when you start.'},
@@ -898,9 +774,6 @@ function pickDate(i){
   spawnFF(sender+' wants to '+d.text.toLowerCase()+' with you');
 }
 
-/* ═══════════════════════════════════════════
-   VIRTUAL FLOWERS
-   ═══════════════════════════════════════════ */
 const flowerTypes=[
   {icon:'\uD83C\uDF38',text:'Rose',msg:'A single rose for you. Because you deserve beauty today.'},
   {icon:'\uD83C\uDF3C',text:'Sunflower',msg:'A sunflower \u2014 because you\'re the brightest part of my day.'},
@@ -915,7 +788,6 @@ function sendFlower(i){
   const f=flowerTypes[i];
   $('flowerOv').classList.remove('open');
   toast(f.msg);
-  /* Flower rain animation */
   const container=$('flowerRain');
   for(let j=0;j<25;j++){
     setTimeout(()=>{
@@ -930,9 +802,6 @@ function sendFlower(i){
   spawnFF(sender+' sent you '+f.text.toLowerCase());
 }
 
-/* ═══════════════════════════════════════════
-   PHOTO UPLOAD — both can add pictures
-   ═══════════════════════════════════════════ */
 function uploadPhotos(files){
   if(!files||!files.length)return;
   Array.from(files).forEach(f=>{
@@ -944,14 +813,8 @@ function uploadPhotos(files){
   });
 }
 
-/* ═══════════════════════════════════════════
-   YOUTUBE — Listen together
-   ═══════════════════════════════════════════ */
 let ytOpen=false;
-const defaultPlaylists=[
-  'dQw4w9WgXcQ','4NRlnxGkLws','kJQP7kiw5Fk','JGwWNGJdvx8','3JZ_D3ELwOQ',
-  'RgKAFK5djSk','fJ9rUzIMcZQ','CevxZvSJLk8','OPf0YbXqDm0','2Vv-BfVoq4g'
-];
+const defaultPlaylists=['dQw4w9WgXcQ','4NRlnxGkLws','kJQP7kiw5Fk','JGwWNGJdvx8','3JZ_D3ELwOQ','RgKAFK5djSk','fJ9rUzIMcZQ','CevxZvSJLk8','OPf0YbXqDm0','2Vv-BfVoq4g'];
 let ytIdx=0;
 function toggleYT(){
   ytOpen=!ytOpen;
@@ -963,9 +826,6 @@ function toggleYT(){
   }
 }
 
-/* ═══════════════════════════════════════════
-   LOOP
-   ═══════════════════════════════════════════ */
 let lastT=0;
 function loop(ts){time=ts/1000;if(phase==='universe'&&time-lastT>.03){updateAll();lastT=time}requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
