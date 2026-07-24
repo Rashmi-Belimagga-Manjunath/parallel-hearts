@@ -24,16 +24,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 #enterBtn.show{animation:btnPulse 3s ease-in-out infinite}
 @keyframes btnPulse{0%,100%{opacity:.5}50%{opacity:1}}
 
-/* ── HUD ── */
-#hud{position:fixed;top:0;left:0;right:0;z-index:12;display:flex;justify-content:space-between;align-items:flex-start;padding:24px 36px;opacity:0;transition:opacity 1.5s;pointer-events:none;background:linear-gradient(to bottom,rgba(5,8,22,.6) 0%,transparent 100%)}
+/* ── Main View ── */
+#mainCanvas{position:fixed;inset:0;z-index:1;opacity:0;transition:opacity 3s}
+#mainCanvas.on{opacity:1}
+#skyCanvas{position:fixed;inset:0;z-index:0}
+
+/* ── HUD — clean layout, no collisions ── */
+#hud{position:fixed;top:0;left:0;right:0;z-index:12;display:grid;grid-template-columns:1fr auto 1fr;align-items:start;padding:24px 40px;opacity:0;transition:opacity 1.5s;pointer-events:none;background:linear-gradient(to bottom,rgba(5,8,22,.8) 0%,rgba(5,8,22,.3) 60%,transparent 100%)}
 #hud.on{opacity:1;pointer-events:auto}
-.hc{text-align:right}.hc:first-child{text-align:left}
-.hc .cn{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,168,85,.5);font-weight:400}
-.hc .ct2{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(22px,3vw,34px);font-weight:300;color:#f0e6d2;letter-spacing:.02em;margin-top:2px}
-.hc .cd2{font-size:10px;color:rgba(200,168,85,.4);margin-top:3px;letter-spacing:.06em}
-.hcc{text-align:center;padding-top:4px}
-.hcc .cl{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(200,168,85,.45);font-weight:400}
-.hcc .cv{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(14px,1.8vw,18px);color:#c8a855;margin-top:4px}
+.hc-left{text-align:left}.hc-right{text-align:right}
+.hc .cn{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(200,168,85,.6);font-weight:400}
+.hc .ct2{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(24px,3.5vw,38px);font-weight:300;color:#f0e6d2;letter-spacing:.02em;margin-top:2px}
+.hc .cd2{font-size:10px;color:rgba(200,168,85,.5);margin-top:4px;letter-spacing:.06em}
+.hcc{text-align:center}
+.hcc .cl{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(200,168,85,.55);font-weight:400}
+.hcc .cv{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(18px,2.5vw,26px);color:#c8a855;margin-top:6px;letter-spacing:.04em}
+
+/* ── Moon — top left, below Dublin clock ── */
+#moonEl{position:fixed;z-index:13;cursor:pointer;opacity:0;transition:opacity .8s;pointer-events:none;top:100px;left:40px}
+#moonEl.on{opacity:1;pointer-events:auto}
+#moonEl:hover{filter:brightness(1.3)}
 
 /* ── Side Nav ── */
 #sideNav{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:12;display:flex;flex-direction:column;gap:0;opacity:0;transition:opacity 1.5s;pointer-events:none}
@@ -45,11 +55,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 .sn:hover .sl{color:rgba(200,168,85,.7)}
 .sn.act .sd{background:#c8a855;border-color:#c8a855;box-shadow:0 0 12px rgba(200,168,85,.4)}
 .sn.act .sl{color:#c8a855}
-
-/* ── Moon ── */
-#moonEl{position:fixed;z-index:12;cursor:pointer;opacity:0;transition:opacity .8s;pointer-events:none}
-#moonEl.on{opacity:1;pointer-events:auto}
-#moonEl:hover{filter:brightness(1.3)}
 
 /* ── I Miss You ── */
 #missBtn{position:fixed;bottom:40px;right:32px;z-index:12;width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(200,168,85,.2);background:rgba(5,8,16,.5);backdrop-filter:blur(12px);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .5s cubic-bezier(.16,1,.3,1);pointer-events:none}
@@ -94,7 +99,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 /* ── Scroll Bar ── */
 #scrollBar{position:fixed;right:0;top:0;width:2px;height:0;background:linear-gradient(to bottom,rgba(200,168,85,.4),rgba(200,168,85,.15));z-index:12;transition:height .3s;pointer-events:none}
 
-/* ── Photo Gallery ── */
+/* ── Gallery ── */
 #gallery{position:fixed;inset:0;z-index:22;background:rgba(5,8,16,.97);opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(200,168,85,.15) transparent}
 #gallery.open{opacity:1;visibility:visible}
 .gal-header{position:sticky;top:0;z-index:2;text-align:center;padding:32px 20px 20px;background:linear-gradient(to bottom,rgba(5,8,16,.98),transparent)}
@@ -111,10 +116,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 .gal-card .gc-date{font-size:8px;color:#c8a855;letter-spacing:.15em;text-transform:uppercase}
 .gal-card .gc-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;color:#f0e6d2;margin-top:3px;font-weight:300}
 .gal-card .gc-desc{font-size:9px;color:rgba(240,230,210,.35);margin-top:2px;font-style:italic}
-/* Wedding video card */
-.gal-card.video-card{background:linear-gradient(135deg,rgba(200,168,85,.08),rgba(5,8,16,.9));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px}
-.gal-card.video-card .play-icon{width:56px;height:56px;border-radius:50%;border:2px solid rgba(200,168,85,.3);display:flex;align-items:center;justify-content:center;color:#c8a855;font-size:20px;transition:all .3s}
-.gal-card.video-card:hover .play-icon{border-color:#c8a855;transform:scale(1.1);box-shadow:0 0 30px rgba(200,168,85,.15)}
 
 /* ── Photo Viewer ── */
 #photoViewer{position:fixed;inset:0;z-index:25;background:rgba(2,4,12,.96);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .6s cubic-bezier(.16,1,.3,1)}
@@ -179,25 +180,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 .letSend:hover{background:rgba(200,168,85,.1);border-color:rgba(200,168,85,.35)}
 .letEmpty{text-align:center;padding:40px 20px;color:rgba(200,168,85,.25);font-size:12px;letter-spacing:.08em;font-style:italic;font-family:'Cormorant Garamond',Georgia,serif}
 
+/* ── Paper Airplane ── */
+.pp{position:fixed;z-index:18;pointer-events:none;opacity:0;transition:none}
+.pp svg{filter:drop-shadow(0 0 8px rgba(200,168,85,.4))}
+.pp.incoming svg{stroke:#88b4d8;filter:drop-shadow(0 0 8px rgba(136,180,216,.4))}
+
 /* ── Firefly ── */
 .ff{position:fixed;z-index:15;width:7px;height:7px;border-radius:50%;background:#c8a855;box-shadow:0 0 12px rgba(200,168,85,.5),0 0 24px rgba(200,168,85,.2);pointer-events:auto;cursor:pointer;transition:box-shadow .3s}
 .ff:hover{box-shadow:0 0 24px rgba(200,168,85,.7),0 0 48px rgba(200,168,85,.3)}
 .ff.open{animation:fLand .7s cubic-bezier(.16,1,.3,1) forwards}
 @keyframes fLand{0%{transform:scale(1)}50%{transform:scale(1.8);box-shadow:0 0 40px rgba(200,168,85,.6)}100%{transform:scale(0);opacity:0}}
 
-/* ── Paper Plane ── */
-.pp{position:fixed;z-index:15;pointer-events:none;opacity:0}
-
 /* ── Time Overlay ── */
 #timeOv{position:fixed;inset:0;z-index:0;pointer-events:none;transition:background 3s}
 
 @media(max-width:768px){
-  #hud{padding:16px 18px}
+  #hud{padding:16px 18px;grid-template-columns:1fr 1fr}
   .hcc{display:none}
   #sideNav{right:10px}.sn .sl{display:none}
   #missBtn{bottom:20px;right:16px;width:42px;height:42px}
   #audio{bottom:20px;left:16px}
   .gal-grid{padding:16px 18px 40px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  #moonEl{left:18px;top:80px}
 }
 </style>
 </head>
@@ -215,9 +219,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 
 <!-- HUD -->
 <div id="hud">
-  <div class="hc"><div class="cn">Dublin</div><div class="ct2" id="clDub">--:--</div><div class="cd2" id="weDub"></div></div>
+  <div class="hc hc-left"><div class="cn">Dublin</div><div class="ct2" id="clDub">--:--</div><div class="cd2" id="weDub"></div></div>
   <div class="hcc"><div class="cl">Until we meet</div><div class="cv" id="cdVal"></div></div>
-  <div class="hc"><div class="cn">Bangalore</div><div class="ct2" id="clBan">--:--</div><div class="cd2" id="weBan"></div></div>
+  <div class="hc hc-right"><div class="cn">Bangalore</div><div class="ct2" id="clBan">--:--</div><div class="cd2" id="weBan"></div></div>
 </div>
 
 <!-- Constellation Nav -->
@@ -252,15 +256,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 
 <div id="toast"><div class="tt" id="tTx"></div></div>
 <div id="scrollBar"></div>
-
-<!-- Time Overlay -->
 <div id="timeOv"></div>
 
 <!-- Gallery -->
 <div id="gallery">
   <div class="gal-header">
     <div class="gal-title">Our Memories</div>
-    <div class="gal-sub">21 moments across 14 months</div>
+    <div class="gal-sub">Moments across 14 months</div>
     <button class="gal-close" onclick="document.getElementById('gallery').classList.remove('open')">&#10005;</button>
   </div>
   <div class="gal-grid" id="galGrid"></div>
@@ -321,20 +323,16 @@ const $=id=>document.getElementById(id);
 const PI=Math.PI,TAU=PI*2;
 let W=innerWidth,H=innerHeight;
 let phase='landing',scrollP=0,time=0;
-
 addEventListener('resize',()=>{W=innerWidth;H=innerHeight});
 
 /* ═══════════════════════════════════════════
    LANDING — Stars Being Born
    ═══════════════════════════════════════════ */
-const lCanvas=$('landCanvas');
-const lCtx=lCanvas.getContext('2d');
+const lCanvas=$('landCanvas'),lCtx=lCanvas.getContext('2d');
 function resizeLanding(){lCanvas.width=W;lCanvas.height=H}
-resizeLanding();
-addEventListener('resize',resizeLanding);
+resizeLanding();addEventListener('resize',resizeLanding);
 
 const bgStars=Array.from({length:50},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.5+.4,bright:Math.random()*.5+.15,flicker:Math.random()*TAU}));
-
 const constStars=[
   {x:.18,y:.28,r:1.8,bright:.6},{x:.14,y:.22,r:1.4,bright:.5},{x:.22,y:.2,r:1.3,bright:.48},
   {x:.12,y:.35,r:1.5,bright:.52},{x:.2,y:.38,r:1.2,bright:.45},{x:.16,y:.42,r:1.6,bright:.55},
@@ -343,123 +341,34 @@ const constStars=[
   {x:.35,y:.15,r:1.1,bright:.38},{x:.65,y:.12,r:1.2,bright:.4},{x:.5,y:.72,r:1,bright:.35},
   {x:.42,y:.68,r:1.1,bright:.37},{x:.58,y:.75,r:1,bright:.34},{x:.3,y:.6,r:.9,bright:.3},
 ];
-
 const constLines=[[0,1],[1,2],[0,3],[3,4],[4,5],[6,7],[7,8],[6,9],[9,10],[10,11],[12,13],[14,15],[16,17]];
-
-const heartStars=[
-  {x:.38,y:.48,r:3.5,bright:0,target:1,name:'Rashmi'},
-  {x:.62,y:.48,r:3.5,bright:0,target:1,name:'Sharath'},
-];
-
-let threadProg=0,threadTarget=0;
-let zoom=1,zoomTarget=1;
+const heartStars=[{x:.38,y:.48,r:3.5,bright:0,target:1},{x:.62,y:.48,r:3.5,bright:0,target:1}];
+let threadProg=0,threadTarget=0,zoom=1,zoomTarget=1;
 let landPhase=0,landStart=performance.now();
 const pTime=[800,2800,5000,7000,8500,10500,13000];
 
 function drawLanding(ts){
   if(phase!=='landing')return;
   const el=ts-landStart;
-  let np=0;
-  for(let i=pTime.length-1;i>=0;i--){if(el>pTime[i]){np=i+1;break}}
+  let np=0;for(let i=pTime.length-1;i>=0;i--){if(el>pTime[i]){np=i+1;break}}
   if(np!==landPhase){
     landPhase=np;
     if(landPhase===3){heartStars[0].target=1;heartStars[1].target=1}
     if(landPhase===4)threadTarget=1;
     if(landPhase===5)zoomTarget=.65;
-    if(landPhase===6){
-      $('titleBlock').style.opacity='1';
-      setTimeout(()=>{$('enterBtn').style.opacity='1';$('enterBtn').classList.add('show')},1500);
-    }
+    if(landPhase===6){$('titleBlock').style.opacity='1';setTimeout(()=>{$('enterBtn').style.opacity='1';$('enterBtn').classList.add('show')},1500)}
   }
-
-  lCtx.fillStyle='#050816';
-  lCtx.fillRect(0,0,W,H);
-
-  lCtx.save();
-  zoom+=(zoomTarget-zoom)*.008;
-  lCtx.translate(W/2,H/2);
-  lCtx.scale(zoom,zoom);
-  lCtx.translate(-W/2,-H/2);
-
-  /* Background stars */
+  lCtx.fillStyle='#050816';lCtx.fillRect(0,0,W,H);
+  lCtx.save();zoom+=(zoomTarget-zoom)*.008;lCtx.translate(W/2,H/2);lCtx.scale(zoom,zoom);lCtx.translate(-W/2,-H/2);
   const bgC=Math.min(bgStars.length,Math.floor(el/50));
-  bgStars.slice(0,bgC).forEach(s=>{
-    const f=.7+Math.sin(ts*.002+s.flicker)*.3;
-    lCtx.fillStyle=`rgba(240,230,210,${s.bright*f})`;
-    lCtx.beginPath();lCtx.arc(s.x*W,s.y*H,s.r,0,TAU);lCtx.fill();
-  });
-
-  /* Constellation stars */
-  if(landPhase>=1){
-    const cS=pTime[1];
-    const cC=Math.min(constStars.length,Math.floor((el-cS)/70));
-    constStars.slice(0,cC).forEach(s=>{
-      const f=.7+Math.sin(ts*.002+s.bright*10)*.3;
-      lCtx.fillStyle=`rgba(240,230,210,${s.bright*f})`;
-      lCtx.beginPath();lCtx.arc(s.x*W,s.y*H,s.r,0,TAU);lCtx.fill();
-    });
-  }
-
-  /* Constellation lines */
-  if(landPhase>=2){
-    const lS=pTime[2];
-    const lP=Math.min(1,(el-lS)/2000);
-    lCtx.strokeStyle=`rgba(200,168,85,${.12*lP})`;
-    lCtx.lineWidth=.6;
-    constLines.forEach((line,i)=>{
-      if(i/constLines.length>lP)return;
-      const a=constStars[line[0]],b=constStars[line[1]];
-      if(!a||!b)return;
-      lCtx.beginPath();lCtx.moveTo(a.x*W,a.y*H);lCtx.lineTo(b.x*W,b.y*H);lCtx.stroke();
-    });
-  }
-
-  /* Heart stars */
-  heartStars.forEach(h=>{
-    h.bright+=(h.target-h.bright)*.018;
-    if(h.bright<.01)return;
-    const p=.8+Math.sin(ts*.0015)*.2;
-    const g=lCtx.createRadialGradient(h.x*W,h.y*H,0,h.x*W,h.y*H,h.r*10);
-    g.addColorStop(0,`rgba(200,168,85,${h.bright*.3*p})`);
-    g.addColorStop(1,'rgba(200,168,85,0)');
-    lCtx.fillStyle=g;lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r*10,0,TAU);lCtx.fill();
-    lCtx.fillStyle=`rgba(255,215,100,${h.bright*p})`;
-    lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r,0,TAU);lCtx.fill();
-    lCtx.fillStyle=`rgba(255,255,240,${h.bright*p*.8})`;
-    lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r*.35,0,TAU);lCtx.fill();
-  });
-
-  /* Thread */
+  bgStars.slice(0,bgC).forEach(s=>{const f=.7+Math.sin(ts*.002+s.flicker)*.3;lCtx.fillStyle=`rgba(240,230,210,${s.bright*f})`;lCtx.beginPath();lCtx.arc(s.x*W,s.y*H,s.r,0,TAU);lCtx.fill()});
+  if(landPhase>=1){const cC=Math.min(constStars.length,Math.floor((el-pTime[1])/70));constStars.slice(0,cC).forEach(s=>{const f=.7+Math.sin(ts*.002+s.bright*10)*.3;lCtx.fillStyle=`rgba(240,230,210,${s.bright*f})`;lCtx.beginPath();lCtx.arc(s.x*W,s.y*H,s.r,0,TAU);lCtx.fill()})}
+  if(landPhase>=2){const lP=Math.min(1,(el-pTime[2])/2000);lCtx.strokeStyle=`rgba(200,168,85,${.12*lP})`;lCtx.lineWidth=.6;constLines.forEach((line,i)=>{if(i/constLines.length>lP)return;const a=constStars[line[0]],b=constStars[line[1]];if(!a||!b)return;lCtx.beginPath();lCtx.moveTo(a.x*W,a.y*H);lCtx.lineTo(b.x*W,b.y*H);lCtx.stroke()})}
+  heartStars.forEach(h=>{h.bright+=(h.target-h.bright)*.018;if(h.bright<.01)return;const p=.8+Math.sin(ts*.0015)*.2;const g=lCtx.createRadialGradient(h.x*W,h.y*H,0,h.x*W,h.y*H,h.r*10);g.addColorStop(0,`rgba(200,168,85,${h.bright*.3*p})`);g.addColorStop(1,'rgba(200,168,85,0)');lCtx.fillStyle=g;lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r*10,0,TAU);lCtx.fill();lCtx.fillStyle=`rgba(255,215,100,${h.bright*p})`;lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r,0,TAU);lCtx.fill();lCtx.fillStyle=`rgba(255,255,240,${h.bright*p*.8})`;lCtx.beginPath();lCtx.arc(h.x*W,h.y*H,h.r*.35,0,TAU);lCtx.fill()});
   threadProg+=(threadTarget-threadProg)*.015;
-  if(threadProg>.01){
-    const sx=heartStars[0].x*W,sy=heartStars[0].y*H;
-    const ex=heartStars[1].x*W,ey=heartStars[1].y*H;
-    const mx=(sx+ex)/2,my=Math.min(sy,ey)-70;
-    lCtx.strokeStyle=`rgba(200,168,85,${threadProg*.4})`;
-    lCtx.lineWidth=1.5;
-    lCtx.shadowBlur=10;lCtx.shadowColor='rgba(200,168,85,.3)';
-    lCtx.beginPath();lCtx.moveTo(sx,sy);
-    lCtx.quadraticCurveTo(mx,my,sx+(ex-sx)*threadProg,sy+(ey-sy)*threadProg);
-    lCtx.stroke();lCtx.shadowBlur=0;
-    if(threadProg>.1){
-      const tp=(ts*.0003)%1;
-      const px=sx+(ex-sx)*tp,py=sy+(ey-sy)*tp-(1-tp)*tp*140;
-      lCtx.fillStyle=`rgba(200,168,85,${threadProg*.6})`;
-      lCtx.beginPath();lCtx.arc(px,py,2.5,0,TAU);lCtx.fill();
-    }
-  }
-
-  /* Name labels */
-  if(landPhase>=3){
-    const la=Math.min(1,(el-pTime[3])/1500);
-    lCtx.font='300 15px "Cormorant Garamond"';lCtx.textAlign='center';
-    lCtx.fillStyle=`rgba(200,168,85,${la*.7})`;
-    lCtx.fillText('Rashmi \u2726',heartStars[0].x*W,heartStars[0].y*H+32);
-    lCtx.fillText('Sharath \u2726',heartStars[1].x*W,heartStars[1].y*H+32);
-  }
-
-  lCtx.restore();
-  requestAnimationFrame(drawLanding);
+  if(threadProg>.01){const sx=heartStars[0].x*W,sy=heartStars[0].y*H,ex=heartStars[1].x*W,ey=heartStars[1].y*H,mx=(sx+ex)/2,my=Math.min(sy,ey)-70;lCtx.strokeStyle=`rgba(200,168,85,${threadProg*.4})`;lCtx.lineWidth=1.5;lCtx.shadowBlur=10;lCtx.shadowColor='rgba(200,168,85,.3)';lCtx.beginPath();lCtx.moveTo(sx,sy);lCtx.quadraticCurveTo(mx,my,sx+(ex-sx)*threadProg,sy+(ey-sy)*threadProg);lCtx.stroke();lCtx.shadowBlur=0;if(threadProg>.1){const tp=(ts*.0003)%1,px=sx+(ex-sx)*tp,py=sy+(ey-sy)*tp-(1-tp)*tp*140;lCtx.fillStyle=`rgba(200,168,85,${threadProg*.6})`;lCtx.beginPath();lCtx.arc(px,py,2.5,0,TAU);lCtx.fill()}}
+  if(landPhase>=3){const la=Math.min(1,(el-pTime[3])/1500);lCtx.font='300 15px "Cormorant Garamond"';lCtx.textAlign='center';lCtx.fillStyle=`rgba(200,168,85,${la*.7})`;lCtx.fillText('Rashmi \u2726',heartStars[0].x*W,heartStars[0].y*H+32);lCtx.fillText('Sharath \u2726',heartStars[1].x*W,heartStars[1].y*H+32)}
+  lCtx.restore();requestAnimationFrame(drawLanding);
 }
 requestAnimationFrame(drawLanding);
 
@@ -467,217 +376,110 @@ requestAnimationFrame(drawLanding);
    ENTER
    ═══════════════════════════════════════════ */
 $('enterBtn').addEventListener('click',()=>{
-  if(phase!=='landing')return;
-  phase='trans';
-  $('landing').classList.add('out');
-  setTimeout(()=>{
-    $('landing').style.display='none';
-    phase='universe';
-    $('mainCanvas').classList.add('on');
-    $('hud').classList.add('on');
-    $('sideNav').classList.add('on');
-    $('missBtn').classList.add('on');
-    $('audio').classList.add('on');
-    $('moonEl').classList.add('on');
-    $('scrlH').classList.add('on');
-    lab('Your Universe','Scroll to travel through time');
-    setTimeout(()=>$('scrlH').classList.remove('on'),8000);
-    updateAll();
-  },2500);
+  if(phase!=='landing')return;phase='trans';$('landing').classList.add('out');
+  setTimeout(()=>{$('landing').style.display='none';phase='universe';$('mainCanvas').classList.add('on');$('hud').classList.add('on');$('sideNav').classList.add('on');$('missBtn').classList.add('on');$('audio').classList.add('on');$('moonEl').classList.add('on');$('scrlH').classList.add('on');lab('Your Universe','Scroll to travel through time');setTimeout(()=>$('scrlH').classList.remove('on'),8000);updateAll()},2500);
 });
 
 /* ═══════════════════════════════════════════
-   ASTRONOMICAL CALCULATIONS
+   ASTRONOMICAL
    ═══════════════════════════════════════════ */
 function toJD(date){const y=date.getUTCFullYear(),m=date.getUTCMonth()+1,d=date.getUTCDate()+date.getUTCHours()/24+date.getUTCMinutes()/1440;let Y=y,M=m;if(M<=2){Y--;M+=12}const A=Math.floor(Y/100),B=2-A+Math.floor(A/4);return Math.floor(365.25*(Y+4716))+Math.floor(30.6001*(M+1))+d+B-1524.5}
+function sunPos(date,lat,lng){const jd=toJD(date),T=(jd-2451545)/36525;const L0=(280.46646+T*(36000.76983+T*.0003032))%360;const M=(357.52911+T*(35999.05029-.0001537*T))%360;const Mr=M*PI/180;const C=(1.9146-.004817*T-.000014*T*T)*Math.sin(Mr)+(0.019993-.000101*T)*Math.sin(2*Mr)+.00029*Math.sin(3*Mr);const sunLon=(L0+C)*PI/180;const obliquity=(23.439-0.00000036*T)*PI/180;const decl=Math.asin(Math.sin(obliquity)*Math.sin(sunLon));const RA=Math.atan2(Math.cos(obliquity)*Math.sin(sunLon),Math.cos(sunLon));const djd=(jd-2451545);const GMST=(6.697375+.06570982441908*djd+1.00273790935+.000026*(T*T))*15*PI/180;let HA=GMST+lng*PI/180-RA;while(HA>PI)HA-=TAU;while(HA<-PI)HA+=TAU;const latR=lat*PI/180;const alt=Math.asin(Math.sin(latR)*Math.sin(decl)+Math.cos(latR)*Math.cos(decl)*Math.cos(HA));const az=Math.atan2(-Math.sin(HA),Math.tan(decl)*Math.cos(latR)-Math.sin(latR)*Math.cos(HA));return{altitude:alt*180/PI,azimuth:((az*180/PI)+360)%360,declination:decl*180/PI}}
+function moonPhase(date){const jd=toJD(date),T=(jd-2451545)/36525;const L0=218.3165+T*481267.8813;const M=134.9634+T*477198.8676;const Mp=350.7374+T*445267.1115;const F=93.2720+T*483202.0175;const l=(L0+6.289*Math.sin(M*PI/180)+1.274*Math.sin((2*Mp-M)*PI/180)+.658*Math.sin(2*Mp*PI/180))%360;const age=(l-M)%360;const illum=(1+Math.cos(age*PI/180))/2;const phaseName=illum>.97?'Full Moon':illum>.5?'Waxing':illum>.03?'Waxing Crescent':'New Moon';return{illumination:Math.max(0,Math.min(1,illum)),age:((age%360)+360)%360/360*29.53,name:phaseName}}
 
-function sunPos(date,lat,lng){
-  const jd=toJD(date),T=(jd-2451545)/36525;
-  const L0=(280.46646+T*(36000.76983+T*.0003032))%360;
-  const M=(357.52911+T*(35999.05029-.0001537*T))%360;
-  const Mr=M*PI/180;
-  const C=(1.9146-.004817*T-.000014*T*T)*Math.sin(Mr)+(0.019993-.000101*T)*Math.sin(2*Mr)+.00029*Math.sin(3*Mr);
-  const sunLon=(L0+C)*PI/180;
-  const obliquity=(23.439-0.00000036*T)*PI/180;
-  const decl=Math.asin(Math.sin(obliquity)*Math.sin(sunLon));
-  const RA=Math.atan2(Math.cos(obliquity)*Math.sin(sunLon),Math.cos(sunLon));
-  const djd=(jd-2451545);
-  const GMST=(6.697375+.06570982441908*djd+1.00273790935+.000026*(T*T))*15*PI/180;
-  let HA=GMST+lng*PI/180-RA;while(HA>PI)HA-=TAU;while(HA<-PI)HA+=TAU;
-  const latR=lat*PI/180;
-  const alt=Math.asin(Math.sin(latR)*Math.sin(decl)+Math.cos(latR)*Math.cos(decl)*Math.cos(HA));
-  const az=Math.atan2(-Math.sin(HA),Math.tan(decl)*Math.cos(latR)-Math.sin(latR)*Math.cos(HA));
-  return{altitude:alt*180/PI,azimuth:((az*180/PI)+360)%360,declination:decl*180/PI};
-}
-
-function moonPhase(date){
-  const jd=toJD(date),T=(jd-2451545)/36525;
-  const L0=218.3165+T*481267.8813;
-  const M=134.9634+T*477198.8676;
-  const Mp=350.7374+T*445267.1115;
-  const F=93.2720+T*483202.0175;
-  const e=1-T*.002516;
-  const l=(L0+6.289*Math.sin(M*PI/180)+1.274*Math.sin((2*Mp-M)*PI/180)+.658*Math.sin(2*Mp*PI/180))%360;
-  const b=(5.128*Math.sin(F*PI/180))%360;
-  const age=(l-M)%360;
-  const illum=(1+Math.cos(age*PI/180))/2;
-  const phaseName=illum>.97?'Full Moon':illum>.5?'Waxing':illum>.03?'Waxing Crescent':'New Moon';
-  return{illumination:Math.max(0,Math.min(1,illum)),age:((age%360)+360)%360/360*29.53,name:phaseName};
-}
-
-/* Star catalog */
-const stars=[
-  {name:'Sirius',ra:101.29,dec:-16.72,mag:-1.46},{name:'Canopus',ra:95.99,dec:-52.70,mag:-0.74},
-  {name:'Arcturus',ra:213.92,dec:19.18,mag:-0.05},{name:'Vega',ra:279.23,dec:38.78,mag:0.03},
-  {name:'Capella',ra:79.17,dec:46.00,mag:0.08},{name:'Rigel',ra:78.63,dec:-8.20,mag:0.13},
-  {name:'Procyon',ra:114.83,dec:5.23,mag:0.34},{name:'Betelgeuse',ra:88.79,dec:7.41,mag:0.42},
-  {name:'Achernar',ra:24.43,dec:-57.24,mag:0.46},{name:'Hadar',ra:210.96,dec:-60.37,mag:0.61},
-  {name:'Altair',ra:297.70,dec:8.87,mag:0.76},{name:'Aldebaran',ra:68.98,dec:16.51,mag:0.87},
-  {name:'Antares',ra:247.35,dec:-26.43,mag:1.09},{name:'Spica',ra:201.30,dec:-11.16,mag:1.04},
-  {name:'Pollux',ra:116.33,dec:28.03,mag:1.14},{name:'Fomalhaut',ra:344.41,dec:-29.62,mag:1.16},
-  {name:'Deneb',ra:310.36,dec:45.28,mag:1.25},{name:'Mimosa',ra:191.93,dec:-59.69,mag:1.25},
-  {name:'Regulus',ra:152.09,dec:11.97,mag:1.40},{name:'Adhara',ra:104.66,dec:-28.97,mag:1.50},
-  {name:'Castor',ra:113.65,dec:31.89,mag:1.58},{name:'Shaula',ra:263.40,dec:-37.10,mag:1.63},
-  {name:'Bellatrix',ra:81.28,dec:6.35,mag:1.64},{name:'Elnath',ra:81.57,dec:28.61,mag:1.65},
-  {name:'Miaplacidus',ra:138.30,dec:-69.72,mag:1.68},{name:'Alnilam',ra:84.05,dec:-1.20,mag:1.69},
-  {name:'Alnair',ra:332.06,dec:-46.96,mag:1.74},{name:'Alioth',ra:193.51,dec:55.96,mag:1.77},
-  {name:'Dubhe',ra:165.93,dec:61.75,mag:1.79},{name:'Mirfak',ra:51.08,dec:49.86,mag:1.80},
-  {name:'Wezen',ra:107.10,dec:-26.39,mag:1.84},{name:'Sargas',ra:264.33,dec:-43.00,mag:1.87},
-  {name:'Kaus Australis',ra:276.04,dec:-34.38,mag:1.85},{name:'Avior',ra:125.63,dec:-59.51,mag:1.86},
-  {name:'Alkaid',ra:206.89,dec:49.31,mag:1.86},{name:'Menkent',ra:211.67,dec:-36.37,mag:1.86},
-  {name:'Alpheratz',ra:2.10,dec:29.09,mag:2.06},{name:'Mirach',ra:17.43,dec:35.62,mag:2.06},
-  {name:'Kochab',ra:222.68,dec:74.16,mag:2.08},{name:'Rasalhague',ra:263.73,dec:12.56,mag:2.08},
-  {name:'Algol',ra:47.00,dec:40.96,mag:2.12},{name:'Almach',ra:14.18,dec:42.33,mag:2.17},
-  {name:'Mizar',ra:200.98,dec:54.93,mag:2.27},{name:'Saiph',ra:86.94,dec:-9.67,mag:2.06},
-];
-
-const bgStars2=[];
-for(let i=0;i<300;i++){bgStars2.push({ra:Math.random()*360,dec:(Math.random()-.5)*160,mag:2.5+Math.random()*2.5,flicker:Math.random()*TAU})}
+const stars=[{name:'Sirius',ra:101.29,dec:-16.72,mag:-1.46},{name:'Canopus',ra:95.99,dec:-52.70,mag:-0.74},{name:'Arcturus',ra:213.92,dec:19.18,mag:-0.05},{name:'Vega',ra:279.23,dec:38.78,mag:0.03},{name:'Capella',ra:79.17,dec:46.00,mag:0.08},{name:'Rigel',ra:78.63,dec:-8.20,mag:0.13},{name:'Procyon',ra:114.83,dec:5.23,mag:0.34},{name:'Betelgeuse',ra:88.79,dec:7.41,mag:0.42},{name:'Altair',ra:297.70,dec:8.87,mag:0.76},{name:'Aldebaran',ra:68.98,dec:16.51,mag:0.87},{name:'Antares',ra:247.35,dec:-26.43,mag:1.09},{name:'Spica',ra:201.30,dec:-11.16,mag:1.04},{name:'Pollux',ra:116.33,dec:28.03,mag:1.14},{name:'Deneb',ra:310.36,dec:45.28,mag:1.25},{name:'Regulus',ra:152.09,dec:11.97,mag:1.40},{name:'Castor',ra:113.65,dec:31.89,mag:1.58},{name:'Shaula',ra:263.40,dec:-37.10,mag:1.63},{name:'Bellatrix',ra:81.28,dec:6.35,mag:1.64},{name:'Elnath',ra:81.57,dec:28.61,mag:1.65},{name:'Alioth',ra:193.51,dec:55.96,mag:1.77},{name:'Dubhe',ra:165.93,dec:61.75,mag:1.79},{name:'Mirfak',ra:51.08,dec:49.86,mag:1.80},{name:'Alkaid',ra:206.89,dec:49.31,mag:1.86},{name:'Mizar',ra:200.98,dec:54.93,mag:2.27},{name:'Saiph',ra:86.94,dec:-9.67,mag:2.06}];
+const bgStars2=[];for(let i=0;i<300;i++){bgStars2.push({ra:Math.random()*360,dec:(Math.random()-.5)*160,mag:2.5+Math.random()*2.5,flicker:Math.random()*TAU})}
 
 function drawSky(ctx,date,lat,lng,offsetX){
   const sun=sunPos(date,lat,lng);
-  const moon=moonPhase(date);
   const grad=ctx.createLinearGradient(offsetX,0,offsetX,H);
-  if(sun.altitude>5){
-    grad.addColorStop(0,'#1a2a4a');grad.addColorStop(.3,'#2a4060');grad.addColorStop(.6,'#4a6888');grad.addColorStop(1,'#6a8aa8');
-  }else if(sun.altitude>-2){
-    grad.addColorStop(0,'#0a0c18');grad.addColorStop(.2,'#1a1420');grad.addColorStop(.5,'#3a2018');grad.addColorStop(.8,'#6a3820');grad.addColorStop(1,'#8a5030');
-  }else if(sun.altitude>-8){
-    grad.addColorStop(0,'#060810');grad.addColorStop(.3,'#100e18');grad.addColorStop(.6,'#201820');grad.addColorStop(1,'#302028');
-  }else{
-    grad.addColorStop(0,'#020408');grad.addColorStop(.3,'#050810');grad.addColorStop(.6,'#080c18');grad.addColorStop(1,'#0a1020');
-  }
+  if(sun.altitude>5){grad.addColorStop(0,'#1a2a4a');grad.addColorStop(.3,'#2a4060');grad.addColorStop(.6,'#4a6888');grad.addColorStop(1,'#6a8aa8')}
+  else if(sun.altitude>-2){grad.addColorStop(0,'#0a0c18');grad.addColorStop(.2,'#1a1420');grad.addColorStop(.5,'#3a2018');grad.addColorStop(.8,'#6a3820');grad.addColorStop(1,'#8a5030')}
+  else if(sun.altitude>-8){grad.addColorStop(0,'#060810');grad.addColorStop(.3,'#100e18');grad.addColorStop(.6,'#201820');grad.addColorStop(1,'#302028')}
+  else{grad.addColorStop(0,'#020408');grad.addColorStop(.3,'#050810');grad.addColorStop(.6,'#080c18');grad.addColorStop(1,'#0a1020')}
   ctx.fillStyle=grad;ctx.fillRect(offsetX,0,W,H);
-
   if(sun.altitude<0){
     const sb=Math.min(1,Math.abs(sun.altitude)/8);
-    bgStars2.forEach(s=>{
-      const sa=s.dec*PI/180;
-      const ha=(s.ra*PI/180-(date.getUTCHours()+date.getUTCMinutes()/60)*15*PI/180+lng*PI/180);
-      const x=offsetX+W/2+(ha%(TAU)-PI)*W/TAU*.5;
-      const y=H/2-sa*H/PI;
-      if(x<offsetX-10||x>offsetX+W+10)return;
-      const fl=.5+.5*Math.sin(time*2+s.flicker);
-      const a=sb*(1-s.mag/5)*fl;
-      if(a<=0)return;
-      ctx.fillStyle=`rgba(240,230,210,${a})`;
-      ctx.beginPath();ctx.arc(x,y,.8+s.mag*.3,0,TAU);ctx.fill();
-    });
-    stars.forEach(s=>{
-      const sa=s.dec*PI/180;
-      const ha=(s.ra*PI/180-(date.getUTCHours()+date.getUTCMinutes()/60)*15*PI/180+lng*PI/180);
-      const x=offsetX+W/2+(ha%(TAU)-PI)*W/TAU*.5;
-      const y=H/2-sa*H/PI;
-      if(x<offsetX-10||x>offsetX+W+10)return;
-      const fl=.7+.3*Math.sin(time*1.5+s.flicker);
-      const a=sb*Math.max(0,1-s.mag/4)*fl;
-      if(a<=0)return;
-      ctx.fillStyle=`rgba(240,230,210,${a})`;
-      ctx.beginPath();ctx.arc(x,y,1.2,0,TAU);ctx.fill();
-      if(a>.3&&s.mag<1.5){
-        ctx.fillStyle=`rgba(200,168,85,${a*.3})`;
-        ctx.font='300 7px Inter';ctx.textAlign='center';
-        ctx.fillText(s.name,x,y-6);
-      }
-    });
+    bgStars2.forEach(s=>{const sa=s.dec*PI/180;const ha=(s.ra*PI/180-(date.getUTCHours()+date.getUTCMinutes()/60)*15*PI/180+lng*PI/180);const x=offsetX+W/2+(ha%(TAU)-PI)*W/TAU*.5;const y=H/2-sa*H/PI;if(x<offsetX-10||x>offsetX+W+10)return;const fl=.5+.5*Math.sin(time*2+s.flicker);const a=sb*(1-s.mag/5)*fl;if(a<=0)return;ctx.fillStyle=`rgba(240,230,210,${a})`;ctx.beginPath();ctx.arc(x,y,.8+s.mag*.3,0,TAU);ctx.fill()});
+    stars.forEach(s=>{const sa=s.dec*PI/180;const ha=(s.ra*PI/180-(date.getUTCHours()+date.getUTCMinutes()/60)*15*PI/180+lng*PI/180);const x=offsetX+W/2+(ha%(TAU)-PI)*W/TAU*.5;const y=H/2-sa*H/PI;if(x<offsetX-10||x>offsetX+W+10)return;const fl=.7+.3*Math.sin(time*1.5+s.flicker);const a=sb*Math.max(0,1-s.mag/4)*fl;if(a<=0)return;ctx.fillStyle=`rgba(240,230,210,${a})`;ctx.beginPath();ctx.arc(x,y,1.2,0,TAU);ctx.fill();if(a>.3&&s.mag<1.5){ctx.fillStyle=`rgba(200,168,85,${a*.3})`;ctx.font='300 7px Inter';ctx.textAlign='center';ctx.fillText(s.name,x,y-6)}})
   }
 }
 
-const DUBLIN={lat:53.3498,lng:-6.2603};
-const BANGALORE={lat:12.9716,lng:77.5946};
-
+const DUBLIN={lat:53.3498,lng:-6.2603},BANGALORE={lat:12.9716,lng:77.5946};
 const mainCanvas=$('mainCanvas'),mainCtx=mainCanvas.getContext('2d');
 const skyCanvas=$('skyCanvas'),skyCtx=skyCanvas.getContext('2d');
-
 function resize(){mainCanvas.width=W;mainCanvas.height=H;skyCanvas.width=W;skyCanvas.height=H}
 resize();addEventListener('resize',resize);
 
 function updateAll(){
   if(phase!=='universe')return;
   const now=new Date();
-  const timeOfDay=scrollP;
-  const baseHour=timeOfDay*24;
+  const baseHour=scrollP*24;
   const hour=new Date(now.getFullYear(),now.getMonth(),now.getDate(),Math.floor(baseHour),Math.floor((baseHour%1)*60));
-
-  skyCtx.clearRect(0,0,W,H);
-  drawSky(skyCtx,hour,DUBLIN.lat,DUBLIN.lng,0);
-
-  mainCtx.clearRect(0,0,W,H);
-  drawSky(mainCtx,hour,BANGALORE.lat,BANGALORE.lng,W/2);
-
-  /* Divider */
-  mainCtx.strokeStyle='rgba(200,168,85,.08)';
-  mainCtx.lineWidth=1;
-  mainCtx.beginPath();mainCtx.moveTo(W/2,0);mainCtx.lineTo(W/2,H);mainCtx.stroke();
-
-  /* City labels */
+  skyCtx.clearRect(0,0,W,H);drawSky(skyCtx,hour,DUBLIN.lat,DUBLIN.lng,0);
+  mainCtx.clearRect(0,0,W,H);drawSky(mainCtx,hour,BANGALORE.lat,BANGALORE.lng,W/2);
+  mainCtx.strokeStyle='rgba(200,168,85,.08)';mainCtx.lineWidth=1;mainCtx.beginPath();mainCtx.moveTo(W/2,0);mainCtx.lineTo(W/2,H);mainCtx.stroke();
   mainCtx.font='300 9px Inter';mainCtx.fillStyle='rgba(200,168,85,.25)';mainCtx.textAlign='center';
-  mainCtx.fillText('DUBLIN',W/4,H-40);
-  mainCtx.fillText('BANGALORE',W*3/4,H-40);
-
-  updateClocks();
-  updateMoon();
-  updateWeather();
-  tickFireflies();
+  mainCtx.fillText('DUBLIN',W/4,H-40);mainCtx.fillText('BANGALORE',W*3/4,H-40);
+  updateClocks();updateMoon();updateWeather();tickFireflies();
 }
 
 /* ═══════════════════════════════════════════
    MOON
    ═══════════════════════════════════════════ */
 function updateMoon(){
-  const now=new Date();
-  const moon=moonPhase(now);
-  const sun=sunPos(now,DUBLIN.lat,DUBLIN.lng);
-  const visible=sun.altitude<-6;
-  const el=$('moonEl');
-  const sz=visible?32:26;
-  el.style.width=sz+'px';el.style.height=sz+'px';
-  el.style.borderRadius='50%';
+  const now=new Date(),moon=moonPhase(now),sun=sunPos(now,DUBLIN.lat,DUBLIN.lng),visible=sun.altitude<-6;
+  const el=$('moonEl'),sz=visible?32:26;
+  el.style.width=sz+'px';el.style.height=sz+'px';el.style.borderRadius='50%';
   el.style.background=`radial-gradient(circle at ${40-moon.illumination*30}% 35%, #eee ${moon.illumination*60}%, #aaa ${40+moon.illumination*30}%, #666 100%)`;
   el.style.boxShadow=`0 0 ${visible?24:10}px rgba(200,200,180,${visible?.15:.05})`;
-  el.style.top='52px';el.style.left='50%';el.style.transform='translateX(-50%)';
-
   el.onclick=()=>{
-    const canvas=$('moonBig');
-    const ctx=canvas.getContext('2d');
-    canvas.width=120;canvas.height=120;
-    ctx.beginPath();ctx.arc(60,60,50,0,TAU);
-    const grd=ctx.createRadialGradient(60,60,0,60,60,50);
-    grd.addColorStop(0,'#eee');grd.addColorStop(.7,'#ccc');grd.addColorStop(1,'#999');
-    ctx.fillStyle=grd;ctx.fill();
-    ctx.beginPath();ctx.arc(60,60,50,0,TAU);
-    ctx.fillStyle=`rgba(5,8,16,${1-moon.illumination})`;ctx.fill();
-
-    const msgs=[
-      'Tonight, the same moon hangs over Dublin and Bangalore. She looks up. He looks up. Same light. Two cities. One heart.',
-      'The moon doesn\'t care about borders or time zones. It just shines. The way your love does.',
-      'Some nights, the moon is all you have in common with someone far away. And somehow, that\'s enough.',
-      'He can\'t hold your hand tonight. But the moonlight falling on your skin is the same light touching his.',
-    ];
-    $('mDt').textContent=`${moon.name} — ${Math.round(moon.illumination*100)}% illuminated`;
+    const canvas=$('moonBig'),ctx=canvas.getContext('2d');canvas.width=120;canvas.height=120;
+    ctx.beginPath();ctx.arc(60,60,50,0,TAU);const grd=ctx.createRadialGradient(60,60,0,60,60,50);grd.addColorStop(0,'#eee');grd.addColorStop(.7,'#ccc');grd.addColorStop(1,'#999');ctx.fillStyle=grd;ctx.fill();
+    ctx.beginPath();ctx.arc(60,60,50,0,TAU);ctx.fillStyle=`rgba(5,8,16,${1-moon.illumination})`;ctx.fill();
+    const msgs=['Tonight, the same moon hangs over Dublin and Bangalore. She looks up. He looks up. Same light. Two cities. One heart.','The moon doesn\'t care about borders or time zones. It just shines. The way your love does.','Some nights, the moon is all you have in common with someone far away. And somehow, that\'s enough.','He can\'t hold your hand tonight. But the moonlight falling on your skin is the same light touching his.'];
+    $('mDt').textContent=`${moon.name} \u2014 ${Math.round(moon.illumination*100)}% illuminated`;
     $('mMs').textContent=msgs[Math.floor(Math.random()*msgs.length)];
     $('moonOv').classList.add('open');
   };
+}
+
+/* ═══════════════════════════════════════════
+   PAPER AIRPLANE LETTERS
+   ═══════════════════════════════════════════ */
+function flyPlane(direction,color,delay){
+  return new Promise(resolve=>{
+    setTimeout(()=>{
+      const plane=document.createElement('div');
+      plane.className='pp'+(direction==='incoming'?' incoming':'');
+      plane.innerHTML='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="1.2"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>';
+      document.body.appendChild(plane);
+      let sx,sy,ex,ey;
+      if(direction==='outgoing'){sx=W*.55;sy=H*.45;ex=-40;ey=H*.1}
+      else{sx=-40;sy=H*.1;ex=W*.55;ey=H*.45}
+      const st=performance.now();
+      (function anim(now){
+        const p=Math.min(1,(now-st)/2800);
+        const e=1-Math.pow(1-p,3);
+        const curX=sx+(ex-sx)*e;
+        const curY=sy+(ey-sy)*e-Math.sin(p*PI)*100;
+        const angle=direction==='outgoing'?-45+p*320:135-p*320;
+        plane.style.left=curX+'px';plane.style.top=curY+'px';
+        plane.style.transform='rotate('+angle+'deg) scale('+(1-p*.5)+')';
+        plane.style.opacity=String(1-p*.7);
+        plane.style.display='block';
+        /* Trail particles */
+        if(p<.9&&Math.random()>.6){
+          const trail=document.createElement('div');
+          trail.style.cssText='position:fixed;width:3px;height:3px;border-radius:50%;background:'+color+';opacity:.4;z-index:17;pointer-events:none;left:'+(curX+14)+'px;top:'+(curY+14)+'px;transition:all .8s ease-out';
+          document.body.appendChild(trail);
+          setTimeout(()=>{trail.style.opacity='0';trail.style.transform='scale(0)';setTimeout(()=>trail.remove(),800)},50);
+        }
+        if(p<1)requestAnimationFrame(anim);
+        else{plane.remove();resolve()}
+      })(performance.now());
+    },delay);
+  });
 }
 
 /* ═══════════════════════════════════════════
@@ -685,10 +487,8 @@ function updateMoon(){
    ═══════════════════════════════════════════ */
 const ffs=[];
 function spawnFF(msg){
-  const el=document.createElement('div');el.className='ff';
-  el.title='A thought from Sharath';
-  const sx=Math.random()*W*.6+W*.2,sy=H+10;
-  el.style.left=sx+'px';el.style.top=sy+'px';
+  const el=document.createElement('div');el.className='ff';el.title='A thought from Sharath';
+  const sx=Math.random()*W*.6+W*.2,sy=H+10;el.style.left=sx+'px';el.style.top=sy+'px';
   document.body.appendChild(el);
   const d={el,x:sx,y:sy,vx:(Math.random()-.5)*1.5,vy:-.8-Math.random()*1.5,ph:Math.random()*TAU,msg};
   ffs.push(d);
@@ -722,39 +522,13 @@ const realPhotos=[
   {src:'web-photos/794DBFFB-B01E-4FD8-A95A-BC9570CE11A1.PNG',date:'7 Jun 2025',title:'Us',desc:''},
   {src:'web-photos/76837D23-7E43-41C0-8B37-BC20FD779707.PNG',date:'18 Jul 2026',title:'Today',desc:'Still looking at the same moon'},
 ];
-
-function buildGallery(){
-  const grid=$('galGrid');
-  grid.innerHTML=realPhotos.map((p,i)=>`
-    <div class="gal-card" onclick="openPhoto(${i})">
-      <img src="${p.src}" alt="${p.title}" loading="lazy">
-      <div class="gc-info">
-        <div class="gc-date">${p.date}</div>
-        <div class="gc-title">${p.title}</div>
-        ${p.desc?`<div class="gc-desc">${p.desc}</div>`:''}
-      </div>
-    </div>
-  `).join('');
-}
+function buildGallery(){$('galGrid').innerHTML=realPhotos.map((p,i)=>'<div class="gal-card" onclick="openPhoto('+i+')"><img src="'+p.src+'" alt="'+p.title+'" loading="lazy"><div class="gc-info"><div class="gc-date">'+p.date+'</div><div class="gc-title">'+p.title+'</div>'+(p.desc?'<div class="gc-desc">'+p.desc+'</div>':'')+'</div></div>').join('')}
 buildGallery();
-
 let pvIdx=0;
-function openPhoto(i){
-  pvIdx=i;const p=realPhotos[i];const v=$('photoViewer');
-  v.querySelector('img').src=p.src;
-  v.querySelector('.pv-date').textContent=p.date+' \u2014 '+p.title;
-  v.querySelector('.pv-caption').textContent=p.desc;
-  v.querySelector('.pv-count').textContent=`${i+1} / ${realPhotos.length}`;
-  v.classList.add('open');
-}
+function openPhoto(i){pvIdx=i;const p=realPhotos[i],v=$('photoViewer');v.querySelector('img').src=p.src;v.querySelector('.pv-date').textContent=p.date+' \u2014 '+p.title;v.querySelector('.pv-caption').textContent=p.desc;v.querySelector('.pv-count').textContent=(i+1)+' / '+realPhotos.length;v.classList.add('open')}
 function closePhoto(){$('photoViewer').classList.remove('open')}
 function navPhoto(d){pvIdx=(pvIdx+d+realPhotos.length)%realPhotos.length;openPhoto(pvIdx)}
-document.addEventListener('keydown',e=>{
-  if(!$('photoViewer').classList.contains('open'))return;
-  if(e.key==='Escape')closePhoto();
-  if(e.key==='ArrowLeft')navPhoto(-1);
-  if(e.key==='ArrowRight')navPhoto(1);
-});
+document.addEventListener('keydown',e=>{if(!$('photoViewer').classList.contains('open'))return;if(e.key==='Escape')closePhoto();if(e.key==='ArrowLeft')navPhoto(-1);if(e.key==='ArrowRight')navPhoto(1)});
 
 /* ═══════════════════════════════════════════
    LETTERS
@@ -774,119 +548,54 @@ let letters=loadLetters();
 function saveLetters(){localStorage.setItem(LETTERS_KEY,JSON.stringify(letters))}
 function unreadCount(){return letters.filter(l=>l.from==='Sharath'&&!l.read).length}
 function formatDate(d){return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
-
-function renderInbox(){
-  const panel=$('inboxPanel');
-  const sl=letters.filter(l=>l.from==='Sharath').sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(!sl.length){panel.innerHTML='<div class="letEmpty">No letters yet. He\'ll write soon.</div>';return}
-  panel.innerHTML=sl.map(l=>`<div class="letItem ${l.read?'':'unread'}" onclick="openLetter('${l.id}')"><div class="li-from">${l.from}</div><div class="li-preview">${l.body.substring(0,120)}...</div><div class="li-date">${formatDate(l.date)}</div><div class="li-dot"></div></div>`).join('');
-}
-function renderOutbox(){
-  const panel=$('outboxPanel');
-  const ml=letters.filter(l=>l.from==='Rashmi').sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(!ml.length){panel.innerHTML='<div class="letEmpty">No sent letters yet. Write one?</div>';return}
-  panel.innerHTML=ml.map(l=>`<div class="letItem" onclick="openLetter('${l.id}')"><div class="li-from">To: ${l.to}</div><div class="li-preview">${l.body.substring(0,120)}...</div><div class="li-date">${formatDate(l.date)}</div></div>`).join('');
-}
-function openLetter(id){
-  const l=letters.find(x=>x.id===id);if(!l)return;
-  if(!l.read){l.read=true;saveLetters();updateBadge()}
-  $('lrFrom').textContent=l.from==='Sharath'?`${l.from} \u2726`:`To: ${l.to}`;
-  $('lrDate').textContent=formatDate(l.date);
-  $('lrBody').textContent=l.body;
-  $('lrSig').textContent=l.from==='Sharath'?`\u2014 ${l.from}`:'With love, Rashmi';
-  document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));
-  $('readPanel').classList.add('active');
-}
-function showList(){
-  $('readPanel').classList.remove('active');
-  const t=document.querySelector('.letTab.active');
-  if(t){const tab=t.dataset.tab;
-    if(tab==='inbox')$('inboxPanel').classList.add('active');
-    else if(tab==='outbox')$('outboxPanel').classList.add('active');
-    else if(tab==='write')$('writePanel').classList.add('active');
-  }
-}
+function renderInbox(){const panel=$('inboxPanel');const sl=letters.filter(l=>l.from==='Sharath').sort((a,b)=>new Date(b.date)-new Date(a.date));if(!sl.length){panel.innerHTML='<div class="letEmpty">No letters yet. He\'ll write soon.</div>';return}panel.innerHTML=sl.map(l=>'<div class="letItem '+(l.read?'':'unread')+'" onclick="openLetter(\''+l.id+'\')"><div class="li-from">'+l.from+'</div><div class="li-preview">'+l.body.substring(0,120)+'...</div><div class="li-date">'+formatDate(l.date)+'</div><div class="li-dot"></div></div>').join('')}
+function renderOutbox(){const panel=$('outboxPanel');const ml=letters.filter(l=>l.from==='Rashmi').sort((a,b)=>new Date(b.date)-new Date(a.date));if(!ml.length){panel.innerHTML='<div class="letEmpty">No sent letters yet. Write one?</div>';return}panel.innerHTML=ml.map(l=>'<div class="letItem" onclick="openLetter(\''+l.id+'\')"><div class="li-from">To: '+l.to+'</div><div class="li-preview">'+l.body.substring(0,120)+'...</div><div class="li-date">'+formatDate(l.date)+'</div></div>').join('')}
+function openLetter(id){const l=letters.find(x=>x.id===id);if(!l)return;if(!l.read){l.read=true;saveLetters();updateBadge()}$('lrFrom').textContent=l.from==='Sharath'?l.from+' \u2726':'To: '+l.to;$('lrDate').textContent=formatDate(l.date);$('lrBody').textContent=l.body;$('lrSig').textContent=l.from==='Sharath'?'\u2014 '+l.from:'With love, Rashmi';document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));$('readPanel').classList.add('active')}
+function showList(){$('readPanel').classList.remove('active');const t=document.querySelector('.letTab.active');if(t){const tab=t.dataset.tab;if(tab==='inbox')$('inboxPanel').classList.add('active');else if(tab==='outbox')$('outboxPanel').classList.add('active');else if(tab==='write')$('writePanel').classList.add('active')}}
 function updateBadge(){const c=unreadCount();const b=$('inboxBadge');if(c>0){b.classList.add('on');b.textContent=c}else b.classList.remove('on')}
-document.querySelectorAll('.letTab').forEach(tab=>{tab.addEventListener('click',()=>{
-  document.querySelectorAll('.letTab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');
-  document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));$('readPanel').classList.remove('active');
-  const t=tab.dataset.tab;
-  if(t==='inbox')$('inboxPanel').classList.add('active');
-  else if(t==='outbox')$('outboxPanel').classList.add('active');
-  else if(t==='write')$('writePanel').classList.add('active');
-})});
-function sendPlane(){
+document.querySelectorAll('.letTab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.letTab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));$('readPanel').classList.remove('active');const t=tab.dataset.tab;if(t==='inbox')$('inboxPanel').classList.add('active');else if(t==='outbox')$('outboxPanel').classList.add('active');else if(tab.dataset.tab==='write')$('writePanel').classList.add('active')})});
+
+async function sendPlane(){
   const text=$('letTx').value.trim();if(!text)return;
   if(text.split(/\s+/).filter(Boolean).length>250){toast('Keep it under 250 words');return}
   letters.push({id:'r'+Date.now(),from:'Rashmi',to:'Sharath',date:new Date().toISOString().split('T')[0],body:text,read:true});
   saveLetters();$('letTx').value='';$('letCnt').textContent='0 words';renderOutbox();
   $('letOv').classList.remove('open');
-  const plane=document.createElement('div');plane.className='pp';
-  plane.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c8a855" stroke-width="1"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>';
-  document.body.appendChild(plane);
-  const sx=W*.5,sy=H*.5,ex=W*.15,ey=H*.15,st=performance.now();
-  (function anim(now){const p=Math.min(1,(now-st)/3000);const e=1-Math.pow(1-p,3);plane.style.left=(sx+(ex-sx)*e)+'px';plane.style.top=(sy+(ey-sy)*e-Math.sin(p*PI)*120)+'px';plane.style.transform=`rotate(${-45+p*300}deg) scale(${1-p*.4})`;plane.style.opacity=String(1-p*.6);plane.style.display='block';if(p<1)requestAnimationFrame(anim);else{plane.remove();toast('Letter sent across the stars \u2726')}})(performance.now());
+  await flyPlane('outgoing','#c8a855',200);
+  toast('Letter sent across the stars \u2726');
+  /* Simulate a reply after 8 seconds */
+  setTimeout(()=>{spawnFF('A letter from Sharath is on its way...');setTimeout(()=>{flyPlane('incoming','#88b4d8',0).then(()=>{toast('Sharath wrote back \u2726')})},3000)},8000);
 }
 function closeLetters(){$('letOv').classList.remove('open')}
 $('letSend').addEventListener('click',sendPlane);
-$('letTx')?.addEventListener('input',function(){$('letCnt').textContent=`${this.value.trim().split(/\s+/).filter(Boolean).length} words`});
+$('letTx')?.addEventListener('input',function(){$('letCnt').textContent=this.value.trim().split(/\s+/).filter(Boolean).length+' words'});
 renderInbox();renderOutbox();updateBadge();
 
 /* ═══════════════════════════════════════════
    I MISS YOU
    ═══════════════════════════════════════════ */
 $('missBtn').addEventListener('click',()=>{
-  $('missBtn').classList.add('puls');setTimeout(()=>$('missBtn').classList.remove('puls'),1500);
-  toast('He knows');
+  $('missBtn').classList.add('puls');setTimeout(()=>$('missBtn').classList.remove('puls'),1500);toast('He knows');
 });
-function receiveMiss(){
-  $('missPulse').classList.add('on');$('mName').textContent='Sharath';$('missToast').classList.add('on');
-  setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},3000);
-  spawnFF('Thinking of you');
-}
+function receiveMiss(){$('missPulse').classList.add('on');$('mName').textContent='Sharath';$('missToast').classList.add('on');setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},3000);spawnFF('Thinking of you')}
 
 /* ═══════════════════════════════════════════
    SCROLL
    ═══════════════════════════════════════════ */
 addEventListener('wheel',e=>{if(phase!=='universe')return;scrollP=Math.max(0,Math.min(1,scrollP+e.deltaY*.0003));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
-let tSt=0;
-addEventListener('touchstart',e=>{tSt=e.touches[0].clientY});
-addEventListener('touchmove',e=>{if(phase!=='universe')return;const dy=tSt-e.touches[0].clientY;tSt=e.touches[0].clientY;scrollP=Math.max(0,Math.min(1,scrollP+dy*.001));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
+let tSt=0;addEventListener('touchstart',e=>{tSt=e.touches[0].clientY});addEventListener('touchmove',e=>{if(phase!=='universe')return;const dy=tSt-e.touches[0].clientY;tSt=e.touches[0].clientY;scrollP=Math.max(0,Math.min(1,scrollP+dy*.001));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
 
 /* ═══════════════════════════════════════════
-   HUD CLOCKS & WEATHER
+   HUD
    ═══════════════════════════════════════════ */
-async function updateWeather(){
-  try{
-    const[d,b]=await Promise.all([
-      fetch('https://wttr.in/Dublin?format=%C+%t').then(r=>r.text()).catch(()=>''),
-      fetch('https://wttr.in/Bangalore?format=%C+%t').then(r=>r.text()).catch(()=>'')
-    ]);
-    if(d)$('weDub').textContent=d.trim();
-    if(b)$('weBan').textContent=b.trim();
-  }catch(e){}
-}
-function updateClocks(){
-  const now=new Date();
-  $('clDub').textContent=new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
-  $('clBan').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);
-  const target=new Date('2026-12-01');const diff=target-now;
-  $('cdVal').textContent=diff>0?`${Math.floor(diff/864e5)} days`:'Home';
-}
-updateClocks();setInterval(updateClocks,10000);
-updateWeather();setInterval(updateWeather,600000);
+async function updateWeather(){try{const[d,b]=await Promise.all([fetch('https://wttr.in/Dublin?format=%C+%t').then(r=>r.text()).catch(()=>''),fetch('https://wttr.in/Bangalore?format=%C+%t').then(r=>r.text()).catch(()=>'')]);if(d)$('weDub').textContent=d.trim();if(b)$('weBan').textContent=b.trim()}catch(e){}}
+function updateClocks(){const now=new Date();$('clDub').textContent=new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);$('clBan').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);const target=new Date('2026-12-01'),diff=target-now;$('cdVal').textContent=diff>0?Math.floor(diff/864e5)+' days':'Home'}
+updateClocks();setInterval(updateClocks,10000);updateWeather();setInterval(updateWeather,600000);
 
 /* ═══════════════════════════════════════════
    NAV
    ═══════════════════════════════════════════ */
-document.querySelectorAll('.sn').forEach(s=>s.addEventListener('click',()=>{
-  const sc=s.dataset.s;document.querySelectorAll('.sn').forEach(x=>x.classList.remove('act'));s.classList.add('act');
-  if(sc==='letters'){$('letOv').classList.add('open');return}
-  if(sc==='gallery'){$('gallery').classList.add('open');return}
-  if(sc==='moon'){$('moonEl').click();return}
-  if(sc==='miss'){receiveMiss();return}
-  lab(s.querySelector('.sl').textContent,'');
-}));
+document.querySelectorAll('.sn').forEach(s=>s.addEventListener('click',()=>{const sc=s.dataset.s;document.querySelectorAll('.sn').forEach(x=>x.classList.remove('act'));s.classList.add('act');if(sc==='letters'){$('letOv').classList.add('open');return}if(sc==='gallery'){$('gallery').classList.add('open');return}if(sc==='moon'){$('moonEl').click();return}if(sc==='miss'){receiveMiss();return}lab(s.querySelector('.sl').textContent,'')}));
 
 /* ═══════════════════════════════════════════
    LABEL & TOAST
@@ -902,21 +611,15 @@ function iA(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)(
 function mkPiano(){if(asnd.piano)return sS('piano');iA();const o1=actx.createOscillator(),o2=actx.createOscillator(),g=actx.createGain(),f=actx.createBiquadFilter();o1.type='sine';o1.frequency.value=220;o2.type='sine';o2.frequency.value=330;f.type='lowpass';f.frequency.value=400;g.gain.value=0;o1.connect(f);o2.connect(f);f.connect(g);g.connect(actx.destination);o1.start();o2.start();g.gain.linearRampToValueAtTime(.025,actx.currentTime+2);asnd.piano={osc:[o1,o2],gain:g};document.querySelector('[data-s="piano"]').classList.add('act')}
 function mkRain(){if(asnd.rain)return sS('rain');iA();const buf=actx.createBuffer(1,2*actx.sampleRate,actx.sampleRate),d=buf.getChannelData(0);let last=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;d[i]=(last+.02*w)/1.02;last=d[i];d[i]*=3.5}const n=actx.createBufferSource();n.buffer=buf;n.loop=true;const f=actx.createBiquadFilter();f.type='bandpass';f.frequency.value=800;f.Q.value=.5;const g=actx.createGain();g.gain.value=0;n.connect(f);f.connect(g);g.connect(actx.destination);n.start();g.gain.linearRampToValueAtTime(.035,actx.currentTime+2);asnd.rain={noise:n,gain:g};document.querySelector('[data-s="rain"]').classList.add('act')}
 function mkNight(){if(asnd.night)return sS('night');iA();const o=actx.createOscillator(),o2=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=440;o2.type='triangle';o2.frequency.value=554;g.gain.value=0;o.connect(g);o2.connect(g);g.connect(actx.destination);o.start();o2.start();g.gain.linearRampToValueAtTime(.012,actx.currentTime+3);asnd.night={osc:[o,o2],gain:g};document.querySelector('[data-s="night"]').classList.add('act')}
-function sS(t){const s=asnd[t];if(!s)return;if(s.gain)s.gain.gain.linearRampToValueAtTime(0,actx.currentTime+1);setTimeout(()=>{if(s.osc)(Array.isArray(s.osc)?s.osc:[s.osc]).forEach(o=>{try{o.stop()}catch(e){}});if(s.noise)try{s.noise.stop()}catch(e){}},1100);delete asnd[t];document.querySelector(`[data-s="${t}"]`)?.classList.remove('act')}
+function sS(t){const s=asnd[t];if(!s)return;if(s.gain)s.gain.gain.linearRampToValueAtTime(0,actx.currentTime+1);setTimeout(()=>{if(s.osc)(Array.isArray(s.osc)?s.osc:[s.osc]).forEach(o=>{try{o.stop()}catch(e){}});if(s.noise)try{s.noise.stop()}catch(e){}},1100);delete asnd[t];document.querySelector('[data-s="'+t+'"]')?.classList.remove('act')}
 document.querySelectorAll('.ab').forEach(b=>b.addEventListener('click',()=>{const s=b.dataset.s;if(s==='piano')mkPiano();if(s==='rain')mkRain();if(s==='night')mkNight()}));
 
 /* ═══════════════════════════════════════════
-   ANIMATION LOOP
+   LOOP
    ═══════════════════════════════════════════ */
 let lastT=0;
-function loop(ts){
-  time=ts/1000;
-  if(phase==='universe'&&time-lastT>.03){updateAll();lastT=time}
-  requestAnimationFrame(loop);
-}
+function loop(ts){time=ts/1000;if(phase==='universe'&&time-lastT>.03){updateAll();lastT=time}requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
-
-/* Demo: firefly after 12 seconds */
 setTimeout(()=>{if(phase==='universe')spawnFF('Missing you from Bangalore')},12000);
 </script>
 </body>
