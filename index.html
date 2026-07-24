@@ -178,7 +178,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 .letWrite .letCnt{font-size:10px;color:rgba(200,168,85,.3);letter-spacing:.06em}
 .letSend{padding:8px 20px;border:1.5px solid rgba(200,168,85,.2);border-radius:20px;background:rgba(200,168,85,.04);color:#c8a855;font-size:10px;cursor:pointer;transition:all .3s;letter-spacing:.06em}
 .letSend:hover{background:rgba(200,168,85,.1);border-color:rgba(200,168,85,.35)}
-.letEmpty{text-align:center;padding:40px 20px;color:rgba(200,168,85,.25);font-size:12px;letter-spacing:.08em;font-style:italic;font-family:'Cormorant Garamond',Georgia,serif}
+.letEmpty{text-align:center;padding:40px 20px;color:rgba(200,168,85,.25);font-size:12px;letter-spacing:.08em;font-style:italic;font-family:'Cormorant Garamond',Georgia,serif;white-space:pre-line;line-height:1.6}
+.letWho{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.letWhoLabel{font-size:10px;color:rgba(200,168,85,.4);letter-spacing:.1em;text-transform:uppercase;font-family:'Inter',sans-serif}
+.letWhoBtn{padding:6px 16px;border:1px solid rgba(200,168,85,.1);border-radius:20px;background:transparent;color:rgba(200,168,85,.35);font-family:'Cormorant Garamond',Georgia,serif;font-size:13px;cursor:pointer;transition:all .3s}
+.letWhoBtn.active{border-color:rgba(200,168,85,.4);background:rgba(200,168,85,.06);color:#c8a855}
+.letWhoBtn:hover{border-color:rgba(200,168,85,.3);color:rgba(200,168,85,.6)}
+
+/* ── Quick Messages ── */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0}
+.qk{padding:16px 14px;border:1px solid rgba(200,168,85,.08);border-radius:12px;cursor:pointer;transition:all .3s;text-align:center;background:rgba(200,168,85,.02)}
+.qk:hover{border-color:rgba(200,168,85,.25);background:rgba(200,168,85,.06);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.qk:active{transform:scale(.97)}
+.qk .qk-icon{font-size:22px;margin-bottom:6px}
+.qk .qk-text{font-family:'Cormorant Garamond',Georgia,serif;font-size:14px;color:#f0e6d2;font-weight:300}
+.qk .qk-sub{font-size:8px;color:rgba(200,168,85,.3);margin-top:4px;letter-spacing:.1em}
+.qk.sent{border-color:rgba(200,168,85,.2);background:rgba(200,168,85,.04)}
+.qk.sent .qk-text{color:#c8a855}
 
 /* ── Paper Airplane ── */
 .pp{position:fixed;z-index:18;pointer-events:none;opacity:0;transition:none}
@@ -292,20 +308,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
   <div class="letEnv">
     <button class="letX" onclick="closeLetters()">&#10005;</button>
     <div class="letTabs">
-      <div class="letTab active" data-tab="inbox">Inbox <span class="badge on" id="inboxBadge"></span></div>
-      <div class="letTab" data-tab="outbox">Sent</div>
+      <div class="letTab active" data-tab="inbox">Received <span class="badge on" id="inboxBadge"></span></div>
+      <div class="letTab" data-tab="sent">Sent</div>
       <div class="letTab" data-tab="write">Write</div>
+      <div class="letTab" data-tab="quick">Quick Messages</div>
     </div>
     <div class="letPanels">
       <div class="letPanel active" id="inboxPanel"></div>
-      <div class="letPanel" id="outboxPanel"></div>
+      <div class="letPanel" id="sentPanel"></div>
       <div class="letWrite active" id="writePanel">
-        <h3>Write a Letter to Sharath</h3>
+        <div class="letWho">
+          <span class="letWhoLabel">From:</span>
+          <button class="letWhoBtn active" data-who="Rashmi" onclick="setSender('Rashmi')">Rashmi</button>
+          <button class="letWhoBtn" data-who="Sharath" onclick="setSender('Sharath')">Sharath</button>
+        </div>
+        <h3 id="writeTitle">Write a Letter</h3>
         <textarea id="letTx" placeholder="Write something from the heart..."></textarea>
         <div class="letAct">
           <span class="letCnt" id="letCnt">0 words</span>
           <button class="letSend" id="letSend">Send with love</button>
         </div>
+      </div>
+      <div class="letPanel" id="quickPanel">
+        <div class="quick-grid" id="quickGrid"></div>
       </div>
       <div class="letRead" id="readPanel">
         <div class="lr-back" onclick="showList()">&#8592; Back</div>
@@ -531,53 +556,86 @@ function navPhoto(d){pvIdx=(pvIdx+d+realPhotos.length)%realPhotos.length;openPho
 document.addEventListener('keydown',e=>{if(!$('photoViewer').classList.contains('open'))return;if(e.key==='Escape')closePhoto();if(e.key==='ArrowLeft')navPhoto(-1);if(e.key==='ArrowRight')navPhoto(1)});
 
 /* ═══════════════════════════════════════════
-   LETTERS
+   LETTERS — Our shared space
    ═══════════════════════════════════════════ */
 const LETTERS_KEY='parallel_hearts_letters';
-const defaultLetters=[
-  {id:'s1',from:'Sharath',to:'Rashmi',date:'2026-01-05',body:'I know you just left yesterday. The house feels different already. I walked into the kitchen this morning and your coffee mug was still on the counter. I didn\'t move it.\n\nI keep telling myself this is temporary. December will come. You\'ll come home. But right now, sitting in this quiet apartment, temporary feels like forever.\n\nI miss the way you hum when you cook. I miss hearing your keys in the door. I miss knowing you were just in the next room.\n\nBe safe in Dublin. Study hard. And know that every night, I look up at the same moon you do.\n\nI love you.',read:false},
-  {id:'s2',from:'Sharath',to:'Rashmi',date:'2026-01-15',body:'Two weeks. It\'s been two weeks and I still reach for my phone to call you at 6pm before remembering you\'re 5:30 hours behind.\n\nI went to our biryani place today. The one near Brigade Road. The owner asked where you were. I said Ireland. He looked confused. I think he thought I was joking.\n\nSometimes I sit in the car after work and just... stay there. Because the apartment is too quiet without you.\n\nBut I\'m proud of you. What you\'re doing takes courage. Most people wouldn\'t leave everything they know to chase something bigger.\n\nYou\'re not most people.\n\nCome home to me in December.',read:false},
-  {id:'s3',from:'Sharath',to:'Rashmi',date:'2026-02-03',body:'Happy birthday to me, I guess. You called at midnight your time. I pretended to be asleep but I was smiling so hard my face hurt.\n\nThank you for the video message. I watched it four times. The way you said "I wish I was there" \u2014 I could hear it in your voice. I feel the same way every single day.\n\nYour birthday is next month. I\'ll be counting the days.\n\nI love you more than biryani. And you know how much I love biryani.\n\nAlways,\nSharath',read:false},
-  {id:'s4',from:'Sharath',to:'Rashmi',date:'2026-03-20',body:'Happy birthday, my love.\n\nI know it\'s hard being away on your birthday. I know you wanted to celebrate together. I know this isn\'t what we planned.\n\nBut here\'s what I know for sure: one day we\'ll look back at this year and realize it was the thing that made us unbreakable.\n\nEat some cake for me. Light a candle. Make a wish.\n\nI already know what I\'m wishing for.\n\nDecember. You. Home.\n\nForever yours,\nSharath',read:false},
-  {id:'s5',from:'Sharath',to:'Rashmi',date:'2026-04-12',body:'I had a dream about you last night. We were at the beach in Goa, the one we went to before the wedding. You were laughing at something I said. I don\'t remember what, but I remember the sound.\n\nI woke up and for a second I thought you were in the next room. Then I remembered.\n\n8,580 km. That\'s what the internet says. But it doesn\'t feel like a number. It feels like every quiet evening, every meal alone, every time I reach for you and you\'re not there.\n\nBut then I see your messages. Your photos. The way you\'re building something in Dublin. And I think \u2014 she\'s coming back. She\'s coming back to me.\n\nThat\'s enough to keep going.\n\nMiss you always.',read:false},
-  {id:'s6',from:'Sharath',to:'Rashmi',date:'2026-05-23',body:'One year.\n\nOne year ago today, you walked toward me in that white dress and I forgot every word I\'d prepared. I just stood there, watching you, thinking \u2014 how did I get this lucky?\n\nI\'m sorry I can\'t be there today. I\'m sorry we can\'t celebrate together. But I want you to know: marrying you was the best decision I ever made. Even the distance can\'t change that.\n\nEspecially the distance.\n\nIt taught me that love isn\'t about proximity. It\'s about choosing someone, every day, even when they\'re 8,580 km away.\n\nHappy anniversary, Rashmi. I\'ll be looking at our wedding photos tonight.\n\nAlways yours,\nSharath',read:false},
-  {id:'s7',from:'Sharath',to:'Rashmi',date:'2026-06-10',body:'Something small happened today that I wanted to tell you about.\n\nI was walking home from work and I passed a couple holding hands. They were laughing about something. And for the first time, it didn\'t hurt to see that. It just made me think of you.\n\nI thought about the way you hold my hand \u2014 how you always interlock your fingers first. I thought about how you squeeze twice when you want me to know you\'re there.\n\nI can\'t hold your hand right now. But I can remember how it feels. And I can wait for the day I get to hold it again.\n\nSix more months. I\'m counting.\n\nLove,\nSharath',read:false},
+const quickMsgs=[
+  {icon:' miss',text:'I miss you',sub:'They\'ll know',msg:'I miss you so much. Every single day.'},
+  {icon:' love',text:'I love you',sub:'Always',msg:'I love you. More than words can say.'},
+  {icon:' thinking',text:'Thinking of you',sub:'Right now',msg:'I\'m sitting here thinking about you. About us.'},
+  {icon:' goodnight',text:'Goodnight',sub:'Same moon tonight',msg:'Goodnight, my love. The same moon is watching over us both.'},
+  {icon:' soon',text:'Coming home soon',sub:'December',msg:'Counting the days until I can hold you again. December.'},
+  {icon:' proud',text:'Proud of you',sub:'Always',msg:'I\'m so proud of everything you\'re doing. Keep going.'},
+  {icon:' coffee',text:'Coffee?',sub:'Virtual date',msg:'Want to have coffee together? Same time, different cities.'},
+  {icon:' song',text:'Our song',sub:'Always playing',msg:'I heard our song today. Had to stop everything. Just sat there smiling.'},
 ];
-function loadLetters(){const s=localStorage.getItem(LETTERS_KEY);if(s){try{return JSON.parse(s)}catch(e){}}localStorage.setItem(LETTERS_KEY,JSON.stringify(defaultLetters));return[...defaultLetters]}
+let sender='Rashmi';
+function setSender(who){
+  sender=who;
+  document.querySelectorAll('.letWhoBtn').forEach(b=>b.classList.toggle('active',b.dataset.who===who));
+  $('writeTitle').textContent='Write a Letter';
+  $('letTx').placeholder=who==='Rashmi'?'Write something from the heart to Sharath...':'Write something from the heart to Rashmi...';
+}
+function loadLetters(){const s=localStorage.getItem(LETTERS_KEY);if(s){try{return JSON.parse(s)}catch(e){}}localStorage.setItem(LETTERS_KEY,JSON.stringify([]));return[]}
 let letters=loadLetters();
 function saveLetters(){localStorage.setItem(LETTERS_KEY,JSON.stringify(letters))}
-function unreadCount(){return letters.filter(l=>l.from==='Sharath'&&!l.read).length}
+function unreadCount(){const other=sender==='Rashmi'?'Sharath':'Rashmi';return letters.filter(l=>l.from===other&&!l.read).length}
 function formatDate(d){return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
-function renderInbox(){const panel=$('inboxPanel');const sl=letters.filter(l=>l.from==='Sharath').sort((a,b)=>new Date(b.date)-new Date(a.date));if(!sl.length){panel.innerHTML='<div class="letEmpty">No letters yet. He\'ll write soon.</div>';return}panel.innerHTML=sl.map(l=>'<div class="letItem '+(l.read?'':'unread')+'" onclick="openLetter(\''+l.id+'\')"><div class="li-from">'+l.from+'</div><div class="li-preview">'+l.body.substring(0,120)+'...</div><div class="li-date">'+formatDate(l.date)+'</div><div class="li-dot"></div></div>').join('')}
-function renderOutbox(){const panel=$('outboxPanel');const ml=letters.filter(l=>l.from==='Rashmi').sort((a,b)=>new Date(b.date)-new Date(a.date));if(!ml.length){panel.innerHTML='<div class="letEmpty">No sent letters yet. Write one?</div>';return}panel.innerHTML=ml.map(l=>'<div class="letItem" onclick="openLetter(\''+l.id+'\')"><div class="li-from">To: '+l.to+'</div><div class="li-preview">'+l.body.substring(0,120)+'...</div><div class="li-date">'+formatDate(l.date)+'</div></div>').join('')}
-function openLetter(id){const l=letters.find(x=>x.id===id);if(!l)return;if(!l.read){l.read=true;saveLetters();updateBadge()}$('lrFrom').textContent=l.from==='Sharath'?l.from+' \u2726':'To: '+l.to;$('lrDate').textContent=formatDate(l.date);$('lrBody').textContent=l.body;$('lrSig').textContent=l.from==='Sharath'?'\u2014 '+l.from:'With love, Rashmi';document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));$('readPanel').classList.add('active')}
-function showList(){$('readPanel').classList.remove('active');const t=document.querySelector('.letTab.active');if(t){const tab=t.dataset.tab;if(tab==='inbox')$('inboxPanel').classList.add('active');else if(tab==='outbox')$('outboxPanel').classList.add('active');else if(tab==='write')$('writePanel').classList.add('active')}}
+function renderInbox(){
+  const panel=$('inboxPanel');
+  const other=sender==='Rashmi'?'Sharath':'Rashmi';
+  const sl=letters.filter(l=>l.from===other).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!sl.length){panel.innerHTML='<div class="letEmpty">No letters yet.\n\nWhen '+other+' writes, they\'ll appear here.\n\nThis is your shared space \u2014 a place for real words, between real people, across real distance.</div>';return}
+  panel.innerHTML=sl.map(l=>'<div class="letItem '+(l.read?'':'unread')+'" onclick="openLetter(\''+l.id+'\')"><div class="li-from">'+l.from+'</div><div class="li-preview">'+l.body.substring(0,120)+'...</div><div class="li-date">'+formatDate(l.date)+'</div><div class="li-dot"></div></div>').join('')
+}
+function renderSent(){
+  const panel=$('sentPanel');
+  const sl=letters.filter(l=>l.from===sender).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if(!sl.length){panel.innerHTML='<div class="letEmpty">No letters sent yet.\n\nWrite one \u2014 real words, from you, to them.</div>';return}
+  panel.innerHTML=sl.map(l=>'<div class="letItem" onclick="openLetter(\''+l.id+'\')"><div class="li-from">To: '+(l.to||sender==='Rashmi'?'Sharath':'Rashmi')+'</div><div class="li-preview">'+l.body.substring(0,120)+'...</div><div class="li-date">'+formatDate(l.date)+'</div></div>').join('')
+}
+function renderQuick(){$('quickGrid').innerHTML=quickMsgs.map((q,i)=>'<div class="qk" onclick="sendQuick('+i+')"><div class="qk-icon">'+q.icon+'</div><div class="qk-text">'+q.text+'</div><div class="qk-sub">'+q.sub+'</div></div>').join('')}
+function openLetter(id){const l=letters.find(x=>x.id===id);if(!l)return;if(!l.read){l.read=true;saveLetters();updateBadge()}$('lrFrom').textContent=l.from;$('lrDate').textContent=formatDate(l.date);$('lrBody').textContent=l.body;$('lrSig').textContent='\u2014 '+l.from;document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));$('readPanel').classList.add('active')}
+function showList(){$('readPanel').classList.remove('active');const t=document.querySelector('.letTab.active');if(t){const tab=t.dataset.tab;if(tab==='inbox')$('inboxPanel').classList.add('active');else if(tab==='sent')$('sentPanel').classList.add('active');else if(tab==='write')$('writePanel').classList.add('active');else if(tab==='quick')$('quickPanel').classList.add('active')}}
 function updateBadge(){const c=unreadCount();const b=$('inboxBadge');if(c>0){b.classList.add('on');b.textContent=c}else b.classList.remove('on')}
-document.querySelectorAll('.letTab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.letTab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));$('readPanel').classList.remove('active');const t=tab.dataset.tab;if(t==='inbox')$('inboxPanel').classList.add('active');else if(t==='outbox')$('outboxPanel').classList.add('active');else if(tab.dataset.tab==='write')$('writePanel').classList.add('active')})});
+document.querySelectorAll('.letTab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.letTab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));$('readPanel').classList.remove('active');const t=tab.dataset.tab;if(t==='inbox')$('inboxPanel').classList.add('active');else if(t==='sent')$('sentPanel').classList.add('active');else if(t==='write')$('writePanel').classList.add('active');else if(t==='quick')$('quickPanel').classList.add('active')})});
+
+async function sendQuick(i){
+  const q=quickMsgs[i];
+  const to=sender==='Rashmi'?'Sharath':'Rashmi';
+  letters.push({id:'q'+Date.now(),from:sender,to:to,date:new Date().toISOString().split('T')[0],body:q.msg,read:true});
+  saveLetters();
+  document.querySelectorAll('.qk')[i].classList.add('sent');
+  setTimeout(()=>document.querySelectorAll('.qk')[i]?.classList.remove('sent'),2000);
+  $('letOv').classList.remove('open');
+  const color=sender==='Rashmi'?'#c8a855':'#88b4d8';
+  await flyPlane('outgoing',color,200);
+  toast(q.text+' \u2014 sent with love');
+}
 
 async function sendPlane(){
   const text=$('letTx').value.trim();if(!text)return;
   if(text.split(/\s+/).filter(Boolean).length>250){toast('Keep it under 250 words');return}
-  letters.push({id:'r'+Date.now(),from:'Rashmi',to:'Sharath',date:new Date().toISOString().split('T')[0],body:text,read:true});
-  saveLetters();$('letTx').value='';$('letCnt').textContent='0 words';renderOutbox();
+  const to=sender==='Rashmi'?'Sharath':'Rashmi';
+  letters.push({id:'r'+Date.now(),from:sender,to:to,date:new Date().toISOString().split('T')[0],body:text,read:true});
+  saveLetters();$('letTx').value='';$('letCnt').textContent='0 words';renderSent();
   $('letOv').classList.remove('open');
-  await flyPlane('outgoing','#c8a855',200);
+  const color=sender==='Rashmi'?'#c8a855':'#88b4d8';
+  await flyPlane('outgoing',color,200);
   toast('Letter sent across the stars \u2726');
-  /* Simulate a reply after 8 seconds */
-  setTimeout(()=>{spawnFF('A letter from Sharath is on its way...');setTimeout(()=>{flyPlane('incoming','#88b4d8',0).then(()=>{toast('Sharath wrote back \u2726')})},3000)},8000);
 }
 function closeLetters(){$('letOv').classList.remove('open')}
 $('letSend').addEventListener('click',sendPlane);
 $('letTx')?.addEventListener('input',function(){$('letCnt').textContent=this.value.trim().split(/\s+/).filter(Boolean).length+' words'});
-renderInbox();renderOutbox();updateBadge();
+renderInbox();renderSent();renderQuick();updateBadge();
 
 /* ═══════════════════════════════════════════
    I MISS YOU
    ═══════════════════════════════════════════ */
-$('missBtn').addEventListener('click',()=>{
-  $('missBtn').classList.add('puls');setTimeout(()=>$('missBtn').classList.remove('puls'),1500);toast('He knows');
+  $('missBtn').addEventListener('click',()=>{
+  $('missBtn').classList.add('puls');setTimeout(()=>$('missBtn').classList.remove('puls'),1500);toast('They know');
 });
-function receiveMiss(){$('missPulse').classList.add('on');$('mName').textContent='Sharath';$('missToast').classList.add('on');setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},3000);spawnFF('Thinking of you')}
+function receiveMiss(){$('missPulse').classList.add('on');$('mName').textContent=sender==='Rashmi'?'Sharath':'Rashmi';$('missToast').classList.add('on');setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},3000);spawnFF('Thinking of you')}
 
 /* ═══════════════════════════════════════════
    SCROLL
@@ -620,7 +678,7 @@ document.querySelectorAll('.ab').forEach(b=>b.addEventListener('click',()=>{cons
 let lastT=0;
 function loop(ts){time=ts/1000;if(phase==='universe'&&time-lastT>.03){updateAll();lastT=time}requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
-setTimeout(()=>{if(phase==='universe')spawnFF('Missing you from Bangalore')},12000);
+setTimeout(()=>{if(phase==='universe')spawnFF('Missing you')},12000);
 </script>
 </body>
 </html>
