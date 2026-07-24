@@ -479,8 +479,8 @@ requestAnimationFrame(drawLanding);
    ENTER
    ═══════════════════════════════════════════ */
 $('enterBtn').addEventListener('click',()=>{
-  if(phase!=='landing')return;phase='trans';$('landing').classList.add('out');
-  setTimeout(()=>{$('landing').style.display='none';phase='universe';$('mainCanvas').classList.add('on');$('hud').classList.add('on');$('sideNav').classList.add('on');$('missBtn').classList.add('on');$('audio').classList.add('on');$('moonEl').classList.add('on');$('scrlH').classList.add('on');$('ytToggle').classList.add('on');lab('Your Universe','Scroll to travel through time');setTimeout(()=>$('scrlH').classList.remove('on'),8000);updateAll();mkPiano()},2500);
+  if(phase!=='landing')return;phase='trans';$('landing').classList.add('out');iA();
+  setTimeout(()=>{$('landing').style.display='none';phase='universe';$('mainCanvas').classList.add('on');$('hud').classList.add('on');$('sideNav').classList.add('on');$('missBtn').classList.add('on');$('audio').classList.add('on');$('moonEl').classList.add('on');$('scrlH').classList.add('on');$('ytToggle').classList.add('on');lab('Your Universe','Scroll to travel through time');setTimeout(()=>$('scrlH').classList.remove('on'),8000);updateAll();try{mkPiano()}catch(e){}},2500);
 });
 
 /* ═══════════════════════════════════════════
@@ -720,6 +720,10 @@ const realPhotos=[
   {src:'web-photos/794DBFFB-B01E-4FD8-A95A-BC9570CE11A1.PNG',date:'7 Jun 2025',title:'Us',desc:''},
   {src:'web-photos/76837D23-7E43-41C0-8B37-BC20FD779707.PNG',date:'18 Jul 2026',title:'Today',desc:'Still looking at the same moon'},
 ];
+const USER_PHOTOS_KEY='parallel_hearts_user_photos';
+function loadUserPhotos(){try{return JSON.parse(localStorage.getItem(USER_PHOTOS_KEY))||[]}catch(e){return[]}}
+let userPhotos=loadUserPhotos();
+function saveUserPhotos(){localStorage.setItem(USER_PHOTOS_KEY,JSON.stringify(userPhotos))}
 function buildGallery(){userPhotos=loadUserPhotos();const all=[...realPhotos,...userPhotos];$('galGrid').innerHTML=all.map((p,i)=>'<div class="gal-card" onclick="openPhoto('+i+')"><img src="'+p.src+'" alt="'+p.title+'" loading="lazy"><div class="gc-info"><div class="gc-date">'+p.date+'</div><div class="gc-title">'+p.title+'</div>'+(p.desc?'<div class="gc-desc">'+p.desc+'</div>':'')+'</div></div>').join('')}
 buildGallery();
 let pvIdx=0;
@@ -906,10 +910,6 @@ function sendFlower(i){
 /* ═══════════════════════════════════════════
    PHOTO UPLOAD — both can add pictures
    ═══════════════════════════════════════════ */
-const USER_PHOTOS_KEY='parallel_hearts_user_photos';
-function loadUserPhotos(){try{return JSON.parse(localStorage.getItem(USER_PHOTOS_KEY))||[]}catch(e){return[]}}
-let userPhotos=loadUserPhotos();
-function saveUserPhotos(){localStorage.setItem(USER_PHOTOS_KEY,JSON.stringify(userPhotos))}
 function uploadPhotos(files){
   if(!files||!files.length)return;
   Array.from(files).forEach(f=>{
