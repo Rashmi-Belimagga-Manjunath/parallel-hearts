@@ -157,14 +157,14 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 #photoViewer .pv-next{right:24px}
 #photoViewer .pv-count{position:absolute;bottom:24px;font-size:9px;color:rgba(212,160,160,.3);letter-spacing:.12em}
 
-#aboutOv{position:fixed;inset:0;z-index:20;background:rgba(5,8,16,.96);backdrop-filter:blur(24px);display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
+#aboutOv{position:fixed;inset:0;z-index:20;background:rgba(5,8,16,.96);backdrop-filter:blur(24px);display:flex;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1);overflow-y:auto}
 #aboutOv.open{opacity:1;visibility:visible}
 .aboutTop{text-align:center;padding:20px 28px 16px;border-bottom:1px solid rgba(212,160,160,.06);position:relative;flex-shrink:0}
 .aboutX{position:absolute;top:16px;right:20px;width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(212,160,160,.15);background:rgba(5,8,16,.4);color:rgba(212,160,160,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;z-index:2;transition:all .3s}
 .aboutX:hover{border-color:rgba(212,160,160,.4);color:#d4a0a0}
 .aboutTop .ah-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(20px,3vw,28px);color:#f0e6d2;font-weight:300;letter-spacing:.04em}
 .aboutTop .ah-sub{font-size:10px;color:rgba(212,160,160,.5);letter-spacing:.14em;margin-top:4px;text-transform:uppercase}
-.aboutSplit{display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden}
+.aboutSplit{display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:visible}
 .aboutSide{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px;position:relative;overflow:hidden}
 .aboutSide:first-child{border-right:1px solid rgba(212,160,160,.06)}
 .aboutSide .as-img{width:min(420px,44vw);height:min(520px,68vh);object-fit:cover;border-radius:16px;border:2px solid rgba(212,160,160,.2);box-shadow:0 0 50px rgba(212,160,160,.12),0 20px 60px rgba(0,0,0,.4);flex-shrink:0;margin-bottom:16px}
@@ -431,9 +431,9 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
       <div class="as-detail"><strong>Birthday:</strong> 20 March<br><strong>Location:</strong> Dublin, Ireland<br><strong>Profession:</strong> Product Manager, pursuing MSc in AI<br><strong>Moved abroad:</strong> 2 January 2026</div>
     </div>
     <div class="aboutSide">
-      <img class="as-img" src="about us/Sharath.png" alt="Sharath" onclick="openAboutPhoto('about us/Sharath.png','Sharath Manjunath')">
-      <button class="as-btn" onclick="openAboutPhoto('about us/Sharath.png','Sharath Manjunath')">Click me</button>
-      <div class="as-name">Sharath Manjunath</div>
+      <img class="as-img" src="about us/Sharath.png" alt="Sharath" onclick="openAboutPhoto('about us/Sharath.png','Sharath Gopal')">
+      <button class="as-btn" onclick="openAboutPhoto('about us/Sharath.png','Sharath Gopal')">Click me</button>
+      <div class="as-name">Sharath Gopal</div>
       <div class="as-detail"><strong>Birthday:</strong> 3 February<br><strong>Location:</strong> Bangalore, India<br><strong>Profession:</strong> IT Professional</div>
     </div>
   </div>
@@ -503,7 +503,7 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 </div>
 
 <script>
-if(location.search.indexOf('v=13')===-1){location.replace(location.pathname+'?v=13');throw'cache bust'}
+if(location.search.indexOf('v=14')===-1){location.replace(location.pathname+'?v=14');throw'cache bust'}
 var $=id=>document.getElementById(id);
 var PI=Math.PI,TAU=PI*2;
 var W=innerWidth,H=innerHeight;
