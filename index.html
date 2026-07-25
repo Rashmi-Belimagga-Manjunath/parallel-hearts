@@ -76,10 +76,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 
 #missPulse{position:fixed;inset:0;z-index:11;background:radial-gradient(ellipse at center,rgba(212,160,160,.08) 0%,transparent 70%);opacity:0;pointer-events:none;transition:opacity .6s}
 #missPulse.on{opacity:1}
-#missToast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:15;text-align:center;opacity:0;pointer-events:none;transition:opacity .6s}
-#missToast.on{opacity:1}
-#missToast .mn{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:#d4a0a0;font-weight:300;letter-spacing:.04em}
-#missToast .ms{font-size:10px;color:rgba(240,230,210,.45);letter-spacing:.12em;margin-top:4px}
+#missToast{position:fixed;top:28px;right:28px;z-index:15;opacity:0;pointer-events:none;transform:translateY(-20px);transition:all .5s cubic-bezier(.16,1,.3,1)}
+#missToast.on{opacity:1;transform:translateY(0)}
+#missToast .mn{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:#f0e6d2;font-weight:500;letter-spacing:.04em;padding:20px 28px;border-radius:16px;background:rgba(5,8,22,.85);border:2px solid rgba(212,160,160,.6);box-shadow:0 0 30px rgba(212,160,160,.25),0 0 60px rgba(212,160,160,.1),inset 0 0 20px rgba(212,160,160,.05);backdrop-filter:blur(16px);max-width:320px;text-align:center;line-height:1.5}
+#missToast .mn strong{color:#d4a0a0;font-weight:600}
+#missToast .ms{font-size:11px;color:rgba(212,160,160,.7);letter-spacing:.12em;margin-top:8px;text-transform:uppercase;font-weight:400}
 
 #sLab{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:12;opacity:0;transition:opacity 1.5s;pointer-events:none;text-align:center}
 #sLab.on{opacity:1}
@@ -308,7 +309,7 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 </button>
 
 <div id="missPulse"></div>
-<div id="missToast"><div class="mn" id="mName"></div><div class="ms">is thinking about you</div></div>
+<div id="missToast"><div class="mn" id="mName"></div><div class="ms">thinking of you right now</div></div>
 
 <div id="sLab"><div class="sn2" id="slNm"></div><div class="sh2" id="slHt"></div></div>
 
@@ -856,10 +857,14 @@ $('letTx')?.addEventListener('input',function(){$('letCnt').textContent=this.val
 renderInbox();renderSent();renderQuick();updateBadge();
 
 $('missBtn').addEventListener('click',()=>{
-  $('missBtn').classList.add('puls');setTimeout(()=>$('missBtn').classList.remove('puls'),1500);toast('They know');
+  $('missBtn').classList.add('puls');setTimeout(()=>$('missBtn').classList.remove('puls'),1500);
+  var who=sender==='Rashmi'?'Sharath':'Rashmi';
+  $('mName').innerHTML='<strong>'+who+'</strong>, I miss you so much right now';
+  $('missPulse').classList.add('on');$('missToast').classList.add('on');
+  setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},4000);
   notifyEmail(sender+' is thinking about you right now \u2728',sender);
 });
-function receiveMiss(){$('missPulse').classList.add('on');$('mName').textContent=sender==='Rashmi'?'Sharath':'Rashmi';$('missToast').classList.add('on');setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},3000);spawnFF('Thinking of you')}
+function receiveMiss(){$('mName').innerHTML='<strong>'+(sender==='Rashmi'?'Sharath':'Rashmi')+'</strong> is thinking about you right now';$('missPulse').classList.add('on');$('missToast').classList.add('on');setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},4000);spawnFF('Thinking of you')}
 
 addEventListener('wheel',e=>{if(phase!=='universe')return;scrollP=Math.max(0,Math.min(1,scrollP+e.deltaY*.0001));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
 var tSt=0;addEventListener('touchstart',e=>{tSt=e.touches[0].clientY});addEventListener('touchmove',e=>{if(phase!=='universe')return;var dy=tSt-e.touches[0].clientY;tSt=e.touches[0].clientY;scrollP=Math.max(0,Math.min(1,scrollP+dy*.0004));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
@@ -868,7 +873,7 @@ async function updateWeather(){try{var[d,b]=await Promise.all([fetch('https://wt
 function updateClocks(){var now=new Date();$('clDub').textContent=new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);$('clBan').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);var target=new Date('2026-12-01'),diff=target-now;var days=diff>0?Math.floor(diff/864e5):0;$('cdVal').textContent=days+' days';if($('ccVal'))$('ccVal').textContent=days}
 updateClocks();setInterval(updateClocks,10000);updateWeather();setInterval(updateWeather,600000);
 
-document.querySelectorAll('.sn').forEach(s=>s.addEventListener('click',()=>{var sc=s.dataset.s;document.querySelectorAll('.sn').forEach(x=>x.classList.remove('act'));s.classList.add('act');if(sc==='letters'){$('letOv').classList.add('open');return}if(sc==='gallery'){$('gallery').classList.add('open');return}if(sc==='date'){$('dateOv').classList.add('open');return}if(sc==='flowers'){$('flowerOv').classList.add('open');return}if(sc==='moon'){$('moonEl').click();return}if(sc==='miss'){receiveMiss();return}lab(s.querySelector('.sl').textContent,'')}));
+document.querySelectorAll('.sn').forEach(s=>s.addEventListener('click',()=>{var sc=s.dataset.s;document.querySelectorAll('.sn').forEach(x=>x.classList.remove('act'));s.classList.add('act');if(sc==='letters'){$('letOv').classList.add('open');return}if(sc==='gallery'){$('gallery').classList.add('open');return}if(sc==='date'){$('dateOv').classList.add('open');return}if(sc==='flowers'){$('flowerOv').classList.add('open');return}if(sc==='moon'){if($('moonEl').onclick)$('moonEl').onclick();else{$('moonOv').classList.add('open')}return}if(sc==='miss'){receiveMiss();return}lab(s.querySelector('.sl').textContent,'')}));
 
 var labT;function lab(n,h){$('slNm').textContent=n;$('slHt').textContent=h||'';$('sLab').classList.add('on');clearTimeout(labT);labT=setTimeout(()=>$('sLab').classList.remove('on'),5000)}
 var toastT;function toast(t){$('tTx').textContent=t;$('toast').classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>$('toast').classList.remove('on'),3000)}
