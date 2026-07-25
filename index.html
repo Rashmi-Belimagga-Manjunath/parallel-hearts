@@ -159,7 +159,7 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 
 #aboutOv{position:fixed;inset:0;z-index:20;background:rgba(5,8,16,.94);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
 #aboutOv.open{opacity:1;visibility:visible}
-.aboutCard{width:min(860px,94vw);max-height:86vh;background:linear-gradient(145deg,rgba(16,18,30,.96),rgba(10,12,24,.98));border:1px solid rgba(212,160,160,.1);border-radius:20px;transform:translateY(24px) scale(.97);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.aboutCard{width:min(960px,96vw);max-height:90vh;background:linear-gradient(145deg,rgba(16,18,30,.96),rgba(10,12,24,.98));border:1px solid rgba(212,160,160,.1);border-radius:20px;transform:translateY(24px) scale(.97);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;display:flex;flex-direction:column}
 #aboutOv.open .aboutCard{transform:translateY(0) scale(1)}
 .aboutX{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(212,160,160,.1);background:rgba(5,8,16,.4);color:rgba(212,160,160,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:2;transition:all .3s}
 .aboutX:hover{border-color:rgba(212,160,160,.3);color:#d4a0a0}
@@ -170,7 +170,7 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 .aboutBody{flex:1;overflow-y:auto;padding:24px 28px;scrollbar-width:thin;scrollbar-color:rgba(212,160,160,.1) transparent}
 .aboutCols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
 .aboutCol{padding:20px;border:1px solid rgba(212,160,160,.08);border-radius:16px;background:rgba(212,160,160,.02);text-align:center}
-.aboutCol .ac-img{width:160px;height:160px;border-radius:50%;object-fit:cover;border:2.5px solid rgba(212,160,160,.3);box-shadow:0 0 30px rgba(212,160,160,.18);margin-bottom:16px}
+.aboutCol .ac-img{width:200px;height:200px;border-radius:16px;object-fit:cover;border:2.5px solid rgba(212,160,160,.3);box-shadow:0 0 40px rgba(212,160,160,.18);margin-bottom:18px}
 .aboutCol .ac-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:#d4a0a0;font-weight:400;margin-bottom:12px}
 .aboutCol .ac-detail{text-align:left;font-size:12px;color:rgba(240,230,210,.55);line-height:1.8}
 .aboutCol .ac-detail strong{color:rgba(212,160,160,.7);font-weight:400;display:inline-block;min-width:90px}
@@ -514,7 +514,7 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 </div>
 
 <script>
-if(location.search.indexOf('v=9')===-1){location.replace(location.pathname+'?v=9');throw'cache bust'}
+if(location.search.indexOf('v=10')===-1){location.replace(location.pathname+'?v=10');throw'cache bust'}
 var $=id=>document.getElementById(id);
 var PI=Math.PI,TAU=PI*2;
 var W=innerWidth,H=innerHeight;
