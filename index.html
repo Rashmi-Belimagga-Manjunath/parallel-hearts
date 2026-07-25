@@ -249,11 +249,19 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 .qk.sent{border-color:rgba(212,160,160,.2);background:rgba(212,160,160,.04)}
 .qk.sent .qk-text{color:#d4a0a0}
 
-#dateOv{position:fixed;inset:0;z-index:25;background:rgba(4,6,12,.96);backdrop-filter:blur(30px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
+#dateOv{position:fixed;inset:0;z-index:25;background:rgba(4,6,12,.96);backdrop-filter:blur(30px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1);overflow-y:auto;padding:0}
 #dateOv.open{opacity:1;visibility:visible}
+.date-hero{position:relative;width:100%;height:50vh;min-height:400px;overflow:hidden;margin-bottom:40px}
+.date-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.5s ease-in-out}
+.date-hero-img.active{opacity:1}
+.date-hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,6,12,.3) 0%,rgba(4,6,12,.6) 50%,rgba(4,6,12,.95) 100%)}
+.date-hero-text{position:absolute;bottom:40px;left:0;right:0;text-align:center;z-index:2}
+.date-hero-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(36px,6vw,64px);font-weight:300;color:#f0e6d2;letter-spacing:.06em;margin-bottom:8px;text-shadow:0 2px 20px rgba(0,0,0,.5)}
+.date-hero-subtitle{font-size:14px;color:rgba(212,160,160,.8);letter-spacing:.15em;text-transform:uppercase}
+.date-content{width:100%;max-width:800px;padding:0 20px;text-align:center}
 .date-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(28px,5vw,48px);font-weight:300;color:#f0e6d2;letter-spacing:.04em;margin-bottom:8px;text-align:center}
 .date-sub{font-size:12px;color:rgba(212,160,160,.6);letter-spacing:.12em;margin-bottom:40px;text-align:center}
-.date-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;max-width:600px;width:90%;margin-bottom:40px}
+.date-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;max-width:600px;width:90%;margin:0 auto 40px}
 .date-opt{padding:24px 16px;border:1px solid rgba(212,160,160,.08);border-radius:16px;cursor:pointer;transition:all .4s;text-align:center;background:rgba(212,160,160,.02)}
 .date-opt:hover{border-color:rgba(212,160,160,.3);background:rgba(212,160,160,.06);transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.3)}
 .date-opt:active{transform:scale(.97)}
@@ -379,10 +387,24 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 <div id="dateActive"><div class="da-msg" id="dateMsg"></div><div class="da-who" id="dateWho"></div></div>
 
 <div id="dateOv">
-  <div class="date-title">Date Tonight</div>
-  <div class="date-sub">Pick something. We're in this together.</div>
-  <div class="date-grid" id="dateGrid"></div>
-  <button class="date-close" onclick="document.getElementById('dateOv').classList.remove('open')">Maybe later</button>
+  <div class="date-hero">
+    <img src="date-night/romantic-dinner-1.jpg" class="date-hero-img active" alt="Romantic dinner">
+    <img src="date-night/romantic-dinner-2.jpg" class="date-hero-img" alt="Romantic dinner">
+    <img src="date-night/romantic-dinner-3.jpg" class="date-hero-img" alt="Romantic dinner">
+    <img src="date-night/romantic-dinner-4.jpg" class="date-hero-img" alt="Romantic dinner">
+    <img src="date-night/romantic-dinner-5.jpg" class="date-hero-img" alt="Romantic dinner">
+    <div class="date-hero-overlay"></div>
+    <div class="date-hero-text">
+      <div class="date-hero-title">Date Tonight</div>
+      <div class="date-hero-subtitle">Different cities. Same evening.</div>
+    </div>
+  </div>
+  <div class="date-content">
+    <div class="date-title">Pick Something</div>
+    <div class="date-sub">We're in this together.</div>
+    <div class="date-grid" id="dateGrid"></div>
+    <button class="date-close" onclick="document.getElementById('dateOv').classList.remove('open')">Maybe later</button>
+  </div>
 </div>
 
 <div id="flowerOv">
@@ -504,7 +526,7 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 </div>
 
 <script>
-if(location.search.indexOf('v=15')===-1){location.replace(location.pathname+'?v=15');throw'cache bust'}
+if(location.search.indexOf('v=16')===-1){location.replace(location.pathname+'?v=16');throw'cache bust'}
 var $=id=>document.getElementById(id);
 var PI=Math.PI,TAU=PI*2;
 var W=innerWidth,H=innerHeight;
@@ -1008,6 +1030,16 @@ var dateActivities=[
   {icon:'\uD83D\uDCDD',text:'Talk',sub:'No distractions, just us',msg:'Let\'s just talk. No phones, no distractions. Just you and me, face to face on screen.'},
 ];
 function renderDates(){$('dateGrid').innerHTML=dateActivities.map((d,i)=>'<div class="date-opt" onclick="pickDate('+i+')"><div class="do-icon">'+d.icon+'</div><div class="do-text">'+d.text+'</div><div class="do-sub">'+d.sub+'</div></div>').join('')}
+
+var heroImgs=document.querySelectorAll('.date-hero-img');
+var heroIdx=0;
+function rotateHero(){
+  heroImgs[heroIdx].classList.remove('active');
+  heroIdx=(heroIdx+1)%heroImgs.length;
+  heroImgs[heroIdx].classList.add('active');
+}
+setInterval(rotateHero,4000);
+
 renderDates();
 function pickDate(i){
   var d=dateActivities[i];
