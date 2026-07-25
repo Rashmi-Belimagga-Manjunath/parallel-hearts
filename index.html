@@ -26,9 +26,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 
 #skyWrap{position:fixed;inset:0;z-index:0;display:flex}
 #skyWrap.on{display:flex}
-#skyDublin{flex:1;background:linear-gradient(180deg,#0a0a2a 0%,#1a1040 20%,#2a1838 40%,#4a2530 60%,#7a3828 75%,#b06030 90%,#d09048 100%);box-shadow:inset 0 -60px 120px -40px rgba(220,140,80,.08);transition:background 4s ease}
-#skyBangalore{flex:1;position:relative;background:linear-gradient(180deg,#1e3a5f 0%,#3a6080 25%,#5a8ab0 50%,#8ab0cc 75%,#c0d8e8 100%);box-shadow:inset 0 -60px 120px -40px rgba(220,140,80,.06);transition:background 4s ease}
-#skyDivider{position:absolute;top:0;left:50%;width:80px;height:100%;transform:translateX(-50%);background:linear-gradient(to right,rgba(5,8,16,0),rgba(5,8,16,.6),rgba(5,8,16,0));z-index:1;pointer-events:none}
+.sky-col{flex:1;position:relative;background-size:cover;background-position:center;background-repeat:no-repeat;transition:filter 4s ease}
+#skyDublin{background-image:url('web-photos/IMG_9110.JPG')}
+#skyBangalore{background-image:url('web-photos/IMG_9058.JPG')}
+.sky-overlay{position:absolute;inset:0;transition:opacity 4s ease}
+#skyDublin .sky-overlay{background:linear-gradient(to top,rgba(5,8,16,.92) 0%,rgba(5,8,16,.55) 30%,rgba(5,8,16,.25) 55%,rgba(5,8,16,.1) 75%,rgba(5,8,16,.05) 100%)}
+#skyBangalore .sky-overlay{background:linear-gradient(to top,rgba(5,8,16,.92) 0%,rgba(5,8,16,.55) 30%,rgba(5,8,16,.25) 55%,rgba(5,8,16,.1) 75%,rgba(5,8,16,.05) 100%)}
+.sky-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;pointer-events:none;padding:100px 30px 120px}
+.sky-city{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(36px,6vw,72px);font-weight:300;color:#f0e6d2;letter-spacing:.08em;text-shadow:0 2px 30px rgba(0,0,0,.6);opacity:.92}
+.sky-time{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(40px,7vw,80px);font-weight:300;color:#f0e6d2;letter-spacing:.04em;margin-top:8px;text-shadow:0 2px 40px rgba(0,0,0,.5);opacity:.95}
+.sky-msg{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(14px,2vw,20px);font-weight:300;color:rgba(212,160,160,.85);letter-spacing:.06em;font-style:italic;margin-top:20px;text-shadow:0 1px 20px rgba(0,0,0,.6);opacity:.8;max-width:360px;text-align:center;line-height:1.6}
+.sky-date-label{font-size:9px;color:rgba(240,230,210,.35);letter-spacing:.15em;text-transform:uppercase;margin-top:24px}
+#skyDivider{position:absolute;top:0;left:50%;width:1px;height:100%;transform:translateX(-50%);background:linear-gradient(to bottom,transparent 5%,rgba(212,160,160,.2) 30%,rgba(212,160,160,.35) 50%,rgba(212,160,160,.2) 70%,transparent 95%);z-index:3;pointer-events:none;box-shadow:0 0 12px rgba(212,160,160,.08)}
 #starCanvas{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 3s}
 #starCanvas.on{opacity:1}
 #cityLabels{position:fixed;bottom:20px;left:0;right:0;z-index:2;display:flex;pointer-events:none;opacity:0;transition:opacity 1.5s}
@@ -263,9 +272,25 @@ html,body{cursor:none}
 <body>
 
 <div id="skyWrap">
-  <div id="skyDublin"></div>
+  <div id="skyDublin" class="sky-col">
+    <div class="sky-overlay"></div>
+    <div class="sky-content">
+      <div class="sky-city">Dublin</div>
+      <div class="sky-time" id="colTimeDub">--:--</div>
+      <div class="sky-msg">She's building a future. 8,580 km from home.</div>
+      <div class="sky-date-label">New Year's Day 2026</div>
+    </div>
+  </div>
   <div id="skyDivider"></div>
-  <div id="skyBangalore"></div>
+  <div id="skyBangalore" class="sky-col">
+    <div class="sky-overlay"></div>
+    <div class="sky-content">
+      <div class="sky-city">Bangalore</div>
+      <div class="sky-time" id="colTimeBan">--:--</div>
+      <div class="sky-msg">He's waiting. Counting every sunset.</div>
+      <div class="sky-date-label">New Year's Eve 2025</div>
+    </div>
+  </div>
 </div>
 <canvas id="starCanvas"></canvas>
 
@@ -465,29 +490,16 @@ function moonPhase(date){var jd=toJD(date),T=(jd-2451545)/36525;var L0=218.3165+
 
 var DUBLIN={lat:53.3498,lng:-6.2603},BANGALORE={lat:12.9716,lng:77.5946};
 
-function skyGradient(alt){
-  if(alt>10)return'linear-gradient(180deg,#1e3a5f 0%,#3a6080 25%,#5a8ab0 50%,#8ab0cc 75%,#c0d8e8 100%)';
-  if(alt>-2)return'linear-gradient(180deg,#1a1020 0%,#2a1828 10%,#4a2530 25%,#7a3828 45%,#b06030 65%,#d09048 82%,#e0b060 100%)';
-  if(alt>-8)return'linear-gradient(180deg,#141438 0%,#1e1e50 15%,#2a2a68 35%,#353580 60%,#404098 85%,#4c4cb0 100%)';
-  return'linear-gradient(180deg,#0a0a2a 0%,#121240 20%,#1a1a55 40%,#222270 65%,#2a2a88 85%,#3232a0 100%)';
-}
-function horizonGlow(alt){
-  if(alt>-3&&alt<=10){var a=Math.min(.4,Math.max(0,(10-alt)/12));return'radial-gradient(ellipse 120% 50% at 50% 95%,rgba(220,140,80,'+a+') 0%,rgba(180,100,60,'+(a*.5)+') 35%,transparent 70%)'}
-  if(alt>-8){var a=Math.min(.2,(8+alt)/30);return'radial-gradient(ellipse 100% 40% at 50% 95%,rgba(80,60,120,'+a+') 0%,rgba(50,35,80,'+(a*.4)+') 40%,transparent 80%)'}
-  if(alt<=-8){var a=Math.min(.06,(-8-alt)/-80+.03);return'radial-gradient(ellipse 80% 30% at 50% 95%,rgba(80,60,140,'+a+') 0%,transparent 70%)'}
-  return'radial-gradient(ellipse 1px 1px at 50% 50%,transparent 0%,transparent 100%)';
-}
-
 var skyDub=$('skyDublin'),skyBan=$('skyBangalore');
+var skyDubOverlay=skyDub.querySelector('.sky-overlay');
+var skyBanOverlay=skyBan.querySelector('.sky-overlay');
 function updateSkies(date){
   var altDub=sunAlt(date,DUBLIN.lat,DUBLIN.lng);
   var altBan=sunAlt(date,BANGALORE.lat,BANGALORE.lng);
-  skyDub.style.background=skyGradient(altDub)+','+horizonGlow(altDub);
-  skyBan.style.background=skyGradient(altBan)+','+horizonGlow(altBan);
-  var hY=altDub>-3&&altDub<=10?'rgba(220,140,80,.08)':altDub<=-8?'rgba(80,60,140,.03)':'transparent';
-  skyDub.style.boxShadow='inset 0 -60px 120px -40px '+hY;
-  var hY2=altBan>-3&&altBan<=10?'rgba(220,140,80,.08)':altBan<=-8?'rgba(80,60,140,.03)':'transparent';
-  skyBan.style.boxShadow='inset 0 -60px 120px -40px '+hY2;
+  var dubDark=altDub<=-6?0.95:altDub<=0?0.6+0.35*(-altDub/6):0.3+0.3*(1-Math.min(1,altDub/10));
+  var banDark=altBan<=-6?0.95:altBan<=0?0.6+0.35*(-altBan/6):0.3+0.3*(1-Math.min(1,altBan/10));
+  skyDubOverlay.style.background='linear-gradient(to top,rgba(5,8,16,'+dubDark+') 0%,rgba(5,8,16,'+(dubDark*.6)+') 30%,rgba(5,8,16,'+(dubDark*.3)+') 55%,rgba(5,8,16,'+(dubDark*.1)+') 75%,rgba(5,8,16,'+(dubDark*.05)+') 100%)';
+  skyBanOverlay.style.background='linear-gradient(to top,rgba(5,8,16,'+banDark+') 0%,rgba(5,8,16,'+(banDark*.6)+') 30%,rgba(5,8,16,'+(banDark*.3)+') 55%,rgba(5,8,16,'+(banDark*.1)+') 75%,rgba(5,8,16,'+(banDark*.05)+') 100%)';
 }
 
 var starCanvas=$('starCanvas'),starCtx=starCanvas.getContext('2d');
@@ -559,7 +571,7 @@ function updateAll(){
   var simDate=new Date(now.getFullYear(),now.getMonth(),now.getDate(),hr,mn);
   updateSkies(simDate);
   drawStars(simDate);
-  updateClocks();updateMoon();updateWeather();tickFireflies();
+  updateClocks();updateColumnTimes();updateMoon();updateWeather();tickFireflies();
 }
 
 function updateMoon(){
@@ -740,7 +752,8 @@ var tSt=0;addEventListener('touchstart',e=>{tSt=e.touches[0].clientY});addEventL
 
 async function updateWeather(){try{var[d,b]=await Promise.all([fetch('https://wttr.in/Dublin?format=%C+%t').then(r=>r.text()).catch(()=>''),fetch('https://wttr.in/Bangalore?format=%C+%t').then(r=>r.text()).catch(()=>'')]);if(d)$('weDub').textContent=d.trim();if(b)$('weBan').textContent=b.trim()}catch(e){}}
 function updateClocks(){var now=new Date();$('clDub').textContent=new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);$('clBan').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',hour12:false}).format(now);var target=new Date('2026-12-01'),diff=target-now;$('cdVal').textContent=diff>0?Math.floor(diff/864e5)+' days':'Home'}
-updateClocks();setInterval(updateClocks,10000);updateWeather();setInterval(updateWeather,600000);
+function updateColumnTimes(){var now=new Date();$('colTimeDub').textContent=new Intl.DateTimeFormat('en-IE',{timeZone:'Europe/Dublin',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now);$('colTimeBan').textContent=new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now)}
+updateClocks();updateColumnTimes();setInterval(updateClocks,10000);setInterval(updateColumnTimes,1000);updateWeather();setInterval(updateWeather,600000);
 
 document.querySelectorAll('.sn').forEach(s=>s.addEventListener('click',()=>{var sc=s.dataset.s;document.querySelectorAll('.sn').forEach(x=>x.classList.remove('act'));s.classList.add('act');if(sc==='letters'){$('letOv').classList.add('open');return}if(sc==='gallery'){$('gallery').classList.add('open');return}if(sc==='date'){$('dateOv').classList.add('open');return}if(sc==='flowers'){$('flowerOv').classList.add('open');return}if(sc==='moon'){$('moonEl').click();return}if(sc==='miss'){receiveMiss();return}lab(s.querySelector('.sl').textContent,'')}));
 
