@@ -76,11 +76,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 
 #missPulse{position:fixed;inset:0;z-index:11;background:radial-gradient(ellipse at center,rgba(212,160,160,.08) 0%,transparent 70%);opacity:0;pointer-events:none;transition:opacity .6s}
 #missPulse.on{opacity:1}
-#missToast{position:fixed;top:28px;right:28px;z-index:15;opacity:0;pointer-events:none;transform:translateY(-20px);transition:all .5s cubic-bezier(.16,1,.3,1)}
-#missToast.on{opacity:1;transform:translateY(0)}
-#missToast .mn{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:#f0e6d2;font-weight:500;letter-spacing:.04em;padding:20px 28px;border-radius:16px;background:rgba(5,8,22,.85);border:2px solid rgba(212,160,160,.6);box-shadow:0 0 30px rgba(212,160,160,.25),0 0 60px rgba(212,160,160,.1),inset 0 0 20px rgba(212,160,160,.05);backdrop-filter:blur(16px);max-width:320px;text-align:center;line-height:1.5}
-#missToast .mn strong{color:#d4a0a0;font-weight:600}
-#missToast .ms{font-size:11px;color:rgba(212,160,160,.7);letter-spacing:.12em;margin-top:8px;text-transform:uppercase;font-weight:400}
+#missToast{position:fixed;top:28px;right:28px;z-index:15;opacity:0;pointer-events:none;transform:translateY(-20px) scale(.9);transition:all .6s cubic-bezier(.16,1,.3,1)}
+#missToast.on{opacity:1;transform:translateY(0) scale(1)}
+#missToast .mn{position:relative;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;color:#f0e6d2;font-weight:400;letter-spacing:.03em;padding:22px 26px 18px;border-radius:20px;background:linear-gradient(135deg,rgba(15,10,30,.9) 0%,rgba(20,12,35,.88) 50%,rgba(10,8,25,.92) 100%);border:1.5px solid rgba(212,160,160,.35);backdrop-filter:blur(20px);max-width:300px;text-align:center;line-height:1.55;overflow:hidden;animation:missFloat 3s ease-in-out infinite}
+#missToast .mn::before{content:'';position:absolute;inset:-1.5px;border-radius:20px;padding:1.5px;background:linear-gradient(135deg,rgba(212,160,160,.5),rgba(180,130,200,.3),rgba(212,160,160,.1),rgba(200,160,180,.4));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;animation:missGlow 2s ease-in-out infinite}
+#missToast .mn::after{content:'✦';position:absolute;top:10px;right:14px;font-size:12px;color:rgba(212,160,160,.5);animation:missTwinkle 1.5s ease-in-out infinite}
+#missToast .mn strong{color:#d4a0a0;font-weight:600;font-size:23px}
+#missToast .mn .missIcon{display:block;font-size:28px;margin-bottom:8px;filter:drop-shadow(0 0 8px rgba(212,160,160,.4));animation:missHeart 1.2s ease-in-out infinite}
+#missToast .ms{font-size:10px;color:rgba(212,160,160,.6);letter-spacing:.14em;margin-top:10px;text-transform:uppercase;font-weight:400}
+#missToast .missSparkles{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:20px}
+#missToast .missSparkles span{position:absolute;width:3px;height:3px;background:rgba(212,160,160,.6);border-radius:50%;animation:missSparkle 2s ease-in-out infinite}
+#missToast .missSparkles span:nth-child(1){top:15%;left:10%;animation-delay:0s}
+#missToast .missSparkles span:nth-child(2){top:70%;left:80%;animation-delay:.5s}
+#missToast .missSparkles span:nth-child(3){top:40%;left:90%;animation-delay:1s}
+#missToast .missSparkles span:nth-child(4){top:80%;left:20%;animation-delay:1.5s}
+#missToast .missSparkles span:nth-child(5){top:25%;left:60%;animation-delay:.7s}
+@keyframes missFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes missGlow{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes missTwinkle{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes missHeart{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+@keyframes missSparkle{0%,100%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1)}}
 
 #sLab{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:12;opacity:0;transition:opacity 1.5s;pointer-events:none;text-align:center}
 #sLab.on{opacity:1}
@@ -309,7 +324,7 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 </button>
 
 <div id="missPulse"></div>
-<div id="missToast"><div class="mn" id="mName"></div><div class="ms">thinking of you right now</div></div>
+<div id="missToast"><div class="mn" id="mName"><div class="missSparkles"><span></span><span></span><span></span><span></span><span></span></div></div><div class="ms">thinking of you right now</div></div>
 
 <div id="sLab"><div class="sn2" id="slNm"></div><div class="sh2" id="slHt"></div></div>
 
@@ -859,12 +874,12 @@ renderInbox();renderSent();renderQuick();updateBadge();
 $('missBtn').addEventListener('click',()=>{
   $('missBtn').classList.add('puls');setTimeout(()=>$('missBtn').classList.remove('puls'),1500);
   var who=sender==='Rashmi'?'Sharath':'Rashmi';
-  $('mName').innerHTML='<strong>'+who+'</strong>, I miss you so much right now';
+  $('mName').innerHTML='<div class="missSparkles"><span></span><span></span><span></span><span></span><span></span></div><span class="missIcon">\u2764</span><strong>'+who+'</strong>, I miss you so much right now';
   $('missPulse').classList.add('on');$('missToast').classList.add('on');
   setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},4000);
   notifyEmail(sender+' is thinking about you right now \u2728',sender);
 });
-function receiveMiss(){$('mName').innerHTML='<strong>'+(sender==='Rashmi'?'Sharath':'Rashmi')+'</strong> is thinking about you right now';$('missPulse').classList.add('on');$('missToast').classList.add('on');setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},4000);spawnFF('Thinking of you')}
+function receiveMiss(){$('mName').innerHTML='<div class="missSparkles"><span></span><span></span><span></span><span></span><span></span></div><span class="missIcon">\u2764</span><strong>'+(sender==='Rashmi'?'Sharath':'Rashmi')+'</strong> is thinking about you right now';$('missPulse').classList.add('on');$('missToast').classList.add('on');setTimeout(()=>{$('missPulse').classList.remove('on');$('missToast').classList.remove('on')},4000);spawnFF('Thinking of you')}
 
 addEventListener('wheel',e=>{if(phase!=='universe')return;scrollP=Math.max(0,Math.min(1,scrollP+e.deltaY*.0001));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
 var tSt=0;addEventListener('touchstart',e=>{tSt=e.touches[0].clientY});addEventListener('touchmove',e=>{if(phase!=='universe')return;var dy=tSt-e.touches[0].clientY;tSt=e.touches[0].clientY;scrollP=Math.max(0,Math.min(1,scrollP+dy*.0004));$('scrollBar').style.height=(scrollP*100)+'vh';updateAll()},{passive:true});
