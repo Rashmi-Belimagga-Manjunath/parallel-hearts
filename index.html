@@ -159,7 +159,7 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 
 #aboutOv{position:fixed;inset:0;z-index:20;background:rgba(5,8,16,.94);backdrop-filter:blur(24px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
 #aboutOv.open{opacity:1;visibility:visible}
-.aboutCard{width:min(560px,92vw);max-height:82vh;background:linear-gradient(145deg,rgba(16,18,30,.96),rgba(10,12,24,.98));border:1px solid rgba(212,160,160,.1);border-radius:20px;transform:translateY(24px) scale(.97);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;display:flex;flex-direction:column}
+.aboutCard{width:min(860px,94vw);max-height:86vh;background:linear-gradient(145deg,rgba(16,18,30,.96),rgba(10,12,24,.98));border:1px solid rgba(212,160,160,.1);border-radius:20px;transform:translateY(24px) scale(.97);transition:transform .8s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;display:flex;flex-direction:column}
 #aboutOv.open .aboutCard{transform:translateY(0) scale(1)}
 .aboutX{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(212,160,160,.1);background:rgba(5,8,16,.4);color:rgba(212,160,160,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;z-index:2;transition:all .3s}
 .aboutX:hover{border-color:rgba(212,160,160,.3);color:#d4a0a0}
@@ -168,22 +168,22 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 .aboutHeader .ah-title{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(24px,4vw,32px);color:#f0e6d2;font-weight:300;letter-spacing:.04em}
 .aboutHeader .ah-sub{font-size:11px;color:rgba(212,160,160,.5);letter-spacing:.14em;margin-top:6px;text-transform:uppercase}
 .aboutBody{flex:1;overflow-y:auto;padding:24px 28px;scrollbar-width:thin;scrollbar-color:rgba(212,160,160,.1) transparent}
+.aboutCols{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.aboutCol{padding:20px;border:1px solid rgba(212,160,160,.08);border-radius:16px;background:rgba(212,160,160,.02);text-align:center}
+.aboutCol .ac-img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:2.5px solid rgba(212,160,160,.3);box-shadow:0 0 24px rgba(212,160,160,.15);margin-bottom:14px}
+.aboutCol .ac-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:#d4a0a0;font-weight:400;margin-bottom:12px}
+.aboutCol .ac-detail{text-align:left;font-size:12px;color:rgba(240,230,210,.55);line-height:1.8}
+.aboutCol .ac-detail strong{color:rgba(212,160,160,.7);font-weight:400;display:inline-block;min-width:90px}
 .aboutSection{margin-bottom:24px}
 .aboutSection .as-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(212,160,160,.45);margin-bottom:10px;font-weight:400}
-.aboutPerson{display:flex;gap:20px;align-items:center;padding:16px;border:1px solid rgba(212,160,160,.06);border-radius:14px;background:rgba(212,160,160,.02);margin-bottom:10px}
-.aboutPerson .ap-img{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(212,160,160,.25);box-shadow:0 0 16px rgba(212,160,160,.15);flex-shrink:0}
-.aboutPerson .ap-icon{font-size:32px;flex-shrink:0;margin-top:2px}
-.aboutPerson .ap-info{flex:1}
-.aboutPerson .ap-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;color:#d4a0a0;font-weight:400}
-.aboutPerson .ap-detail{font-size:12px;color:rgba(240,230,210,.55);margin-top:5px;line-height:1.6}
-.aboutPerson .ap-detail strong{color:rgba(212,160,160,.7);font-weight:400}
-.aboutRow{display:flex;gap:16px;flex-wrap:wrap}
-.aboutRow .ar-item{flex:1;min-width:140px;padding:14px;border:1px solid rgba(212,160,160,.06);border-radius:12px;background:rgba(212,160,160,.02);text-align:center}
-.aboutRow .ar-item .ari-icon{font-size:22px;margin-bottom:6px}
+.aboutRow{display:flex;gap:12px;flex-wrap:wrap}
+.aboutRow .ar-item{flex:1;min-width:120px;padding:14px;border:1px solid rgba(212,160,160,.06);border-radius:12px;background:rgba(212,160,160,.02);text-align:center}
+.aboutRow .ar-item .ari-icon{font-size:20px;margin-bottom:6px}
 .aboutRow .ar-item .ari-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(212,160,160,.4);margin-bottom:4px}
-.aboutRow .ar-item .ari-val{font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:#f0e6d2;font-weight:300}
+.aboutRow .ar-item .ari-val{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;color:#f0e6d2;font-weight:300}
 .aboutQuote{text-align:center;padding:20px;border-top:1px solid rgba(212,160,160,.06);margin-top:8px}
 .aboutQuote .aq-text{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(14px,2vw,18px);color:rgba(212,160,160,.6);font-style:italic;line-height:1.6;font-weight:300}
+@media(max-width:700px){.aboutCols{grid-template-columns:1fr}}
 
 #moonOv{position:fixed;inset:0;z-index:20;background:rgba(5,8,16,.94);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
 #moonOv.open{opacity:1;visibility:visible}
@@ -308,24 +308,6 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
   .gal-grid{padding:16px 18px 40px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
   #moonEl{left:18px;top:80px}
 }
-#loadingPopup{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:#050816;transition:opacity 1.5s cubic-bezier(.16,1,.3,1)}
-#loadingPopup.out{opacity:0;pointer-events:none}
-#loadingPopup .lp-inner{text-align:center;animation:lpFloat 2.5s ease-in-out infinite}
-#loadingPopup .lp-text{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(18px,3vw,28px);color:#f0e6d2;font-weight:300;letter-spacing:.04em;line-height:1.6;position:relative;padding:24px 36px;border-radius:20px;background:linear-gradient(135deg,rgba(15,10,30,.9) 0%,rgba(20,12,35,.85) 50%,rgba(10,8,25,.9) 100%);border:1.5px solid rgba(212,160,160,.3);backdrop-filter:blur(20px);box-shadow:0 0 40px rgba(212,160,160,.12),0 0 80px rgba(212,160,160,.06)}
-#loadingPopup .lp-text::before{content:'';position:absolute;inset:-1.5px;border-radius:20px;padding:1.5px;background:linear-gradient(135deg,rgba(212,160,160,.4),rgba(180,130,200,.2),rgba(212,160,160,.1),rgba(200,160,180,.3));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;animation:lpGlow 2s ease-in-out infinite}
-#loadingPopup .lp-heart{display:block;font-size:32px;margin-bottom:12px;filter:drop-shadow(0 0 10px rgba(212,160,160,.5));animation:lpHeart 1s ease-in-out infinite}
-#loadingPopup .lp-dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:rgba(212,160,160,.5);margin:0 4px;animation:lpDot 1.4s ease-in-out infinite}
-#loadingPopup .lp-dots span:nth-child(2){animation-delay:.2s}
-#loadingPopup .lp-dots span:nth-child(3){animation-delay:.4s}
-#loadingPopup .lp-sparkles{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:20px}
-#loadingPopup .lp-sparkles span{position:absolute;width:3px;height:3px;background:rgba(212,160,160,.5);border-radius:50%;animation:lpSparkle 2.5s ease-in-out infinite}
-#loadingPopup .lp-sparkles span:nth-child(1){top:12%;left:8%;animation-delay:0s}
-#loadingPopup .lp-sparkles span:nth-child(2){top:75%;left:85%;animation-delay:.6s}
-#loadingPopup .lp-sparkles span:nth-child(3){top:35%;left:92%;animation-delay:1.2s}
-#loadingPopup .lp-sparkles span:nth-child(4){top:85%;left:15%;animation-delay:1.8s}
-#loadingPopup .lp-sparkles span:nth-child(5){top:20%;left:65%;animation-delay:.9s}
-#loadingPopup .lp-sparkles span:nth-child(6){top:60%;left:5%;animation-delay:1.5s}
-@keyframes lpFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes lpGlow{0%,100%{opacity:.5}50%{opacity:1}}
 @keyframes lpHeart{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
 @keyframes lpDot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
@@ -333,17 +315,6 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 </style>
 </head>
 <body>
-
-<div id="loadingPopup">
-  <div class="lp-inner">
-    <div class="lp-text">
-      <div class="lp-sparkles"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-      <span class="lp-heart">&#10084;</span>
-      Please wait while I work my magic &lt;3
-      <div class="lp-dots"><span></span><span></span><span></span></div>
-    </div>
-  </div>
-</div>
 
 <div id="bgImage"></div>
 <div id="bgOverlay"></div>
@@ -447,44 +418,46 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
   <div class="aboutCard">
     <button class="aboutX" onclick="document.getElementById('aboutOv').classList.remove('open')">&times;</button>
     <div class="aboutHeader">
-      <div class="ah-icon">\u2764</div>
+      <div class="ah-icon">&#10084;</div>
       <div class="ah-title">Parallel Hearts</div>
       <div class="ah-sub">Two cities, one love story</div>
     </div>
     <div class="aboutBody">
-      <div class="aboutSection">
-        <div class="as-label">Us</div>
-        <div class="aboutPerson">
-          <img class="ap-img" src="about us/Rashmi.png" alt="Rashmi">
-          <div class="ap-info">
-            <div class="ap-name">Rashmi Manjunath</div>
-            <div class="ap-detail"><strong>Birthday:</strong> 20 March<br><strong>Location:</strong> Dublin, Ireland<br><strong>Profession:</strong> MSc in Artificial Intelligence<br><strong>Moved abroad:</strong> 2 January 2026</div>
+      <div class="aboutCols">
+        <div class="aboutCol">
+          <img class="ac-img" src="about us/Rashmi.png" alt="Rashmi">
+          <div class="ac-name">Rashmi Manjunath</div>
+          <div class="ac-detail">
+            <strong>Birthday:</strong> 20 March<br>
+            <strong>Location:</strong> Dublin, Ireland<br>
+            <strong>Profession:</strong> MSc in Artificial Intelligence<br>
+            <strong>Moved abroad:</strong> 2 January 2026
           </div>
         </div>
-        <div class="aboutPerson">
-          <img class="ap-img" src="about us/Sharath.png" alt="Sharath">
-          <div class="ap-info">
-            <div class="ap-name">Sharath Manjunath</div>
-            <div class="ap-detail"><strong>Birthday:</strong> 3 February<br><strong>Location:</strong> Bangalore, India<br><strong>Profession:</strong> IT Professional</div>
+        <div class="aboutCol">
+          <img class="ac-img" src="about us/Sharath.png" alt="Sharath">
+          <div class="ac-name">Sharath Manjunath</div>
+          <div class="ac-detail">
+            <strong>Birthday:</strong> 3 February<br>
+            <strong>Location:</strong> Bangalore, India<br>
+            <strong>Profession:</strong> IT Professional
           </div>
         </div>
       </div>
       <div class="aboutSection">
         <div class="as-label">Our Story</div>
         <div class="aboutRow">
-          <div class="ar-item"><div class="ari-icon">\u26B9</div><div class="ari-label">Wedding</div><div class="ari-val">23 May 2025</div></div>
-          <div class="ar-item"><div class="ari-icon">\u26FA</div><div class="ari-label">Venue</div><div class="ari-val">Coorg, Karnataka</div></div>
-        </div>
-        <div class="aboutRow" style="margin-top:10px">
-          <div class="ar-item"><div class="ari-icon">\u2708</div><div class="ari-label">Distance</div><div class="ari-val">8,580 km</div></div>
-          <div class="ar-item"><div class="ari-icon">\u23F3</div><div class="ari-label">Reunion</div><div class="ari-val">December 2026</div></div>
+          <div class="ar-item"><div class="ari-icon">&#9875;</div><div class="ari-label">Wedding</div><div class="ari-val">23 May 2025</div></div>
+          <div class="ar-item"><div class="ari-icon">&#9962;</div><div class="ari-label">Venue</div><div class="ari-val">Coorg, Karnataka</div></div>
+          <div class="ar-item"><div class="ari-icon">&#9992;</div><div class="ari-label">Distance</div><div class="ari-val">8,580 km</div></div>
+          <div class="ar-item"><div class="ari-icon">&#9200;</div><div class="ari-label">Reunion</div><div class="ari-val">December 2026</div></div>
         </div>
       </div>
       <div class="aboutSection">
         <div class="as-label">Coordinates</div>
         <div class="aboutRow">
-          <div class="ar-item"><div class="ari-label">Dublin</div><div class="ari-val">53.35\u00B0N, 6.26\u00B0W</div></div>
-          <div class="ar-item"><div class="ari-label">Bangalore</div><div class="ari-val">12.97\u00B0N, 77.59\u00B0E</div></div>
+          <div class="ar-item"><div class="ari-label">Dublin</div><div class="ari-val">53.35&deg;N, 6.26&deg;W</div></div>
+          <div class="ar-item"><div class="ari-label">Bangalore</div><div class="ari-val">12.97&deg;N, 77.59&deg;E</div></div>
         </div>
       </div>
       <div class="aboutQuote">
@@ -592,7 +565,7 @@ function drawLanding(ts){
     if(landPhase===3){heartStars[0].target=1;heartStars[1].target=1}
     if(landPhase===4)threadTarget=1;
     if(landPhase===5)zoomTarget=.65;
-    if(landPhase===6){$('titleBlock').style.opacity='1';$('loadingPopup').classList.add('out');setTimeout(()=>{$('loadingPopup').style.display='none';$('enterBtn').style.opacity='1';$('enterBtn').classList.add('show')},1500)}
+    if(landPhase===6){$('titleBlock').style.opacity='1';setTimeout(()=>{$('enterBtn').style.opacity='1';$('enterBtn').classList.add('show')},1500)}
   }
   lCtx.fillStyle='#050816';lCtx.fillRect(0,0,W,H);
   lCtx.save();zoom+=(zoomTarget-zoom)*.008;lCtx.translate(W/2,H/2);lCtx.scale(zoom,zoom);lCtx.translate(-W/2,-H/2);
