@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Parallel Hearts</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
@@ -105,9 +108,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#050816;color:#f0e6d
 
 #scrollBar{position:fixed;right:0;top:0;width:2px;height:0;background:linear-gradient(to bottom,rgba(212,160,160,.4),rgba(212,160,160,.15));z-index:12;transition:height .3s;pointer-events:none}
 
-#cursorCanvas{position:fixed;inset:0;z-index:16;pointer-events:none}
-html,body{cursor:none}
-#enterBtn,.sn,.ab,.ff,.gal-card,.qk,.fl-opt,.date-opt,.pv-close,.pv-nav,.letWhoBtn,.letSend,.letTab,.letItem,.mcl,.date-close,.gal-upload-btn,.letX,.ab{cursor:none}
+#cursorCanvas{position:fixed;inset:0;z-index:9999;pointer-events:none}
+html,body,#landing,#skyWrap,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBar,#gallery,#photoViewer,#moonOv,#letOv,#dateOv,#flowerOv,#flowerRain,#ytPlayer,#ytToggle,#dateActive,#missPulse,#missToast,#sLab,#cityLabels,#skyDublin,#skyBangalore,#skyDivider,#starCanvas,#cursorCanvas{cursor:none!important}
 
 #gallery{position:fixed;inset:0;z-index:22;background:rgba(5,8,16,.97);opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(212,160,160,.15) transparent}
 #gallery.open{opacity:1;visibility:visible}
@@ -220,10 +222,10 @@ html,body{cursor:none}
 .date-opt.chosen .do-text{color:#d4a0a0}
 .date-close{padding:10px 28px;border:1px solid rgba(212,160,160,.15);border-radius:20px;background:transparent;color:rgba(212,160,160,.5);font-family:'Inter',sans-serif;font-size:10px;cursor:pointer;letter-spacing:.1em;transition:all .3s}
 .date-close:hover{border-color:rgba(212,160,160,.35);color:#d4a0a0}
-.date-active{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:20;text-align:center;opacity:0;pointer-events:none;transition:opacity .8s}
-.date-active.on{opacity:1;pointer-events:auto}
-.date-active .da-msg{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(16px,2.5vw,22px);color:#d4a0a0;font-weight:300;font-style:italic;letter-spacing:.04em}
-.date-active .da-who{font-size:9px;color:rgba(212,160,160,.4);margin-top:6px;letter-spacing:.1em}
+#dateActive{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:20;text-align:center;opacity:0;pointer-events:none;transition:opacity .8s}
+#dateActive.on{opacity:1;pointer-events:auto}
+#dateActive .da-msg{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(16px,2.5vw,22px);color:#d4a0a0;font-weight:300;font-style:italic;letter-spacing:.04em}
+#dateActive .da-who{font-size:9px;color:rgba(212,160,160,.4);margin-top:6px;letter-spacing:.1em}
 
 #flowerOv{position:fixed;inset:0;z-index:25;background:rgba(4,6,12,.96);backdrop-filter:blur(30px);display:flex;align-items:center;justify-content:center;flex-direction:column;opacity:0;visibility:hidden;transition:all .8s cubic-bezier(.16,1,.3,1)}
 #flowerOv.open{opacity:1;visibility:visible}
@@ -663,7 +665,7 @@ var USER_PHOTOS_KEY='parallel_hearts_user_photos';
 function loadUserPhotos(){try{return JSON.parse(localStorage.getItem(USER_PHOTOS_KEY))||[]}catch(e){return[]}}
 var userPhotos=loadUserPhotos();
 function saveUserPhotos(){localStorage.setItem(USER_PHOTOS_KEY,JSON.stringify(userPhotos))}
-function buildGallery(){userPhotos=loadUserPhotos();var all=[...realPhotos,...userPhotos];$('galGrid').innerHTML=all.map((p,i)=>'<div class="gal-card" onclick="openPhoto('+i+')"><img src="'+p.src+'" alt="'+p.title+'" loading="lazy"><div class="gc-info"><div class="gc-date">'+p.date+'</div><div class="gc-title">'+p.title+'</div>'+(p.desc?'<div class="gc-desc">'+p.desc+'</div>':'')+'</div></div>').join('')}
+function buildGallery(){userPhotos=loadUserPhotos();var all=[...realPhotos,...userPhotos];$('galGrid').innerHTML=all.map((p,i)=>'<div class="gal-card" onclick="openPhoto('+i+')"><img src="'+esc(p.src)+'" alt="'+esc(p.title)+'" loading="lazy"><div class="gc-info"><div class="gc-date">'+esc(p.date)+'</div><div class="gc-title">'+esc(p.title)+'</div>'+(p.desc?'<div class="gc-desc">'+esc(p.desc)+'</div>':'')+'</div></div>').join('')}
 buildGallery();
 var pvIdx=0;
 function openPhoto(i){pvIdx=i;var all=[...realPhotos,...userPhotos];var p=all[i],v=$('photoViewer');v.querySelector('img').src=p.src;v.querySelector('.pv-date').textContent=p.date+' \u2014 '+p.title;v.querySelector('.pv-caption').textContent=p.desc;v.querySelector('.pv-count').textContent=(i+1)+' / '+all.length;v.classList.add('open')}
@@ -694,18 +696,19 @@ var letters=loadLetters();
 function saveLetters(){localStorage.setItem(LETTERS_KEY,JSON.stringify(letters))}
 function unreadCount(){var other=sender==='Rashmi'?'Sharath':'Rashmi';return letters.filter(l=>l.from===other&&!l.read).length}
 function formatDate(d){return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function renderInbox(){
   var panel=$('inboxPanel');
   var other=sender==='Rashmi'?'Sharath':'Rashmi';
   var sl=letters.filter(l=>l.from===other).sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(!sl.length){panel.innerHTML='<div class="letEmpty">No letters yet.\n\nWhen '+other+' writes, they\'ll appear here.\n\nThis is your shared space \u2014 a place for real words, between real people, across real distance.</div>';return}
-  panel.innerHTML=sl.map(l=>'<div class="letItem '+(l.read?'':'unread')+'" onclick="openLetter(\''+l.id+'\')"><div class="li-from">'+l.from+'</div><div class="li-preview">'+l.body.substring(0,120)+'...</div><div class="li-date">'+formatDate(l.date)+'</div><div class="li-dot"></div></div>').join('')
+  panel.innerHTML=sl.map(l=>'<div class="letItem '+(l.read?'':'unread')+'" onclick="openLetter(\''+l.id+'\')"><div class="li-from">'+esc(l.from)+'</div><div class="li-preview">'+esc(l.body.substring(0,120))+'...</div><div class="li-date">'+formatDate(l.date)+'</div><div class="li-dot"></div></div>').join('')
 }
 function renderSent(){
   var panel=$('sentPanel');
   var sl=letters.filter(l=>l.from===sender).sort((a,b)=>new Date(b.date)-new Date(a.date));
   if(!sl.length){panel.innerHTML='<div class="letEmpty">No letters sent yet.\n\nWrite one \u2014 real words, from you, to them.</div>';return}
-  panel.innerHTML=sl.map(l=>'<div class="letItem" onclick="openLetter(\''+l.id+'\')"><div class="li-from">To: '+(l.to||sender==='Rashmi'?'Sharath':'Rashmi')+'</div><div class="li-preview">'+l.body.substring(0,120)+'...</div><div class="li-date">'+formatDate(l.date)+'</div></div>').join('')
+  panel.innerHTML=sl.map(l=>'<div class="letItem" onclick="openLetter(\''+l.id+'\')"><div class="li-from">To: '+esc(l.to||sender==='Rashmi'?'Sharath':'Rashmi')+'</div><div class="li-preview">'+esc(l.body.substring(0,120))+'...</div><div class="li-date">'+formatDate(l.date)+'</div></div>').join('')
 }
 function renderQuick(){$('quickGrid').innerHTML=quickMsgs.map((q,i)=>'<div class="qk" onclick="sendQuick('+i+')"><div class="qk-icon">'+q.icon+'</div><div class="qk-text">'+q.text+'</div><div class="qk-sub">'+q.sub+'</div></div>').join('')}
 function openLetter(id){var l=letters.find(x=>x.id===id);if(!l)return;if(!l.read){l.read=true;saveLetters();updateBadge()}$('lrFrom').textContent=l.from;$('lrDate').textContent=formatDate(l.date);$('lrBody').textContent=l.body;$('lrSig').textContent='\u2014 '+l.from;document.querySelectorAll('.letPanel,.letWrite').forEach(p=>p.classList.remove('active'));$('readPanel').classList.add('active')}
@@ -872,7 +875,6 @@ resizeCursor();addEventListener('resize',resizeCursor);
 var mouse={x:W/2,y:H/2,px:W/2,py:H/2,vx:0,vy:0,speed:0};
 var trail=[];
 var ripples=[];
-var magneticTarget=null;
 var magneticForce={x:0,y:0};
 var hoverGlow=0;
 var orbitActive=false;
@@ -880,89 +882,71 @@ var orbitPhase=0;
 
 addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY},{passive:true});
 addEventListener('mousedown',e=>{
-  ripples.push({x:e.clientX,y:e.clientY,r:0,maxR:120,life:1,age:0});
-});
+  ripples.push({x:e.clientX,y:e.clientY,r:0,maxR:100,life:1});
+},{passive:true});
 
-var MAGNETIC_RADIUS=80;
-var MAGNETIC_STRENGTH=0.12;
+var MAGNETIC_RADIUS=70;
+var MAGNETIC_STRENGTH=0.15;
 function getMagneticPull(){
-  var els=document.querySelectorAll('#enterBtn:not([style*="display: none"]),.sn,.ab,.ff,.gal-card,.qk,.fl-opt,.date-opt,.pv-close,.pv-nav,.letWhoBtn,.letSend,.letTab,.mcl,.date-close,.gal-upload-btn,#missBtn,#moonEl,#ytToggle');
   var best=null,bestDist=MAGNETIC_RADIUS;
-  els.forEach(function(el){
+  var els=document.querySelectorAll('.sn,.ab,.ff,.gal-card,.qk,.fl-opt,.date-opt,#missBtn,#moonEl,#ytToggle,#enterBtn');
+  for(var i=0;i<=els.length-1;i++){
+    var el=els[i];
     var r=el.getBoundingClientRect();
-    if(r.width===0||r.height===0)return;
+    if(r.width<=0||r.height<=0)continue;
     var cx=r.left+r.width/2,cy=r.top+r.height/2;
     var dx=cx-mouse.x,dy=cy-mouse.y;
     var dist=Math.sqrt(dx*dx+dy*dy);
     if(dist<bestDist){bestDist=dist;best={x:cx,y:cy,d:dist}}
-  });
+  }
   if(best){
     var strength=(1-best.d/MAGNETIC_RADIUS)*MAGNETIC_STRENGTH;
-    magneticTarget=best;
     return{x:(best.x-mouse.x)*strength,y:(best.y-mouse.y)*strength};
   }
-  magneticTarget=null;
   return{x:0,y:0};
 }
 
-var STAR_INTERACT_RADIUS=60;
-function getHoverGlow(){
-  if(phase!=='universe')return 0;
-  var closest=0;
-  for(var i=0;i<=17;i++){
-    var s=constStars[i];
-    var sx2=s.x*W,sy2=s.y*H;
-    var dx=sx2-mouse.x,dy=sy2-mouse.y;
-    var d=Math.sqrt(dx*dx+dy*dy);
-    var g=Math.max(0,1-d/STAR_INTERACT_RADIUS);
-    if(g>closest)closest=g;
-  }
-  return closest;
-}
-
-var GAL_CARD_RADIUS=150;
 function checkOrbitActive(){
+  if(phase!=='universe')return false;
   var cards=document.querySelectorAll('.gal-card');
   for(var i=0;i<=cards.length-1;i++){
     var r=cards[i].getBoundingClientRect();
+    if(r.width<=0)continue;
     var cx=r.left+r.width/2,cy=r.top+r.height/2;
     var dx=cx-mouse.x,dy=cy-mouse.y;
-    var d=Math.sqrt(dx*dx+dy*dy);
-    if(d<GAL_CARD_RADIUS)return true;
+    if(Math.sqrt(dx*dx+dy*dy)<150)return true;
   }
   return false;
 }
 
 function spawnTrail(x,y,speed){
-  var count=speed>.5?(speed>3?3:2):1;
+  var count=speed>4?3:speed>1.5?2:1;
   for(var i=0;i<count;i++){
     trail.push({
-      x:x+(Math.random()-.5)*4,
-      y:y+(Math.random()-.5)*4,
-      vx:(Math.random()-.5)*1.5,
-      vy:(Math.random()-.5)*1.5-Math.random()*.5,
+      x:x+(Math.random()-.5)*3,
+      y:y+(Math.random()-.5)*3,
+      vx:(Math.random()-.5)*1.2,
+      vy:(Math.random()-.5)*1.2-Math.random()*.4,
       life:1,
-      size:Math.random()*2+1,
-      hue:Math.random()>.5?0:30
+      size:Math.random()*1.8+.8
     });
   }
 }
 
 function drawCursor(){
   curCtx.clearRect(0,0,W,H);
-  if(phase!=='universe'&&phase!=='landing')return;
 
   mouse.vx=mouse.x-mouse.px;
   mouse.vy=mouse.y-mouse.py;
   mouse.speed=Math.sqrt(mouse.vx*mouse.vx+mouse.vy*mouse.vy);
-  mouse.px+=(mouse.x-mouse.px)*.35;
-  mouse.py+=(mouse.y-mouse.py)*.35;
+  mouse.px+=(mouse.x-mouse.px)*.5;
+  mouse.py+=(mouse.y-mouse.py)*.5;
 
   magneticForce=getMagneticPull();
-  var cx=mouse.px+magneticForce.x;
-  var cy=mouse.py+magneticForce.y;
+  var cx=mouse.x+magneticForce.x;
+  var cy=mouse.y+magneticForce.y;
 
-  if(mouse.speed>.8){
+  if(mouse.speed>.5){
     spawnTrail(cx,cy,mouse.speed);
   }
 
@@ -971,11 +955,11 @@ function drawCursor(){
     var p=trail[i];
     p.x+=p.vx;
     p.y+=p.vy;
-    p.vy+=.01;
-    p.life-=.02;
+    p.vy+=.008;
+    p.life-=.025;
     if(p.life<=0){trail.splice(i,1);continue;}
-    curCtx.globalAlpha=p.life*.6;
-    curCtx.fillStyle='rgba(212,160,160,'+p.life*.5+')';
+    curCtx.globalAlpha=p.life*.5;
+    curCtx.fillStyle='#d4a0a0';
     curCtx.beginPath();
     curCtx.arc(p.x,p.y,p.size*p.life,0,TAU);
     curCtx.fill();
@@ -984,59 +968,39 @@ function drawCursor(){
 
   for(i=ripples.length-1;i>=0;i--){
     var rp=ripples[i];
-    rp.age+=.016;
-    rp.r+=4;
-    var progress=rp.r/rp.maxR;
-    rp.life=1-progress;
+    rp.r+=3.5;
+    rp.life=1-rp.r/rp.maxR;
     if(rp.life<=0){ripples.splice(i,1);continue;}
-    curCtx.strokeStyle='rgba(212,160,160,'+(rp.life*.3)+')';
-    curCtx.lineWidth=1.5;
+    curCtx.strokeStyle='rgba(212,160,160,'+(rp.life*.35)+')';
+    curCtx.lineWidth=1.2;
     curCtx.beginPath();
     curCtx.arc(rp.x,rp.y,rp.r,0,TAU);
     curCtx.stroke();
-    if(progress<=.7){
-      curCtx.strokeStyle='rgba(240,230,210,'+(rp.life*.15)+')';
-      curCtx.lineWidth=.8;
-      curCtx.beginPath();
-      curCtx.arc(rp.x,rp.y,rp.r*.6,0,TAU);
-      curCtx.stroke();
-    }
   }
 
-  hoverGlow+=(getHoverGlow()-hoverGlow)*.08;
+  hoverGlow*=.92;
   orbitActive=checkOrbitActive();
   if(orbitActive)orbitPhase+=.02;
 
-  var gSize=8+hoverGlow*12+mouse.speed*.3;
-  var g1=curCtx.createRadialGradient(cx,cy,0,cx,cy,gSize*3);
-  g1.addColorStop(0,'rgba(212,160,160,'+(0.12+hoverGlow*.25)+')');
-  g1.addColorStop(.3,'rgba(212,160,160,'+(0.04+hoverGlow*.1)+')');
+  var gSize=7+mouse.speed*.2;
+  var g1=curCtx.createRadialGradient(cx,cy,0,cx,cy,gSize*2.5);
+  g1.addColorStop(0,'rgba(212,160,160,0.15)');
+  g1.addColorStop(.4,'rgba(212,160,160,0.04)');
   g1.addColorStop(1,'rgba(212,160,160,0)');
   curCtx.fillStyle=g1;
   curCtx.beginPath();
-  curCtx.arc(cx,cy,gSize*3,0,TAU);
+  curCtx.arc(cx,cy,gSize*2.5,0,TAU);
   curCtx.fill();
 
-  curCtx.fillStyle='rgba(255,248,248,'+(0.85+hoverGlow*.15)+')';
+  curCtx.fillStyle='rgba(255,248,248,0.9)';
   curCtx.beginPath();
-  curCtx.arc(cx,cy,2.5+hoverGlow*1.5,0,TAU);
+  curCtx.arc(cx,cy,2.5,0,TAU);
   curCtx.fill();
 
-  curCtx.fillStyle='rgba(255,255,255,'+(0.9+hoverGlow*.1)+')';
+  curCtx.fillStyle='rgba(255,255,255,0.95)';
   curCtx.beginPath();
-  curCtx.arc(cx,cy,1.2+hoverGlow*.8,0,TAU);
+  curCtx.arc(cx,cy,1,0,TAU);
   curCtx.fill();
-
-  for(var sp=0;sp<=2;sp++){
-    var sa=sp*TAU/3+time*1.5;
-    var sr=5+Math.sin(time*2+sp)*2+hoverGlow*3;
-    var sx3=cx+Math.cos(sa)*sr;
-    var sy3=cy+Math.sin(sa)*sr;
-    curCtx.fillStyle='rgba(212,160,160,'+(0.3+hoverGlow*.3)+')';
-    curCtx.beginPath();
-    curCtx.arc(sx3,sy3,.6+hoverGlow*.4,0,TAU);
-    curCtx.fill();
-  }
 }
 
 function tickCursor(){drawCursor();requestAnimationFrame(tickCursor)}
