@@ -672,7 +672,7 @@ html,body,#landing,#hud,#sideNav,#missBtn,#audio,#moonEl,#scrlH,#toast,#scrollBa
 </div>
 
 <script>
-if(location.search.indexOf('v=18')===-1){location.replace(location.pathname+'?v=18');throw'cache bust'}
+if(location.search.indexOf('v=19')===-1){location.replace(location.pathname+'?v=19');throw'cache bust'}
 var $=id=>document.getElementById(id);
 var PI=Math.PI,TAU=PI*2;
 var W=innerWidth,H=innerHeight;
@@ -1250,20 +1250,18 @@ var blogsFetched=false;
 function fetchBlogs(){
   if(blogsFetched)return;
   $('blogLoading').style.display='flex';
-  fetch('https://rashmi95.wordpress.com/feed/')
-    .then(r=>r.text())
-    .then(xml=>{
-      var parser=new DOMParser();
-      var doc=parser.parseFromString(xml,'text/xml');
-      var items=doc.querySelectorAll('item');
-      if(!items.length){$('blogGrid').innerHTML='<div class="blog-error">No posts found yet.</div>';$('blogLoading').style.display='none';return}
+  fetch('https://public-api.wordpress.com/rest/v1.1/sites/rashmi95.wordpress.com/posts/?number=20')
+    .then(r=>r.json())
+    .then(function(data){
+      var posts=data.posts||[];
+      if(!posts.length){$('blogGrid').innerHTML='<div class="blog-error">No posts found yet.</div>';$('blogLoading').style.display='none';return}
       var html='';
-      items.forEach(function(item){
-        var title=item.querySelector('title')?.textContent||'Untitled';
-        var link=item.querySelector('link')?.textContent||'#';
-        var pubDate=item.querySelector('pubDate')?.textContent||'';
-        var desc=item.querySelector('description')?.textContent||'';
-        var tmp=document.createElement('div');tmp.innerHTML=desc;var clean=tmp.textContent||tmp.innerText||'';
+      posts.forEach(function(post){
+        var title=post.title||'Untitled';
+        var link=post.URL||'#';
+        var pubDate=post.date||'';
+        var excerpt=post.excerpt||'';
+        var tmp=document.createElement('div');tmp.innerHTML=excerpt;var clean=tmp.textContent||tmp.innerText||'';
         if(clean.length>180)clean=clean.substring(0,180)+'...';
         var d=new Date(pubDate);var formatted=d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
         html+='<a class="blog-card" href="'+link+'" target="_blank" rel="noopener"><div class="blog-card-title">'+title+'</div><div class="blog-card-date">'+formatted+'</div><div class="blog-card-excerpt">'+clean+'</div><div class="blog-card-arrow">Read on WordPress &rarr;</div></a>';
